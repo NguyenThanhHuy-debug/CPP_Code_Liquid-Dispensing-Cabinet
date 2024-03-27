@@ -19,7 +19,7 @@ bool DangFastPump = false;
 float TocDoTamThoi = TocDoLOW;
 float SoBuocTamThoi = SoBuocLOW;
 
-chuongtrinh_t ChuongTrinh1, ChuongTrinh2, ChuongTrinh3, ChuongTrinh4, ChuongTrinh5, ChuongTrinh6, ChuongTrinh7, ChuongTrinh8, ChuongTrinh9, ChuongTrinh10;
+ChuongTrinh_t ChuongTrinh1, ChuongTrinh2, ChuongTrinh3, ChuongTrinh4, ChuongTrinh5, ChuongTrinh6, ChuongTrinh7, ChuongTrinh8, ChuongTrinh9, ChuongTrinh10;
 
 #define _ON 1                     // ON thiết bị
 #define _OFF 0                    // OFF thiết bị
@@ -64,7 +64,6 @@ void vTaskDWINCode(void* pvParameters)
     _DWIN.LangNgheDWIN();
     _DWIN.ChuyenTrangTheoBamChonCuaUserTrenHMI();
     _DWIN.XuLySetHome();
-    _DWIN.XuLyChonMode();
     _DWIN.XuLyChonChuongTrinhSeChay();
     _DWIN.XuLyThietLapChuongTrinhCheDoMulti();
     _DWIN.XuLyChonViTriPhanPhoi();
@@ -186,6 +185,13 @@ void CapNhatDuLieuLenHMI(void)
   _DWIN.DuLieuBoardGuiLenHMI.DSChuongTrinh = _grbl._DSChuongTrinh;
   _DWIN.DuLieuBoardGuiLenHMI.RTC_ChuoiNgay = _RTC.ChuanHoaChuoiRTC_Ngay();
   _DWIN.DuLieuBoardGuiLenHMI.RTC_ChuoiGio  = _RTC.ChuanHoaChuoiRTC_Gio();
+  _DWIN.DuLieuBoardGuiLenHMI.OngDaPhanPhoi = _grbl.OngDaPhanPhoi;
+  _DWIN.DuLieuBoardGuiLenHMI.KhuVucDangChay = _grbl.KhuVucDangChay;
+  _DWIN.DuLieuBoardGuiLenHMI.RackXHienTai = _grbl.RackXHienTai;
+  _DWIN.DuLieuBoardGuiLenHMI.RackYHienTai = _grbl.RackYHienTai;
+  _DWIN.DuLieuBoardGuiLenHMI.ToaDoXDaChay = _grbl.ToaDoXDaChay;
+  _DWIN.DuLieuBoardGuiLenHMI.ToaDoYDaChay = _grbl.ToaDoYDaChay;
+  _DWIN.DuLieuBoardGuiLenHMI.DaChayXongCacKhuVuc = _grbl.DaChayXongCacKhuVuc;
 
   // if (_DWIN.Mode == _CheDoHoatDongMulti){
 
@@ -255,8 +261,8 @@ void XuLyDuLieuNhanTuHMI(void)
         DangTamDungPhanPhoi = false;
         _grbl.DungPhanPhoi();
       }
-      for (uint8_t i = 0; i < _grbl._DSChuongTrinh.size(); i++)
-        _grbl._DSChuongTrinh[i].ToaDoHienTai = -1;
+      _grbl.OngDaPhanPhoi = -1;
+      _grbl.KhuVucDangChay = -1;
       _grbl.VeViTriHome();
       break;
     case EXITVETRANGCAIDATCHEDOCHUONGTRINH:
@@ -266,11 +272,7 @@ void XuLyDuLieuNhanTuHMI(void)
         DangTamDungPhanPhoi = false;
         _grbl.DungPhanPhoi();
       }
-      for (uint8_t i = 0; i < _grbl._DSChuongTrinh.size(); i++)
-      {
-        _grbl._DSChuongTrinh[i].ToaDoHienTai = -1;
-        _grbl._DSChuongTrinh[i].ThuTuChay = -1;
-      }
+      //TODO reset thứ tự chạy và tọa độ hiện tại
       _grbl.VeViTriHome();
       // _grbl._DSChuongTrinh = DSChuongTrinhLuuTrongEeprom;
       break;
@@ -285,7 +287,7 @@ void XuLyDuLieuNhanTuHMI(void)
     case CAPNHATTHONGSO:            // khi nhấn enter lúc nhập các thông số trong SETUP PROGRAM
       _grbl._DSChuongTrinh = _DWIN._ChuongTrinhEEPROM;
       /* Lưu vào Eeprom */
-      _ThongSoBoard.CaiDatThongSoBoardVaoROM(ChuyenDoiChuongTrinhSangJsonVar(_grbl._DSChuongTrinh));
+      _ThongSoBoard.CaiDatThongSoBoardVaoROM(_ThongSoBoard.ChuyenDoiChuongTrinhSangJsonVar(_grbl._DSChuongTrinh));
       break;
     case BAMNUTDICHUYENXTRU:
       // if (_DWIN.DuLieuBoardGuiLenHMI.ViTriHienTaiX - SoBuocTamThoi < DEFAULT_HOMING_PULLOFF)
@@ -391,17 +393,17 @@ void XuLyDuLieuNhanTuHMI(void)
       break;
     case XACNHAN_A_B_C_H:                               // khi nhấn GET để lưu giá trị A, B, C, H
       _grbl._DSChuongTrinh =_DWIN._ChuongTrinhEEPROM;
-      _ThongSoBoard.CaiDatThongSoBoardVaoROM(ChuyenDoiChuongTrinhSangJsonVar(_grbl._DSChuongTrinh));
+      _ThongSoBoard.CaiDatThongSoBoardVaoROM(_ThongSoBoard.ChuyenDoiChuongTrinhSangJsonVar(_grbl._DSChuongTrinh));
       break;
     case CALIB:                                         // khi nhấn CALIB để thay đổi số vòng bơm
     {
       Serial.printf("actualweight: %g, density: %g, duongkinhong: %g, vitriA: %g\n", _DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy].actualweight, _DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy].density, _DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy].duongkinhong, _grbl.ViTriHienTaiCuaSTEP(MayBom));
-      // chuongtrinh_t* ChuongTrinhDangXuLy = &_DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy];
+      // ChuongTrinh_t* ChuongTrinhDangXuLy = &_DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy];
       // // ChuongTrinhDangXuLy->SoVongDeBom1ml = (double)(_grbl.ViTriHienTaiCuaSTEP(MayBom) * ChuongTrinhDangXuLy->density / ChuongTrinhDangXuLy->actualweight / ChuongTrinhDangXuLy->duongkinhong);
       // ChuongTrinhDangXuLy->TheTichBomDuocKhiQuay1Vong = (float)(ChuongTrinhDangXuLy->actualweight * 1000.0f / (ChuongTrinhDangXuLy->density * ChuongTrinhDangXuLy->duongkinhong * _grbl.ViTriHienTaiCuaSTEP(MayBom)));
       _grbl.Calib(&_DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy]);
       _grbl._DSChuongTrinh = _DWIN._ChuongTrinhEEPROM;
-      _ThongSoBoard.CaiDatThongSoBoardVaoROM(ChuyenDoiChuongTrinhSangJsonVar(_grbl._DSChuongTrinh));
+      _ThongSoBoard.CaiDatThongSoBoardVaoROM(_ThongSoBoard.ChuyenDoiChuongTrinhSangJsonVar(_grbl._DSChuongTrinh));
       _DWIN.DuLieuBoardGuiLenHMI.TrangThaiXacNhanSaveCalib = true;
       #ifdef debug
       // Serial.print("SoVongQuay1ml: ");
@@ -425,11 +427,11 @@ void XuLyDuLieuNhanTuHMI(void)
     }
     case DIRECTION:
     {
-      chuongtrinh_t* ChuongTrinhDangXuLy = &_DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy];
+      ChuongTrinh_t* ChuongTrinhDangXuLy = &_DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy];
       // ChuongTrinhDangXuLy->SoVongDeBom1ml *= -1.0f;
       ChuongTrinhDangXuLy->TheTichBomDuocKhiQuay1Vong *= -1.0f;
       _grbl._DSChuongTrinh = _DWIN._ChuongTrinhEEPROM;
-      _ThongSoBoard.CaiDatThongSoBoardVaoROM(ChuyenDoiChuongTrinhSangJsonVar(_grbl._DSChuongTrinh));
+      _ThongSoBoard.CaiDatThongSoBoardVaoROM(_ThongSoBoard.ChuyenDoiChuongTrinhSangJsonVar(_grbl._DSChuongTrinh));
       #ifdef debug
       Serial.println("DIRECTION");
       // Serial.printf("SoVongDeBom1ml: %g\n", ChuongTrinhDangXuLy->SoVongDeBom1ml);
@@ -439,7 +441,7 @@ void XuLyDuLieuNhanTuHMI(void)
       break;
     case FASTPUMP:
       if (DangFastPump == false){
-        chuongtrinh_t ChuongTrinhDangXuLy = _DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy];
+        ChuongTrinh_t ChuongTrinhDangXuLy = _DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy];
         // if (ChuongTrinhDangXuLy.SoVongDeBom1ml > 0)
         //   WebUI::inputBuffer.push("G91A1000\r");
         // else
@@ -457,8 +459,9 @@ void XuLyDuLieuNhanTuHMI(void)
       break;
     case GOA:
     {
-      chuongtrinh_t ChuongTrinhDangXuLy = _DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy];
-      _grbl.DiChuyenToiViTri(ChuongTrinhDangXuLy.vitriA.X, ChuongTrinhDangXuLy.vitriA.Y, ChuongTrinhDangXuLy.docaoH, ChuongTrinhDangXuLy.tocdoXY);
+      ChuongTrinh_t ChuongTrinhDangXuLy = _DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy];
+      //TODO thêm nút nhấn di chuyển tới A khu vực 1
+      // _grbl.DiChuyenToiViTri(ChuongTrinhDangXuLy.vitriA.X, ChuongTrinhDangXuLy.vitriA.Y, ChuongTrinhDangXuLy.docaoH, ChuongTrinhDangXuLy.tocdoXY);
       #ifdef debug
       Serial.println("Di chuyển tới A");
       #endif
@@ -466,8 +469,9 @@ void XuLyDuLieuNhanTuHMI(void)
     }
     case GOB:
     {
-      chuongtrinh_t ChuongTrinhDangXuLy = _DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy];
-      _grbl.DiChuyenToiViTri(ChuongTrinhDangXuLy.vitriB.X, ChuongTrinhDangXuLy.vitriB.Y, ChuongTrinhDangXuLy.docaoH, ChuongTrinhDangXuLy.tocdoXY);
+      ChuongTrinh_t ChuongTrinhDangXuLy = _DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy];
+      //TODO
+      // _grbl.DiChuyenToiViTri(ChuongTrinhDangXuLy.vitriB.X, ChuongTrinhDangXuLy.vitriB.Y, ChuongTrinhDangXuLy.docaoH, ChuongTrinhDangXuLy.tocdoXY);
       #ifdef debug
       Serial.println("Di chuyển tới B");
       #endif
@@ -475,8 +479,9 @@ void XuLyDuLieuNhanTuHMI(void)
     }
     case GOC:
     {
-      chuongtrinh_t ChuongTrinhDangXuLy = _DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy];
-      _grbl.DiChuyenToiViTri(ChuongTrinhDangXuLy.vitriC.X, ChuongTrinhDangXuLy.vitriC.Y, ChuongTrinhDangXuLy.docaoH, ChuongTrinhDangXuLy.tocdoXY);
+      ChuongTrinh_t ChuongTrinhDangXuLy = _DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy];
+      //TODO
+      // _grbl.DiChuyenToiViTri(ChuongTrinhDangXuLy.vitriC.X, ChuongTrinhDangXuLy.vitriC.Y, ChuongTrinhDangXuLy.docaoH, ChuongTrinhDangXuLy.tocdoXY);
       #ifdef debug
       Serial.println("Di chuyển tới C");
       #endif
@@ -535,18 +540,18 @@ void DWINCapNhatDSChuongTrinhBanDau()
 
 void CapNhatDanhSachChuongTrinhLuuTrongEEPROM()
 {
-  vector<chuongtrinh_t> DSChuongTrinhLuuTrongEeprom;
-  chuongtrinh_t ChuongTrinh1, ChuongTrinh2, ChuongTrinh3, ChuongTrinh4, ChuongTrinh5, ChuongTrinh6, ChuongTrinh7, ChuongTrinh8, ChuongTrinh9, ChuongTrinh10;
-  ChuongTrinh1 = ChuyenDoiJSONVarSangChuongTrinh(_ThongSoBoard.ThongSo["ChuongTrinh1"],0);
-  ChuongTrinh2 = ChuyenDoiJSONVarSangChuongTrinh(_ThongSoBoard.ThongSo["ChuongTrinh2"],0);
-  ChuongTrinh3 = ChuyenDoiJSONVarSangChuongTrinh(_ThongSoBoard.ThongSo["ChuongTrinh3"],0);
-  ChuongTrinh4 = ChuyenDoiJSONVarSangChuongTrinh(_ThongSoBoard.ThongSo["ChuongTrinh4"],0);
-  ChuongTrinh5 = ChuyenDoiJSONVarSangChuongTrinh(_ThongSoBoard.ThongSo["ChuongTrinh5"],0);
-  ChuongTrinh6 = ChuyenDoiJSONVarSangChuongTrinh(_ThongSoBoard.ThongSo["ChuongTrinh6"],0);
-  ChuongTrinh7 = ChuyenDoiJSONVarSangChuongTrinh(_ThongSoBoard.ThongSo["ChuongTrinh7"],0);
-  ChuongTrinh8 = ChuyenDoiJSONVarSangChuongTrinh(_ThongSoBoard.ThongSo["ChuongTrinh8"],0);
-  ChuongTrinh9 = ChuyenDoiJSONVarSangChuongTrinh(_ThongSoBoard.ThongSo["ChuongTrinh9"],0);
-  ChuongTrinh10 = ChuyenDoiJSONVarSangChuongTrinh(_ThongSoBoard.ThongSo["ChuongTrinh10"],0);
+  vector<ChuongTrinh_t> DSChuongTrinhLuuTrongEeprom;
+  ChuongTrinh_t ChuongTrinh1, ChuongTrinh2, ChuongTrinh3, ChuongTrinh4, ChuongTrinh5, ChuongTrinh6, ChuongTrinh7, ChuongTrinh8, ChuongTrinh9, ChuongTrinh10;
+  ChuongTrinh1 = _ThongSoBoard.ChuyenDoiJSONVarSangChuongTrinh(_ThongSoBoard.ThongSo["ChuongTrinh1"],0);
+  ChuongTrinh2 = _ThongSoBoard.ChuyenDoiJSONVarSangChuongTrinh(_ThongSoBoard.ThongSo["ChuongTrinh2"],0);
+  ChuongTrinh3 = _ThongSoBoard.ChuyenDoiJSONVarSangChuongTrinh(_ThongSoBoard.ThongSo["ChuongTrinh3"],0);
+  ChuongTrinh4 = _ThongSoBoard.ChuyenDoiJSONVarSangChuongTrinh(_ThongSoBoard.ThongSo["ChuongTrinh4"],0);
+  ChuongTrinh5 = _ThongSoBoard.ChuyenDoiJSONVarSangChuongTrinh(_ThongSoBoard.ThongSo["ChuongTrinh5"],0);
+  ChuongTrinh6 = _ThongSoBoard.ChuyenDoiJSONVarSangChuongTrinh(_ThongSoBoard.ThongSo["ChuongTrinh6"],0);
+  ChuongTrinh7 = _ThongSoBoard.ChuyenDoiJSONVarSangChuongTrinh(_ThongSoBoard.ThongSo["ChuongTrinh7"],0);
+  ChuongTrinh8 = _ThongSoBoard.ChuyenDoiJSONVarSangChuongTrinh(_ThongSoBoard.ThongSo["ChuongTrinh8"],0);
+  ChuongTrinh9 = _ThongSoBoard.ChuyenDoiJSONVarSangChuongTrinh(_ThongSoBoard.ThongSo["ChuongTrinh9"],0);
+  ChuongTrinh10 = _ThongSoBoard.ChuyenDoiJSONVarSangChuongTrinh(_ThongSoBoard.ThongSo["ChuongTrinh10"],0);
 
   DSChuongTrinhLuuTrongEeprom.push_back(ChuongTrinh1);
   DSChuongTrinhLuuTrongEeprom.push_back(ChuongTrinh2);
@@ -572,74 +577,6 @@ void CapNhatDanhSachChuongTrinhLuuTrongEEPROM()
   _grbl._DSChuongTrinh = DSChuongTrinhLuuTrongEeprom;
 }
 
-JSONVar ChuyenDoiChuongTrinhSangJsonVar(vector<chuongtrinh_t> DsChuongTrinhCanChuyenDoi){
-  JSONVar DsChuongTrinhJsonVar;
-  DsChuongTrinhJsonVar["ID"] = _ThongSoBoard.ID;
-  chuongtrinh_t ChuongTrinh;
-  for (uint8_t i = 0; i < _SoChuongTrinh; i++){
-    ChuongTrinh = DsChuongTrinhCanChuyenDoi[i];
-    DsChuongTrinhJsonVar["ChuongTrinh" + String(i + 1)] =_ThongSoBoard.ChuyenChuongTrinhThanhJsonString(ChuongTrinh);
-  }
-  return DsChuongTrinhJsonVar;
-}
-
-chuongtrinh_t ChuyenDoiJSONVarSangChuongTrinh(JSONVar data,uint8_t idxchuongtrinh)
-{
-  String strdata = (const char *)data;
-  #ifdef debug
-  Serial.print("Data: ");
-  Serial.println(strdata);
-  #endif
-  String str = _ThongSoBoard.TachChuoi(strdata,',',idxchuongtrinh);
-  chuongtrinh_t chuongtrinh;
-  chuongtrinh.tenchuongtrinh = _ThongSoBoard.TachChuoi(str,'&',0);
-  chuongtrinh.tenchuongtrinh = _ThongSoBoard.TachChuoi(chuongtrinh.tenchuongtrinh,'\r',0);
-
-  chuongtrinh.thetich = _ThongSoBoard.TachChuoi(str,'&',1).toFloat();
-  chuongtrinh.duongkinhong =  _ThongSoBoard.TachChuoi(str,'&',2).toFloat();
-  chuongtrinh.tocdobom = _ThongSoBoard.TachChuoi(str,'&',3).toInt();
-  chuongtrinh.tocdoXY = _ThongSoBoard.TachChuoi(str,'&',4).toInt();
-  chuongtrinh.chongnhogiot = _ThongSoBoard.TachChuoi(str,'&',5).toInt();
-  chuongtrinh.rackX = _ThongSoBoard.TachChuoi(str,'&',6).toInt();
-  chuongtrinh.rackY = _ThongSoBoard.TachChuoi(str,'&',7).toInt();
-
-  String strViTri = _ThongSoBoard.TachChuoi(str,'&',8);
-  chuongtrinh.vitriA.X = _ThongSoBoard.TachChuoi(strViTri,'%',0).toFloat();
-  chuongtrinh.vitriA.Y = _ThongSoBoard.TachChuoi(strViTri,'%',1).toFloat();
-
-  strViTri = _ThongSoBoard.TachChuoi(str,'&',9);
-  chuongtrinh.vitriB.X =  _ThongSoBoard.TachChuoi(strViTri,'%',0).toFloat();
-  chuongtrinh.vitriB.Y = _ThongSoBoard.TachChuoi(strViTri,'%',1).toFloat();
-
-  strViTri = _ThongSoBoard.TachChuoi(str,'&',10);
-  chuongtrinh.vitriC.X =  _ThongSoBoard.TachChuoi(strViTri,'%',0).toFloat();
-  chuongtrinh.vitriC.Y = _ThongSoBoard.TachChuoi(strViTri,'%',1).toFloat();
-
-  chuongtrinh.docaoH = _ThongSoBoard.TachChuoi(str,'&',11).toFloat();
-  // chuongtrinh.SoVongDeBom1ml = _ThongSoBoard.TachChuoi(str,'&',12).toFloat();
-  chuongtrinh.TheTichBomDuocKhiQuay1Vong = _ThongSoBoard.TachChuoi(str,'&',12).toFloat();
-
-#ifdef debug
-  Serial.println(chuongtrinh.tenchuongtrinh);
-  Serial.println(chuongtrinh.thetich);
-  Serial.println(chuongtrinh.duongkinhong);
-  Serial.println(chuongtrinh.tocdobom);
-  Serial.println(chuongtrinh.tocdoXY);
-  Serial.println(chuongtrinh.chongnhogiot);
-  Serial.println(chuongtrinh.rackX);
-  Serial.println(chuongtrinh.rackY);
-  Serial.println(chuongtrinh.vitriA.X);
-  Serial.println(chuongtrinh.vitriA.Y);
-  Serial.println(chuongtrinh.vitriB.X);
-  Serial.println(chuongtrinh.vitriB.Y);
-  Serial.println(chuongtrinh.vitriC.X);
-  Serial.println(chuongtrinh.vitriC.Y);
-  Serial.println(chuongtrinh.docaoH);
-  // Serial.println(chuongtrinh.SoVongDeBom1ml);
-  Serial.println(chuongtrinh.TheTichBomDuocKhiQuay1Vong);
-#endif
-  return chuongtrinh;
-}
 
 void CaiDatNguon(void)
 {

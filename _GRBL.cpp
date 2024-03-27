@@ -19,10 +19,7 @@ bool _GRBL::VeViTriHome()
   }
   return true;
 }
-void _GRBL::LayChuongTrinhTuEEPROM()
-{
-  //* Cập nhật danh sách chương trình
-}
+
 //* Hàm này sẽ khởi tạo các tọa độ sẽ đi qua tùy vào người dùng bấm chọn và sẽ lưu tọa độ vào 1 vector
 //* Sau đó sẽ sử dụng vector đó và được sắp xếp dựa vào thuật toán tìm đường ngắn nhất
 double KhoangCachGiua2Diem(const toadoINT_t& Diem1, const toadoINT_t& Diem2) {
@@ -30,35 +27,6 @@ double KhoangCachGiua2Diem(const toadoINT_t& Diem1, const toadoINT_t& Diem2) {
   double dy = Diem1.Y - Diem2.Y;
   return sqrt(dx * dx + dy * dy);
 }
-// vector<uint8_t> ThuatToanTimDuongDiNganNhat(const vector<toadoINT_t>& DanhSachToaDo) {
-//   int SoLuongToaDo = DanhSachToaDo.size();
-//   vector<bool> visited(SoLuongToaDo, false);
-//   vector<uint8_t> route;
-//   route.push_back(0);  // Bắt đầu từ điểm (0,0)
-//   visited[0] = true;
-
-//   for (int i = 1; i < SoLuongToaDo; i++) {
-//     double minDistance = numeric_limits<double>::max();
-//     int nearestNeighbor = -1;
-
-//     for (int j = 0; j < SoLuongToaDo; j++) {
-//       if (!visited[j]) {
-//         double distance = KhoangCachGiua2Diem(DanhSachToaDo[route.back()], DanhSachToaDo[j]);
-//         if (distance < minDistance) {
-//           minDistance = distance;
-//           nearestNeighbor = j;
-//         }
-//       }
-//     }
-
-//     if (nearestNeighbor != -1) {
-//       route.push_back(nearestNeighbor);
-//       visited[nearestNeighbor] = true;
-//     }
-//   }
-
-//   return route;
-// }
 
 vector<uint8_t> ThuatToanTimDuongDiNganNhat(const vector<toadoINT_t>& DanhSachToaDo) {
   int SoLuongToaDo = DanhSachToaDo.size();
@@ -137,9 +105,6 @@ void _GRBL::BatDauPhanPhoi()
   char* SoVongDeBomDungTheTich;
   char* ChongNhoGiot;
 
-  float SoVongCanBom;
-  float SoVongDeChongNhoGiot;
-
 #ifdef debug_grbl
   for (uint8_t i = 0; i < _DSChuongTrinh.size(); i++){
     Serial.printf("Chuongtrinh: %s, ToaDoHienTai: %d\n", _DSChuongTrinh[i].tenchuongtrinh.c_str(), _DSChuongTrinh[i].ToaDoHienTai);
@@ -161,19 +126,24 @@ void _GRBL::BatDauPhanPhoi()
   }
 
 #endif
-
+  DaChayXongCacKhuVuc = false;
   // Sắp xếp thứ tự chạy của các chương trình được chọn dựa vào TrangThaiChuongTrinh và ThuTuChuongTrinhCanChay
-  int8_t ThuTuChuongTrinhCanChay[SoLuongChuongTrinhChayToiDa];
+  int8_t ThuTuChuongTrinhCanChay[SoLuongKhuVucToiDa];
   memset(ThuTuChuongTrinhCanChay, -1, sizeof(ThuTuChuongTrinhCanChay));
+
+  vector<ChuongTrinh_t> DsChuongTrinhCanChay;
 
   for (uint8_t i = 0; i < _DSChuongTrinh.size(); i++)
   {
-    Serial.printf("ChuongTrinh: %s, TrangThai: %d, ThuTu: %d, Size: %d\n", _DSChuongTrinh[i].tenchuongtrinh.c_str(), _DSChuongTrinh[i].TrangThaiChuongTrinh, _DSChuongTrinh[i].ThuTuChay,  _DSChuongTrinh[i].DanhSachToaDo.size());
-
-    if (_DSChuongTrinh[i].TrangThaiChuongTrinh == DuocChon)
+    if (_DSChuongTrinh[i].KhuVucChay.size() > 0)
     {
-      ThuTuChuongTrinhCanChay[_DSChuongTrinh[i].ThuTuChay] = i;
+      sort(_DSChuongTrinh[i].KhuVucChay.begin(), _DSChuongTrinh[i].KhuVucChay.end()); //TODO bỏ nếu không thật sự cần
+      for (auto j : _DSChuongTrinh[i].KhuVucChay)
+      {
+        ThuTuChuongTrinhCanChay[j] = i;
+      }
     }
+    
   }
 
   for (auto i : ThuTuChuongTrinhCanChay)
@@ -187,7 +157,6 @@ void _GRBL::BatDauPhanPhoi()
     int8_t IdxChuongTrinh = ThuTuChuongTrinhCanChay[i];
     if (IdxChuongTrinh == -1) continue;
     //* Nếu chương trình không được chọn hoặc không có ống cần phân phối thì bỏ qua
-    if ((_DSChuongTrinh[IdxChuongTrinh].TrangThaiChuongTrinh == KhongDuocChon) || (_DSChuongTrinh[IdxChuongTrinh].DanhSachToaDo.size() == 0)) continue;
     #ifdef debug_grbl
     for (uint8_t ToaDo = 0; ToaDo < _DSChuongTrinh[IdxChuongTrinh].DanhSachToaDo.size();ToaDo++)
     {
@@ -195,23 +164,33 @@ void _GRBL::BatDauPhanPhoi()
     }
     #endif
 
-    TinhKhoangCachGiuaHaiOng(_DSChuongTrinh[IdxChuongTrinh]);
+    TinhKhoangCachGiuaHaiOng(_DSChuongTrinh[IdxChuongTrinh], i);
     //* Sắp xếp lại thứ tự di chuyển của các ống cần phân phối
-    SapXepThuTuOng(_DSChuongTrinh[IdxChuongTrinh].DanhSachToaDo);
+    SapXepThuTuOng(_DSChuongTrinh[IdxChuongTrinh].DSToaDo[i]);
 
     // SoVongDeChongNhoGiot = (signbit(_DSChuongTrinh[i].SoVongDeBom1ml) ? 1 : -1) * (_DSChuongTrinh[i].chongnhogiot / 360.0); //* đảm bảo chiều chống nhỏ giọt luôn ngược với chiều bơm
-    SoVongDeChongNhoGiot = (signbit(_DSChuongTrinh[IdxChuongTrinh].TheTichBomDuocKhiQuay1Vong) ? 1 : -1) * (_DSChuongTrinh[IdxChuongTrinh].chongnhogiot / 360.0); //* đảm bảo chiều chống nhỏ giọt luôn ngược với chiều bơm
+    float SoVongDeChongNhoGiot = (signbit(_DSChuongTrinh[IdxChuongTrinh].TheTichBomDuocKhiQuay1Vong) ? 1 : -1) * (_DSChuongTrinh[IdxChuongTrinh].chongnhogiot / 360.0); //* đảm bảo chiều chống nhỏ giọt luôn ngược với chiều bơm
+    
 
     // SoVongCanBom = _DSChuongTrinh[i].SoVongDeBom1ml * _DSChuongTrinh[i].thetich * 1000 * _DSChuongTrinh[i].duongkinhong;
-    SoVongCanBom = (_DSChuongTrinh[IdxChuongTrinh].thetich * 1000 / (_DSChuongTrinh[IdxChuongTrinh].TheTichBomDuocKhiQuay1Vong * _DSChuongTrinh[IdxChuongTrinh].duongkinhong)) ;
+    float SoVongCanBom = (_DSChuongTrinh[IdxChuongTrinh].thetich * 1000 / (_DSChuongTrinh[IdxChuongTrinh].TheTichBomDuocKhiQuay1Vong * _DSChuongTrinh[IdxChuongTrinh].duongkinhong)) ;
 
-    for (uint8_t ToaDoHienTai = 0; ToaDoHienTai < _DSChuongTrinh[IdxChuongTrinh].DanhSachToaDo.size(); ToaDoHienTai++)
+    vector<toadoINT_t> DSToaDoCanChay = _DSChuongTrinh[IdxChuongTrinh].DSToaDo[i];
+    toado_t ViTriACanChay = _DSChuongTrinh[IdxChuongTrinh].ViTriA[i];
+    toado_t ViTriBCanChay = _DSChuongTrinh[IdxChuongTrinh].ViTriB[i];
+    toado_t ViTriCCanChay = _DSChuongTrinh[IdxChuongTrinh].ViTriC[i];
+    float ViTriHCanChay = _DSChuongTrinh[IdxChuongTrinh].ViTriH[i];
+
+    RackXHienTai = _DSChuongTrinh[IdxChuongTrinh].rackX;
+    RackYHienTai = _DSChuongTrinh[IdxChuongTrinh].rackY;
+    KhuVucDangChay = i;
+
+    for (uint8_t ToaDoHienTai = 0; ToaDoHienTai < DSToaDoCanChay.size(); ToaDoHienTai++)
     {
       //* Di chuyển đến vị trí X Y Z
-      asprintf(&ViTri, "G1G90X%gY%gZ%gF%d\r", _DSChuongTrinh[IdxChuongTrinh].vitriA.X + _DSChuongTrinh[IdxChuongTrinh].DanhSachToaDo[ToaDoHienTai].X * _KhoangCachGiuaHaiOng.X,
-        _DSChuongTrinh[IdxChuongTrinh].vitriA.Y + _DSChuongTrinh[IdxChuongTrinh].DanhSachToaDo[ToaDoHienTai].Y * _KhoangCachGiuaHaiOng.Y,
-        _DSChuongTrinh[IdxChuongTrinh].docaoH,
-        _DSChuongTrinh[IdxChuongTrinh].tocdoXY); //thêm F để đặt tôc độ trục XY
+      asprintf(&ViTri, "G1G90X%gY%gZ%gF%d\r", ViTriACanChay.X + DSToaDoCanChay[ToaDoHienTai].X * _KhoangCachGiuaHaiOng.X,
+                                              ViTriACanChay.Y + DSToaDoCanChay[ToaDoHienTai].Y * _KhoangCachGiuaHaiOng.Y, ViTriHCanChay, 
+                                              _DSChuongTrinh[IdxChuongTrinh].tocdoXY); //thêm F để đặt tôc độ trục XY
       WebUI::inputBuffer.push(ViTri);
       #ifdef debug_grbl
       Serial.printf("X: %g Y: %g Z: %g\n", _DSChuongTrinh[IdxChuongTrinh].vitriA.X + _DSChuongTrinh[IdxChuongTrinh].DanhSachToaDo[ToaDoHienTai].X * _KhoangCachGiuaHaiOng.X,
@@ -226,53 +205,35 @@ void _GRBL::BatDauPhanPhoi()
       WebUI::inputBuffer.push(SoVongDeBomDungTheTich);
       free(SoVongDeBomDungTheTich);
 
+      asprintf(&ChongNhoGiot, "G1G91A%gF%d\r", SoVongDeChongNhoGiot, _DSChuongTrinh[IdxChuongTrinh].tocdobom);
+      WebUI::inputBuffer.push(ChongNhoGiot);
+      free(ChongNhoGiot);
       //* phải delay để grbl xử lý xong lệnh
       delay(100);
-      //* Chờ đến khi máy bơm quay được đúng bằng số vòng cần để bơm đúng thể tích */
-      //* Hoặc khi máy bị mất điện => ALARM
-      while ((sys.state == State::Cycle) || (sys.state == State::Hold)) {
+
+      while ((sys.state == State::Cycle) || (sys.state == State::Hold) || (sys.state == State::Homing)) {
+
         if (CoBaoDungPhanPhoi == true) {
           return;
         }
         delay(1);
       }
 
-      //Kiểm tra xem góc chống nhỏ giọt có khác 0
-      if (_DSChuongTrinh[IdxChuongTrinh].chongnhogiot == 0) continue;
-
-      //* Chống nhỏ giọt
-      //* Hiện tại đã bơm xong, cần quay ngược lại để chống nhỏ giọt
-      if (sys.state != State::Alarm) {
-        //* 1 bước của bơm hiện tại là 6400 xung => 1 vòng
-        //* đơn vị của chống nhỏ giọt là độ => 1 / 360 (vòng)
-        //*dùng A- do đây là quay ngược lại và trước đó đã reset lại vị trí máy bơm
-        // float SoVongDeChongNhoGiot = -(_DSChuongTrinh[i].chongnhogiot / 360.0);
-        asprintf(&ChongNhoGiot, "G1G91A%gF%d\r", SoVongDeChongNhoGiot, _DSChuongTrinh[IdxChuongTrinh].tocdobom);
-        WebUI::inputBuffer.push(ChongNhoGiot);
-        free(ChongNhoGiot);
-        //* phải delay để grbl xử lý xong lệnh
-        delay(100);
-        //* Chờ đến khi máy bơm chống nhỏ giọt xong
-        while ((sys.state == State::Cycle) || (sys.state == State::Hold)) {
-          if (CoBaoDungPhanPhoi == true) {
-            return;
-          }
-          delay(1);
-        }
-
-        if (sys.state != State::Alarm) {
-          _DSChuongTrinh[IdxChuongTrinh].ToaDoHienTai = ToaDoHienTai;
-        }
-        else {
-          break;
-        }
+      if (sys.state != State::Alarm) 
+      {
+        KhuVucDangChay = i;
+        OngDaPhanPhoi = ToaDoHienTai;
+        ToaDoXDaChay = DSToaDoCanChay[ToaDoHienTai].X;
+        ToaDoYDaChay = DSToaDoCanChay[ToaDoHienTai].Y;
       }
-      else {
+      else 
+      {
         break;
       }
     }
   }
-  VeViTriHome();
+  DaChayXongCacKhuVuc = true;
+  // VeViTriHome();
 }
 //* Trả về vị trí hiện tại của STEP
 float _GRBL::ViTriHienTaiCuaSTEP(uint8_t STEP) {
@@ -305,7 +266,7 @@ void _GRBL::DungPhanPhoi(void) {
   delay(100);
 }
 
-void _GRBL::BatDauCalib(chuongtrinh_t& ChuongTrinh) {
+void _GRBL::BatDauCalib(ChuongTrinh_t& ChuongTrinh) {
   sys_position[MayBom] = 0;
 
   char* ViTri;
@@ -316,11 +277,11 @@ void _GRBL::BatDauCalib(chuongtrinh_t& ChuongTrinh) {
   //TODO: Bắt đầu đếm thời gian
 }
 
-void _GRBL::DungCalib(chuongtrinh_t& ChuongTrinh) {
+void _GRBL::DungCalib(ChuongTrinh_t& ChuongTrinh) {
   TamDungChay();
 }
 
-// void _GRBL::LuuCalib(chuongtrinh_t& ChuongTrinh) {
+// void _GRBL::LuuCalib(ChuongTrinh_t& ChuongTrinh) {
 //   float SoVongDaQuayCuaMayBom = ViTriHienTaiCuaSTEP(MayBom);
 //   float TheTichThuc = _KhoiLuongThuc / _KhoiLuongRieng;
 //   _SoVongDeBomDungTheTich = ChuongTrinh.thetich * SoVongDaQuayCuaMayBom / TheTichThuc;
@@ -420,30 +381,8 @@ void _GRBL::KhoiTaoGRBL(void) {
     &_PhanPhoiTaskHandle);
 }
 
-//* Các hàm lấy vị trí của A, B, C, H
-//* Tương ứng Get A, Get B, Get C, Get H trên HMI
-//* Do không truyền được _ChuongTrinhHienTaiGRBL vào hàm ở file .ino nên tạo thêm các hàm dùng chương trình mặc định là _ChuongTrinhHienTaiGRBL
-void _GRBL::LayViTriA(chuongtrinh_t& ChuongTrinh) {
-  ChuongTrinh.vitriA.X = ViTriHienTaiCuaSTEP(TrucX);
-  ChuongTrinh.vitriA.Y = ViTriHienTaiCuaSTEP(TrucY);
-}
-
-void _GRBL::LayViTriB(chuongtrinh_t& ChuongTrinh) {
-  ChuongTrinh.vitriB.X = ViTriHienTaiCuaSTEP(TrucX);
-  ChuongTrinh.vitriB.Y = ViTriHienTaiCuaSTEP(TrucY);
-}
-
-void _GRBL::LayViTriC(chuongtrinh_t& ChuongTrinh) {
-  ChuongTrinh.vitriC.X = ViTriHienTaiCuaSTEP(TrucX);
-  ChuongTrinh.vitriC.Y = ViTriHienTaiCuaSTEP(TrucY);
-}
-
-void _GRBL::LayDoCaoH(chuongtrinh_t& ChuongTrinh) {
-  ChuongTrinh.docaoH = ViTriHienTaiCuaSTEP(TrucZ);
-}
-
 //* Hàm tính khoảng cách giữa 2 ống theo X, Y dựa vào vị trí A, B, C của chương trình
-void _GRBL::TinhKhoangCachGiuaHaiOng(chuongtrinh_t& ChuongTrinh) {
+void _GRBL::TinhKhoangCachGiuaHaiOng(ChuongTrinh_t ChuongTrinh, uint8_t KhuVuc) {
 
   if (ChuongTrinh.rackX == 1)
   {
@@ -451,7 +390,7 @@ void _GRBL::TinhKhoangCachGiuaHaiOng(chuongtrinh_t& ChuongTrinh) {
   }
   else
   {
-  _KhoangCachGiuaHaiOng.X = (ChuongTrinh.vitriC.X - ChuongTrinh.vitriA.X) / (float)(ChuongTrinh.rackX - 1);
+  _KhoangCachGiuaHaiOng.X = (ChuongTrinh.ViTriC[KhuVuc].X - ChuongTrinh.ViTriA[KhuVuc].X) / (float)(ChuongTrinh.rackX - 1);
   }
 
   if (ChuongTrinh.rackY == 1)
@@ -460,47 +399,13 @@ void _GRBL::TinhKhoangCachGiuaHaiOng(chuongtrinh_t& ChuongTrinh) {
   }
   else
   {
-  _KhoangCachGiuaHaiOng.Y = (ChuongTrinh.vitriC.Y - ChuongTrinh.vitriA.Y) / (float)(ChuongTrinh.rackY - 1);
+  _KhoangCachGiuaHaiOng.Y = (ChuongTrinh.ViTriC[KhuVuc].Y - ChuongTrinh.ViTriA[KhuVuc].Y) / (float)(ChuongTrinh.rackY - 1);
   }
 
   #ifdef debug_grbl
   Serial.printf("Khoang cach giua hai ong: %g %g\n", _KhoangCachGiuaHaiOng.X, _KhoangCachGiuaHaiOng.Y);
   #endif
 }
-
-//* Các hàm cài đặt các thông số của chương trình
-//* Tốc độ trục XY, RackX, RackY, Tốc độ bơm, Góc chống nhỏ giọt
-
-//* Tốc độ XY
-void _GRBL::CaiDatTocDoTrucXY(chuongtrinh_t& ChuongTrinh, uint16_t TocDo) {
-  ChuongTrinh.tocdoXY = TocDo;
-}
-
-//* Rack X
-void _GRBL::CaiDatSoOngTrenMotHang(chuongtrinh_t& ChuongTrinh, uint8_t SoOngTrenMotHang) {
-  ChuongTrinh.rackX = SoOngTrenMotHang;
-}
-
-//* Rack Y
-void _GRBL::CaiDatSoOngTrenMotCot(chuongtrinh_t& ChuongTrinh, uint8_t SoOngTrenMotCot) {
-  ChuongTrinh.rackY = SoOngTrenMotCot;
-}
-
-//* Thể tích ống
-void _GRBL::CaiDatTheTichOng(chuongtrinh_t& ChuongTrinh, float TheTichOng) {
-  ChuongTrinh.thetich = TheTichOng;
-}
-
-//* Tốc độ bơm
-void _GRBL::CaiDatTocDoBom(chuongtrinh_t& ChuongTrinh, uint16_t TocDoBom) {
-  ChuongTrinh.tocdobom = TocDoBom;
-}
-
-//* Góc chống nhỏ giọt
-void _GRBL::CaiDatGocChongNhoGiot(chuongtrinh_t& ChuongTrinh, float GocChongNhoGiot) {
-  ChuongTrinh.chongnhogiot = GocChongNhoGiot;
-}
-
 //* Hàm gọi task Phân phối
 void _GRBL::PhanPhoi(void) {
   xTaskNotifyGive(_PhanPhoiTaskHandle);
@@ -520,12 +425,12 @@ void _GRBL::DiChuyenToiViTri(float X, float Y, float Z, uint16_t TocDo) {
   free(ViTri);
 }
 
-void _GRBL::Calib(chuongtrinh_t * ChuongTrinh)
+void _GRBL::Calib(ChuongTrinh_t * ChuongTrinh)
 {
   ChuongTrinh->TheTichBomDuocKhiQuay1Vong = ChuongTrinh->TheTichBomDuocKhiQuay1Vong = (float)(ChuongTrinh->actualweight * 1000.0f / (ChuongTrinh->density * ChuongTrinh->duongkinhong * ViTriHienTaiCuaSTEP(MayBom)));
 }
 
-void _GRBL::TestFill(chuongtrinh_t ChuongTrinh)
+void _GRBL::TestFill(ChuongTrinh_t ChuongTrinh)
 {
   if (sys.state == State::Idle)
   {

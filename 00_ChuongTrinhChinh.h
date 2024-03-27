@@ -21,8 +21,6 @@ void CapNhatDuLieuLenHMI(void);
 void XuLyDuLieuNhanTuHMI(void);
 void DWINCapNhatDSChuongTrinhBanDau();
 void CapNhatDanhSachChuongTrinhLuuTrongEEPROM();
-JSONVar ChuyenDoiChuongTrinhSangJsonVar(vector<chuongtrinh_t> DsChuongTrinhCanChuyenDoi);
-chuongtrinh_t ChuyenDoiJSONVarSangChuongTrinh(JSONVar data,uint8_t idxchuongtrinh);
 
 void CaiDatNguon(void);
 void KiemTraNguon(void);

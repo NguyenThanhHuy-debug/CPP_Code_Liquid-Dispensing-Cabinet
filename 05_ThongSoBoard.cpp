@@ -106,7 +106,7 @@ Thông số chương trình:"Program 1&5.0&3&100&1&90&12&8&21.0;-21.0&21.0;-181.
 void ThongSoBoard::ThietLapThongSoBoardMacDinh(void) {
   this->ThongSo["ID"] = this->ID;
 
-  chuongtrinh_t ChuongTrinhGoc;
+  ChuongTrinh_t ChuongTrinhGoc;
   for (uint8_t i = 0; i < _SoChuongTrinh; i++){
     // ChuongTrinhGoc.tenchuongtrinh = "Program " + String(i + 1);
     ChuongTrinhGoc.tenchuongtrinh = "Program " + String(i + 1);
@@ -220,17 +220,110 @@ void ThongSoBoard::XoaEEPROM(int start, int end) {
   // delay(500);
 }
 
-String ThongSoBoard::ChuyenChuongTrinhThanhJsonString(chuongtrinh_t ChuongTrinh){
+// tên CT & thể tích & đường kính & tốc độ bơm & tốc độ XY & antidrop & rackx & racky & A1.X % A1.Y & B1.X % B1.Y & C1.X % C1.Y & H1 & A2.X % A2.Y & B2.X % B2.Y & C2.X % C2.Y & H2 & TheTichBomDuocKhiQuay1Vong
+
+String ThongSoBoard::ChuyenChuongTrinhThanhJsonString(ChuongTrinh_t ChuongTrinh){
   String strChuongTrinh = "";
   char *ThongSoChuongTrinh;
   asprintf(&ThongSoChuongTrinh, "%s&%07.3f&%07.3f&%05d&%05d&%07.3f&%02d&%02d&%07.3f%%%07.3f&%07.3f%%%07.3f&%07.3f%%%07.3f&%07.3f&%07.3f&", 
           DienVaoChoTrong(ChuongTrinh.tenchuongtrinh).c_str(), ChuongTrinh.thetich, ChuongTrinh.duongkinhong, ChuongTrinh.tocdobom, 
-          ChuongTrinh.tocdoXY, ChuongTrinh.chongnhogiot, ChuongTrinh.rackX, ChuongTrinh.rackY, ChuongTrinh.vitriA.X, 
-          ChuongTrinh.vitriA.Y, ChuongTrinh.vitriB.X, ChuongTrinh.vitriB.Y, ChuongTrinh.vitriC.X, ChuongTrinh.vitriC.Y, ChuongTrinh.docaoH, 
-          /* ChuongTrinh.SoVongDeBom1ml */ ChuongTrinh.TheTichBomDuocKhiQuay1Vong);
+          ChuongTrinh.tocdoXY, ChuongTrinh.chongnhogiot, ChuongTrinh.rackX, ChuongTrinh.rackY, ChuongTrinh.ViTriA[0].X, ChuongTrinh.ViTriA[0].Y, ChuongTrinh.ViTriB[0].X, ChuongTrinh.ViTriB[0].Y, ChuongTrinh.ViTriC[0].X, ChuongTrinh.ViTriC[0].Y, ChuongTrinh.ViTriH[0],
+          ChuongTrinh.ViTriA[1].X, ChuongTrinh.ViTriA[1].Y, ChuongTrinh.ViTriB[1].X, ChuongTrinh.ViTriB[1].Y, ChuongTrinh.ViTriC[1].X, ChuongTrinh.ViTriC[1].Y, ChuongTrinh.ViTriH[1],
+          ChuongTrinh.TheTichBomDuocKhiQuay1Vong);
   strChuongTrinh = String(ThongSoChuongTrinh);
   free(ThongSoChuongTrinh);
   return strChuongTrinh;
+}
+
+ChuongTrinh_t ThongSoBoard::ChuyenDoiJSONVarSangChuongTrinh(JSONVar data,uint8_t idxchuongtrinh)
+{
+  String strdata = (const char *)data;
+  #ifdef debug
+  Serial.print("Data: ");
+  Serial.println(strdata);
+  #endif
+  String str = TachChuoi(strdata,',',idxchuongtrinh);
+  ChuongTrinh_t chuongtrinh;
+  chuongtrinh.tenchuongtrinh = TachChuoi(str,'&',0);
+  chuongtrinh.tenchuongtrinh = TachChuoi(chuongtrinh.tenchuongtrinh,'\r',0);
+
+  chuongtrinh.thetich = TachChuoi(str,'&',1).toFloat();
+  chuongtrinh.duongkinhong =  TachChuoi(str,'&',2).toFloat();
+  chuongtrinh.tocdobom = TachChuoi(str,'&',3).toInt();
+  chuongtrinh.tocdoXY = TachChuoi(str,'&',4).toInt();
+  chuongtrinh.chongnhogiot = TachChuoi(str,'&',5).toInt();
+  chuongtrinh.rackX = TachChuoi(str,'&',6).toInt();
+  chuongtrinh.rackY = TachChuoi(str,'&',7).toInt();
+
+  String strViTri = TachChuoi(str,'&',8);
+  chuongtrinh.ViTriA[0].X = TachChuoi(strViTri,'%',0).toFloat();
+  chuongtrinh.ViTriA[0].Y = TachChuoi(strViTri,'%',1).toFloat();
+
+
+  strViTri = TachChuoi(str,'&',9);
+  chuongtrinh.ViTriB[0].X =  TachChuoi(strViTri,'%',0).toFloat();
+  chuongtrinh.ViTriB[0].Y = TachChuoi(strViTri,'%',1).toFloat();
+
+
+  strViTri = TachChuoi(str,'&',10);
+  chuongtrinh.ViTriC[0].X =  TachChuoi(strViTri,'%',0).toFloat();
+  chuongtrinh.ViTriC[0].Y = TachChuoi(strViTri,'%',1).toFloat();
+
+  chuongtrinh.ViTriH[0] = TachChuoi(str,'&',11).toFloat();
+
+  strViTri = TachChuoi(str,'&',12);
+  chuongtrinh.ViTriA[1].X = TachChuoi(strViTri,'%',0).toFloat();
+  chuongtrinh.ViTriA[1].Y = TachChuoi(strViTri,'%',1).toFloat();
+
+  strViTri = TachChuoi(str,'&',13);
+  chuongtrinh.ViTriB[1].X =  TachChuoi(strViTri,'%',0).toFloat();
+  chuongtrinh.ViTriB[1].Y = TachChuoi(strViTri,'%',1).toFloat();
+
+  strViTri = TachChuoi(str,'&',14);
+  chuongtrinh.ViTriC[1].X =  TachChuoi(strViTri,'%',0).toFloat();
+  chuongtrinh.ViTriC[1].Y = TachChuoi(strViTri,'%',1).toFloat();
+
+  chuongtrinh.ViTriH[1] = TachChuoi(str,'&',15).toFloat();
+
+  chuongtrinh.TheTichBomDuocKhiQuay1Vong = TachChuoi(str,'&',16).toFloat();
+
+#ifdef debug
+  Serial.println(chuongtrinh.tenchuongtrinh);
+  Serial.println(chuongtrinh.thetich);
+  Serial.println(chuongtrinh.duongkinhong);
+  Serial.println(chuongtrinh.tocdobom);
+  Serial.println(chuongtrinh.tocdoXY);
+  Serial.println(chuongtrinh.chongnhogiot);
+  Serial.println(chuongtrinh.rackX);
+  Serial.println(chuongtrinh.rackY);
+  Serial.println(chuongtrinh.ViTriA[0].X);
+  Serial.println(chuongtrinh.ViTriA[0].Y);
+  Serial.println(chuongtrinh.ViTriB[0].X);
+  Serial.println(chuongtrinh.ViTriB[0].Y);
+  Serial.println(chuongtrinh.ViTriC[0].X);
+  Serial.println(chuongtrinh.ViTriC[0].Y);
+  Serial.println(chuongtrinh.ViTriH[0]);
+  Serial.println(chuongtrinh.ViTriA[1].X);
+  Serial.println(chuongtrinh.ViTriA[1].Y);
+  Serial.println(chuongtrinh.ViTriB[1].X);
+  Serial.println(chuongtrinh.ViTriB[1].Y);
+  Serial.println(chuongtrinh.ViTriC[1].X);
+  Serial.println(chuongtrinh.ViTriC[1].Y);
+  Serial.println(chuongtrinh.ViTriH[1]);
+  Serial.println(chuongtrinh.TheTichBomDuocKhiQuay1Vong);
+#endif
+  return chuongtrinh;
+}
+
+JSONVar ThongSoBoard::ChuyenDoiChuongTrinhSangJsonVar(vector<ChuongTrinh_t> DsChuongTrinhCanChuyenDoi){
+  JSONVar DsChuongTrinhJsonVar;
+  DsChuongTrinhJsonVar["ID"] = ID;
+  ChuongTrinh_t ChuongTrinh;
+  for (uint8_t i = 0; i < _SoChuongTrinh; i++){
+    ChuongTrinh = DsChuongTrinhCanChuyenDoi[i];
+    DsChuongTrinhJsonVar["ChuongTrinh" + String(i + 1)] = ChuyenChuongTrinhThanhJsonString(ChuongTrinh);
+  }
+  return DsChuongTrinhJsonVar;
 }
 
 String ThongSoBoard::DienVaoChoTrong(String Chuoi, size_t DoDaiChuoi, char KyTuCanDien){

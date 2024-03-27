@@ -50,26 +50,17 @@
 
 #define KhoangCachGiua2Khay 85U
 
-#define BuachieuDaiXChonToaDo 650U
-#define BuachieuDaiYChonToaDo 350U
+#define BuachieuDaiXChonToaDo 760U
+#define BuachieuDaiYChonToaDo 170U
 
-#define ToaDoXIconHinhTronDauTienKhayChon 850U
-#define ToaDoYIconHinhTronDauTienKhayChon 125U
+#define ToaDoXIconHinhTronDauTienKhayChon 740U
+#define ToaDoYIconHinhTronDauTienKhayChon 50U
 
 #define ToaDoXIconHinhTronDauTienKhay1 35U
 #define ToaDoYIconHinhTronDauTienKhay1 120U
 
 #define ToaDoXIconHinhTronDauTienKhay2 405U
 #define ToaDoYIconHinhTronDauTienKhay2 120U
-
-#define ToaDoXIconHinhTronDauTienKhay3 775U
-#define ToaDoYIconHinhTronDauTienKhay3 120U
-
-#define ToaDoXIconHinhTronDauTienKhay4 1145U
-#define ToaDoYIconHinhTronDauTienKhay4 120U
-
-#define ToaDoXIconHinhTronDauTienKhay5 1515U
-#define ToaDoYIconHinhTronDauTienKhay5 120U
 
 #define ToaDoX0Khay1 30U
 #define ToaDoY0Khay 105U
@@ -115,9 +106,6 @@
 
 #define _HMIBamVaoVungChonToaDo 0x1A
 
-#define _VpKhungHCN 0x9600UL
-#define _VpKhungChonToaDo 0x9700UL
-
 /* Define các nút bấm trang 130 */
 #define _HMIBamNutEXITTrangManualControl 0x181
 #define _HMIBamNutGoHomeTrangChaySetHome 0x81
@@ -137,6 +125,11 @@
 #define _HMIBamNutChonProgram3TrangCaiDatCheDoChuongTrinh 0x202
 #define _HMIBamNutChonProgram4TrangCaiDatCheDoChuongTrinh 0x203
 #define _HMIBamNutChonProgram5TrangCaiDatCheDoChuongTrinh 0x204
+#define _HMIBamNutChonProgram6TrangCaiDatCheDoChuongTrinh 0x205
+#define _HMIBamNutChonProgram7TrangCaiDatCheDoChuongTrinh 0x206
+#define _HMIBamNutChonProgram8TrangCaiDatCheDoChuongTrinh 0x207
+#define _HMIBamNutChonProgram9TrangCaiDatCheDoChuongTrinh 0x208
+#define _HMIBamNutChonProgram10TrangCaiDatCheDoChuongTrinh 0x209
 
 /* Define các nút bấm trang 132*/
 #define _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh 0x8B         // nút chọn chương trình cần đổi 1->10
@@ -336,6 +329,11 @@
 #define _VPChonProgram3TrangCaiDatCheDoChuongTrinh 0x3302
 #define _VPChonProgram4TrangCaiDatCheDoChuongTrinh 0x3303
 #define _VPChonProgram5TrangCaiDatCheDoChuongTrinh 0x3304
+#define _VPChonProgram6TrangCaiDatCheDoChuongTrinh 0x3305
+#define _VPChonProgram7TrangCaiDatCheDoChuongTrinh 0x3306
+#define _VPChonProgram8TrangCaiDatCheDoChuongTrinh 0x3307
+#define _VPChonProgram9TrangCaiDatCheDoChuongTrinh 0x3308
+#define _VPChonProgram10TrangCaiDatCheDoChuongTrinh 0x3309
 
 /* Trang 131 */
 #define _VPTextHienThiTenProgramTrangCaiDatCheDoChuongTrinh 0x9500
@@ -345,6 +343,8 @@
 #define _VPTextProgram3TrangChonCheDo 0xA200
 #define _VPTextProgram4TrangChonCheDo 0xA300
 #define _VPTextProgram5TrangChonCheDo 0xA400
+
+
 
 /* Trang 132*/
 #define _VPTextProgram1TrangChonChuongTrinh 0x8000
@@ -497,7 +497,6 @@ typedef enum {
 }CheDoVaoTrangBanPhimMoRong_t;
 
 typedef enum {
-  _CheDoHoatDongSimple,
   _CheDoHoatDongMulti
 }CheDoHoatDong_t;
 
@@ -510,10 +509,10 @@ typedef enum {
 }CheDoCaiDatThoiGian_t;
 
 typedef struct {
-  vector<chuongtrinh_t> DSChuongTrinh;
-  double ViTriHienTaiX;
-  double ViTriHienTaiY;
-  double ViTriHienTaiZ;
+  vector<ChuongTrinh_t> DSChuongTrinh;
+  float ViTriHienTaiX;
+  float ViTriHienTaiY;
+  float ViTriHienTaiZ;
   bool TrangThaiXacNhanSaveCalib;
   bool TrangThaiXacNhanSetHome;
   String RTC_Ngay = "";
@@ -525,6 +524,13 @@ typedef struct {
   String RTC_ChuoiGio = "";
   bool TrangThaiChayXongMulti = false;
   bool CapNhatThoiGianRTC;
+  int8_t KhuVucDangChay = -1;
+  int8_t OngDaPhanPhoi = -1;
+  uint8_t RackXHienTai;
+  uint8_t RackYHienTai;
+  uint8_t ToaDoXDaChay;
+  uint8_t ToaDoYDaChay;
+  bool DaChayXongCacKhuVuc = false;
 } DuLieuHMI;// Struct cấu trúc dữ liệu dùng để giao tiếp giữa board và HMI.
 
 
@@ -536,7 +542,7 @@ public:
   void LangNgheDWIN();                                      // Hàm lắng nghe các thao tác của user trên màn hình HMI.
   DuLieuHMI DuLieuHMIGuiXuongBoard;                             
   DuLieuHMI DuLieuBoardGuiLenHMI;
-  vector<chuongtrinh_t> _ChuongTrinhEEPROM;                 // Biến này chỉ thay đổi khi người dùng muốn thay đổỉ để lưu chương trình
+  vector<ChuongTrinh_t> _ChuongTrinhEEPROM;                 // Biến này chỉ thay đổi khi người dùng muốn thay đổỉ để lưu chương trình
   void ChuyenTrangTheoBamChonCuaUserTrenHMI();              // Hàm này dùng chuyển đến trang khi user bấm chuyển trang trên HMI.
   void XuLySetHome();
   void XuLyChonChuongTrinhSeChay();                               // Hiển thị trên màn hình HMI các dữ liệu từ board gửi lên.
@@ -548,20 +554,20 @@ public:
   void HienThiThongSoHienThiThoiGianThuc();
   void ResetProgram();
   void XuLySetupProgram();
-  void XuLyChonMode();
   void XuLyThoiGianThuc();
   void XuLyCalib();
   void ResetCode();
   void ThayDoiTenChuongTrinh();
 
   DanhSachMaLenh_t ReturnMaLenhGRBL();
-  CheDoHoatDong_t Mode = _CheDoHoatDongSimple;
+  CheDoHoatDong_t Mode = _CheDoHoatDongMulti;
   bool BamNutRunON = false;
   bool delay_flag = false;
   int32_t timeLoopDelay = 0;
   bool TamDungChayDelay = false;
   int8_t IndexChuongTrinhDangXuLy;                           // Đây là biến tạm để biết chương trình nào đang xử lý
   uint8_t countTest = 1;
+  // vector<toadoINT_t> DSToaDoKhuVuc[SoLuongKhuVucToiDa];
 
 private:
   uint16_t KichThuocHcnDaVeTheoX;  // kích thước X / 2
@@ -572,7 +578,6 @@ private:
   uint16_t khay2[12][8];
   uint16_t khay3[12][8];
   uint16_t khay4[12][8];
-  uint16_t khay5[12][8];
   String TimeRunStart_c = "00:00";
   String timeLoopDelay_c = "00:00"; 
   int TimeNow = 0;
@@ -580,7 +585,6 @@ private:
   // uint8_t NutModidyDaBam;                                         // Đây là biến dùng để biết nút modify nào được bấm để hiển thị full chương trình hợp lý           
   uint8_t IndxchuongTrinhDangModify;                              // Đây là biến dùng để sử dụng ở chế độ multi để biêt chương trình nào đang được thay đổi
   vector <uint8_t> DSIndexChuongTrinhDuocChon;                    // Đây là biến dùng để xử lý chương trình được chọn ở chê độ MULTI
-  uint8_t DSIndexChuongTrinhHienThi[5]={0,1,2,3,4};               // Đây là biến dùng để xử lý chương trình hiển thị được chọn ở chê độ MULTI
   CheDoVaoTrangChonChuongTrinh_t CheDoVaoTrangChonChuongTrinh;
   CheDoVaoTrangBanPhim_t CheDoVaoTrangBanPhim;
   CheDoVaoTrangBanPhimMoRong_t CheDoVaoTrangBanPhimMoRong;
@@ -594,7 +598,7 @@ private:
   static void onHMIEvent(String address, int lastByte, String message, String response);
   void GuiTextLenHMI(uint16_t VPAddress, String text);              // Hiển thị nội dung text trên HMI.
   void GuiIconLenHMI(uint16_t VPAddress, uint8_t data);
-  void Debug(vector<chuongtrinh_t> data);
+  void Debug(vector<ChuongTrinh_t> data);
   void CapNhatHienThiThongTinChiTietChuongTrinh();
   void CapNhatHienThiThongTinChuongTrinhTrangChonChuongTrinh();
   void CapNhatHienThiThongTinTenChuongTrinhKhiVaoTrangChonChuongTrinh();
@@ -602,22 +606,21 @@ private:
   void CapNhatHienThiThongTinChuongTrinhTrangThietLapChuongTrinhDiChuyen();
   void CapNhatHienThiTenCacChuongTrinhTrangCaiDatCheDoChuongTrinh();
   void CapNhatHienThiDuLieuThoiGianTuDS3231();
-  void HienThiMau(uint32_t VpAddress, uint16_t X, uint16_t Y, uint16_t Mau, chuongtrinh_t ChuongTrinh);
-  void HienThiMau(int8_t SoKhay, uint16_t X, uint16_t Y, chuongtrinh_t ChuongTrinh,uint16_t Mau);
+  void HienThiMau(uint32_t VpAddress, uint16_t X, uint16_t Y, uint16_t Mau, ChuongTrinh_t ChuongTrinh);
+  void HienThiMau(int8_t SoKhay, uint16_t X, uint16_t Y, ChuongTrinh_t ChuongTrinh,uint16_t Mau);
   void ResetFullMauChonToaDo(uint16_t Mau);
   void ResetFullMau(uint8_t IdxChuongTrinhDuocChon, uint16_t Mau, uint8_t SoKhay);
-  void VeToanBoHinhTron(uint32_t VpAddress, chuongtrinh_t ChuongTrinh);
+  void VeToanBoHinhTron(uint32_t VpAddress, ChuongTrinh_t ChuongTrinh);
   void VeToanBoHinhTron(uint8_t IdxChuongTrinhDuocChon, uint8_t SoKhay);
-  void VeKhungHCN(uint8_t SoLuongKhay, uint16_t Mau);
-  void VeKhungHCN(uint32_t VpAddress, uint16_t X0, uint16_t Y0, uint16_t X1, uint16_t Y1, uint16_t Mau);
   void XoaToanBoHinhTron(void);
   void XoaHinhTron(uint32_t VpAddress);
   void XoaMau(uint32_t VpAddress);
   TaskHandle_t xTaskHandle_RunTime;
-  static void xTaskFunction_RunTime(void *);
+  static void StaticTaskFunction_RunTime(void* _this);
+  void TaskFunction_RunTime(void);
   void ChuyenDoiThanhChuoiThoiGian();
 
-  void CapNhatLaiDanhSachToaDo(chuongtrinh_t & ChuongTrinh);
+  void CapNhatLaiDanhSachToaDo(ChuongTrinh_t & ChuongTrinh);
 
   void HienThiNoiDungChuongTrinh(void);
 };
