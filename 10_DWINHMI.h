@@ -37,11 +37,8 @@
 // #define OffsetIconOng   15
 #define BanKinhIconOng  10U
 
-#define KhoangCachIconX 25U
-#define KhoangCachIconY 30U
-
-#define ChieuDaiX KhoangCachIconX * 11U
-#define ChieuDaiY KhoangCachIconY * 7U
+#define ChieuDaiX 330
+#define ChieuDaiY 150
 
 #define MauDo 0xF800U
 #define MauXanhLa 0x07E0U
@@ -51,16 +48,16 @@
 #define KhoangCachGiua2Khay 85U
 
 #define BuachieuDaiXChonToaDo 710U
-#define BuachieuDaiYChonToaDo 270U
+#define BuachieuDaiYChonToaDo 265U
 
-#define ToaDoXIconHinhTronDauTienKhayChon 770U
-#define ToaDoYIconHinhTronDauTienKhayChon 60U
+#define ToaDoXIconHinhTronDauTienKhayChon 775U
+#define ToaDoYIconHinhTronDauTienKhayChon 55U
 
-#define ToaDoXIconHinhTronDauTienKhay1 35U
-#define ToaDoYIconHinhTronDauTienKhay1 120U
+#define ToaDoXIconHinhTronDauTienKhay1 152U
+#define ToaDoYIconHinhTronDauTienKhay1 150U
 
-#define ToaDoXIconHinhTronDauTienKhay2 405U
-#define ToaDoYIconHinhTronDauTienKhay2 120U
+#define ToaDoXIconHinhTronDauTienKhay2 550U
+#define ToaDoYIconHinhTronDauTienKhay2 ToaDoYIconHinhTronDauTienKhay1
 
 #define ToaDoX0Khay1 30U
 #define ToaDoY0Khay 105U
@@ -164,7 +161,6 @@
 #define _HMIBamNutMODIFY3TrangThietLapCheDoChayMulti 0xA2
 #define _HMIBamNutMODIFY4TrangThietLapCheDoChayMulti 0xA3
 #define _HMIBamNutMODIFY5TrangThietLapCheDoChayMulti 0xA4
-#define _HMIBamNutRUNTrangThietLapCheDoChayMulti 0xA5
 #define _HMIBamNutEXITTrangThietLapCheDoChayMulti 0xA6
 #define _HMIBamNutSecondTrangMULTIPROGRAMSETUP 0x201B
 #define _HMIBamNutXoaTrangMULTIPROGRAMSETUP 0x201C
@@ -285,7 +281,8 @@
 #define _TrangCaiDatCheDoChuongTrinh_HOME 131
 #define _TrangChonChuongTrinh 132
 #define _TrangPhanPhoiViTri 133
-#define _TrangHienThiPhanPhoiThoiGianThuc 134
+#define _TrangHienThiPhanPhoiThoiGianThuc_OFF_HOME 134
+#define _TrangHienThiPhanPhoiThoiGianThuc_OFF_notHOME 175
 #define _TrangThietLapCheDoChayMulti 135
 #define _TrangThongSoChuongTrinh 136
 #define _TrangThietLapChuongTrinhDiChuyen 137

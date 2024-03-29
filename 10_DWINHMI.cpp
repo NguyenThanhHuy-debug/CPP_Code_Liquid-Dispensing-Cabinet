@@ -229,7 +229,26 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
     /* =============================== BEGIN: CODE TRANG 131 CÀI ĐẶT CHẾ ĐỘ CHƯƠNG TRÌNH ===============================*/
     case _HMIBamNutRunTrangCaiDatCheDoChuongTrinh:
     {
-      //TODO vào trang chạy thời gian thực
+      for (uint8_t i = 0; i < sizeof(DSIndexChuongTrinhDuocChon); i++)
+      {
+        if (DSIndexChuongTrinhDuocChon[i] == -1)
+        {
+          continue;
+        }
+        IdxKhuVucDangXuLy = i;
+        ResetFullMau(DSIndexChuongTrinhDuocChon[i], MauDo, i);
+      }
+
+      if (DangOViTriHome() == true)
+      {
+        DWINHMI::setPage(_TrangHienThiPhanPhoiThoiGianThuc_OFF_HOME);
+      }
+      else
+      {
+        DWINHMI::setPage(_TrangHienThiPhanPhoiThoiGianThuc_OFF_notHOME);
+      }
+
+      
       break;
     }
     case _HMIBamNutSetupProgramTrangCaiDat:
@@ -352,7 +371,16 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
       if (BamNutRunON == false)
       {
         //TODO quay lại trang chính
+        if (DangOViTriHome() == true)
+        {
+          DWINHMI::setPage(_TrangCaiDatCheDoChuongTrinh_HOME);
+        }
+        else
+        {
+          DWINHMI::setPage(_TrangCaiDatCheDoChuongTrinh_notHOME);
+        }
         XoaToanBoHinhTron();
+        
 
       }
       break;
@@ -373,22 +401,6 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
     case _HMIBamNutEXITTrangThietLapCheDoChayMulti:
     {
         DWIN::setPage(_TrangCaiDatCheDoChuongTrinh_notHOME);
-      break;
-    }
-    case _HMIBamNutRUNTrangThietLapCheDoChayMulti:
-    {
-      DWIN::setPage(_TrangHienThiPhanPhoiThoiGianThuc);
-
-      for (uint8_t i = 0; i < sizeof(DSIndexChuongTrinhDuocChon); i++)
-      {
-        if (DSIndexChuongTrinhDuocChon[i] == -1)
-        {
-          continue;
-        }
-        Serial.printf("Ve hinh tron %d \r\n",i);
-        ResetFullMau(DSIndexChuongTrinhDuocChon[i], MauDo, i);
-      }
-
       break;
     }
     /* =============================== END: CODE TRANG 135 TRANG THIẾT LẬP CHẾ ĐỘ CHẠY MULTI ===============================*/
@@ -765,6 +777,7 @@ void DWINHMI::XuLyChonChuongTrinhSeChay(void)
       //TODO hiển thị tên chương trình ở trang 131 và thông tin ở trang chọn chương trình
       GuiTextLenHMI(_VPTextHienThiTenProgramTrangCaiDatCheDoChuongTrinh, _ChuongTrinhEEPROM[DSIndexChuongTrinhDuocChon[IdxKhuVucDangXuLy]].tenchuongtrinh);
       HienThiNoiDungChuongTrinh(DSIndexChuongTrinhDuocChon[IdxKhuVucDangXuLy], _VPTextHienThiChuongTrinhTrangChonChuongTrinh);
+      HienThiThongTinPhanPhoi();
 
       for (uint8_t KhuVuc = 0; KhuVuc < sizeof(DSIndexChuongTrinhDuocChon); KhuVuc++)
       {
@@ -774,7 +787,6 @@ void DWINHMI::XuLyChonChuongTrinhSeChay(void)
         }
         GuiTextLenHMI(_VPTextTenProgramArea1 + 0x100 * KhuVuc, _ChuongTrinhEEPROM[DSIndexChuongTrinhDuocChon[KhuVuc]].tenchuongtrinh);
       }
-      HienThiThongTinPhanPhoi();
     }
   }
 
@@ -1573,7 +1585,7 @@ void DWINHMI::XuLySetupProgram(void)
 void DWINHMI::HienThiThongSoHienThiThoiGianThuc(void)
 {
 
-  if(codeHMI == _HMIBamNutRUNTrangThietLapCheDoChayMulti)
+  if(codeHMI == _HMIBamNutRunTrangCaiDatCheDoChuongTrinh)
   { 
     if(!oneTimeMulti)
     {
@@ -1599,7 +1611,7 @@ void DWINHMI::HienThiThongSoHienThiThoiGianThuc(void)
   {
     if (BamNutRunON == true)
     {
-      DWIN::setPage(_TrangHienThiPhanPhoiThoiGianThuc);
+      DWIN::setPage(_TrangHienThiPhanPhoiThoiGianThuc_OFF_notHOME);
       vTaskSuspend(xTaskHandle_RunTime);  
     }
     else
@@ -1630,6 +1642,7 @@ void DWINHMI::ResetProgram(void)
         {
           continue;
         }
+        IdxKhuVucDangXuLy = i;
         ResetFullMau(DSIndexChuongTrinhDuocChon[i], MauDo, i);
       }
       GuiTextLenHMI(_VPTextTimeRunTrangHienThiPhanPhoiThoiGianThuc, "00:00:00");
@@ -1701,7 +1714,7 @@ DanhSachMaLenh_t DWINHMI::ReturnMaLenhGRBL()
       //   return CAPNHATCHUONGTRINH;
 
       case _HMIBamNutOKTrangPhanPhoiViTri:
-      case _HMIBamNutRUNTrangThietLapCheDoChayMulti:
+      case _HMIBamNutRunTrangCaiDatCheDoChuongTrinh:
         return CAPNHATTOADO;
 
       // case _HMIBamNutSetupProgramTrangCaiDat:
@@ -1889,7 +1902,7 @@ void DWINHMI::ResetCode()
     codeHMI = -1;
   else if(codeHMI == _HMIBamNutModeTrangCaiDatCheDoChuongTrinh)
     codeHMI = -1;    
-  else if(codeHMI == _HMIBamNutRUNTrangThietLapCheDoChayMulti)
+  else if(codeHMI == _HMIBamNutRunTrangCaiDatCheDoChuongTrinh)
     codeHMI = -1;
   else if(codeHMI == _HMIBamNutEXITTrangThietLapCheDoChayMulti)
     codeHMI = -1;
@@ -2198,8 +2211,8 @@ void DWINHMI ::HienThiMau(uint32_t VpAddress, uint16_t X, uint16_t Y, uint16_t M
   }
   else if(VpAddress >= _VpAddressVung1Khay1HienThiMau && VpAddress <= _VpAddressVung4Khay1HienThiMau)
   {
-    toadoXIcondautien = ToaDoX0Khay(0) + 20;
-    toadoYIcondautien = ToaDoY0Khay + 20;
+    toadoXIcondautien = ToaDoXIconHinhTronDauTienKhay1;
+    toadoYIcondautien = ToaDoYIconHinhTronDauTienKhay1;
     khay1[X][Y] = Mau;
     for (uint8_t i = 0; i < 12; i++){
       for (uint8_t j = 0; j < 8; j++){
@@ -2209,8 +2222,8 @@ void DWINHMI ::HienThiMau(uint32_t VpAddress, uint16_t X, uint16_t Y, uint16_t M
   }
   else if(VpAddress >= _VpAddressVung1Khay2HienThiMau && VpAddress <= _VpAddressVung4Khay2HienThiMau)
   {
-    toadoXIcondautien = ToaDoX0Khay(1) + 20;
-    toadoYIcondautien = ToaDoY0Khay + 20;
+    toadoXIcondautien = ToaDoXIconHinhTronDauTienKhay2;
+    toadoYIcondautien = ToaDoYIconHinhTronDauTienKhay2;
     khay2[X][Y] = Mau;
     for (uint8_t i = 0; i < 12; i++){
       for (uint8_t j = 0; j < 8; j++){
@@ -2313,7 +2326,8 @@ void DWINHMI ::HienThiMau(uint32_t VpAddress, uint16_t X, uint16_t Y, uint16_t M
     }
     
     bool include = false;
-    for (uint8_t k = 0; k < ChuongTrinh.DsToaDo[IdxKhuVucDangXuLy].size(); k++){
+    for (uint8_t k = 0; k < ChuongTrinh.DsToaDo[IdxKhuVucDangXuLy].size(); k++)
+    {
       if (ChuongTrinh.DsToaDo[IdxKhuVucDangXuLy][k].X == ToaDoXMaTran && ChuongTrinh.DsToaDo[IdxKhuVucDangXuLy][k].Y == ToaDoYMaTran){
         include = true;
         break;
@@ -2544,7 +2558,7 @@ void DWINHMI::VeToanBoHinhTron(uint32_t VpAddress, ChuongTrinh_t ChuongTrinh)
   DGUS_SERIAL.write(buffer, 252);
 
   this->KichThuocHcnDaVeTheoX = KhoangCachGiua2DiemTheoX / 4;
-  this->KichThuocHcnDaVeTheoY = KhoangCachGiua2DiemTheoY / 4;
+  this->KichThuocHcnDaVeTheoY = KhoangCachGiua2DiemTheoY / 3;
 
   #ifdef debug_dwin
   // for (uint8_t i = 0; i < 252; i++){
@@ -2841,5 +2855,5 @@ void DWINHMI::HienThiThongTinPhanPhoi(void)
   fillstr = "Fill: " + String(chuongtrinhhienthi.DsToaDo[IdxKhuVucDangXuLy].size()) + "/" + String(chuongtrinhhienthi.rackX * chuongtrinhhienthi.rackY);
   String data;
   data = rackstr + volstr + fillstr;
-  GuiTextLenHMI(_VPTextprogram1TrangThietLapChayCheDoMULTI + DSIndexChuongTrinhDuocChon[IdxKhuVucDangXuLy] * 0x100, data);
+  GuiTextLenHMI(_VPTextprogram1TrangThietLapChayCheDoMULTI + IdxKhuVucDangXuLy * 0x100, data);
 }

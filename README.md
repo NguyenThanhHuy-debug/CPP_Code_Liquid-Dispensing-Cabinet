@@ -11,7 +11,7 @@ Luồng xử lý của chương trình
     - Serial: Xử lý lệnh GRBL nhận được qua serial (sử dụng WebUI::inputBuffer.* để thay cho serial uart).
     - PhanPhoiTask: điều khiển STEP phân phối tại các ống có tọa độ trong chương trình được gửi xuống từ DWIN (chạy khi được notify khi nhấn nút RUN trên màn hình).
     - vTaskDWINCode: xử lý tương tác từ người dùng trên HMI.
-    - xTaskFunction_RunTime: xử lý hiển thị các ống đã được phân phối, các thông số khác trên _TrangHienThiPhanPhoiThoiGianThuc (được resume khi chạy, khi chạy xong hoặc tạm dừng thì suspend task đi).
+    - xTaskFunction_RunTime: xử lý hiển thị các ống đã được phân phối, các thông số khác trên _TrangHienThiPhanPhoiThoiGianThuc_OFF_HOME (được resume khi chạy, khi chạy xong hoặc tạm dừng thì suspend task đi).
 
 3. Luồng xử lý (không bao gồm Loop, GRBL, Serial):
     - PhanPhoiTask: Khi nhận được notify, hàm BatDauPhanPhoi được gọi. Lý do dùng hàm là vì phải kết thúc task khi cần người dùng không muốn chạy phân phối nữa (Nhấn RUN để dừng, sau đó nhấn EXIT để thoát), khi đó chỉ cần return hàm BatDauPhanPhoi để task tiếp tục chờ notify (nếu không dùng hàm mà chạy lệnh trực tiếp trong task thì khi return sẽ làm RTOS bị lỗi, reset lại ESP32). Quá trình chạy hàm BatDauPhanPhoi:
@@ -61,7 +61,7 @@ Luồng xử lý của chương trình
         + XuLyChonMode: (xử lý ở trang _TrangCaiDatCheDoChuongTrinh_HOME)
             * Khi nhấn nút _HMIBamNutModeTrangCaiDatCheDoChuongTrinh (nút đổi chế độ giữa SIMPLE và MULTI) thì tên và nội dung chương trình ở phần bên trái bị xóa đi, đồng thời reset TrangThaiChuongTrinh và ThuTuChay của tất cả các chương trình hiển thị 1 -> 5, đồng thời đảo Mode thành _CheDoHoatDongMulti hoặc _CheDoHoatDongSimple.
         + XuLyChonChuongTrinhSeChay: (xử lý ở trang _TrangCaiDatCheDoChuongTrinh_HOME)
-            * Khi thoát ra từ _TrangHienThiPhanPhoiThoiGianThuc (EXIT) hoặc trang _TrangCaiDat (BACK) thì xóa tên và nội dung chương trình được chọn ở phần bên trái trang _TrangCaiDatCheDoChuongTrinh_HOME.
+            * Khi thoát ra từ _TrangHienThiPhanPhoiThoiGianThuc_OFF_HOME (EXIT) hoặc trang _TrangCaiDat (BACK) thì xóa tên và nội dung chương trình được chọn ở phần bên trái trang _TrangCaiDatCheDoChuongTrinh_HOME.
             * Khi nhấn vào nút chọn chương trình (dấu tick V hoặc X): cập nhật IndexChuongTrinhDangXuLy, đảo TrangThaiChuongTrinh của chương trình đó, đổi icon V hoặc X tương ứng. Nếu đang ở chế độ SIMPLE thì có chương trình được chọn là DuocChon, còn lại là KhongDuocChon. Nếu TrangThaiChuongTrinh của chương trình vừa chọn là KhongDuocChon (bỏ tick V) thì xóa tên và nội dung chương trình bên trái. Còn nếu là DuocChon thì hiện tên và nội dung.
             * Nếu chế độ hiện tại là vào trang từ các nút nhấn PROGRAM 1 -> 5 thì cập nhật IndexChuongTrinhDangXuLy dựa vào nút đã nhấn, và hiện tên 10 chương trình. Nếu chọn 1 trong 10 chương trình thì hiện thông tin chương trình đó bên phải. Nếu nhấn nút OK kiểm tra chương trình được chọn có trùng với các chương trình hiển thị bên ngoài không (dựa vào DSIndexChuongTrinhHienThi), nếu không thì set TrangThai của chương trình cũ là KhongDuocChon, cập nhật DSIndexChuongTrinhHienThi, hiện lại tên 5 chương trình.
         + XuLyThietLapChuongTrinhCheDoMulti: (xử lý ở trang _TrangThietLapCheDoChayMulti)
@@ -77,7 +77,7 @@ Luồng xử lý của chương trình
              Khi nhấn CLEAR, clear DsToaDo rồi đổi thành màu Trắng(không chọn).
              Khi nhấn nút ADD, tùy thuộc vào lần nhấn trước đó mà sẽ vào chế độ ADD, SUB, hoặc tắt chức năng này đi. Khi vào ADD hoặc SUB và nhấn vào vùng chọn vị trí ống, HMI sẽ gửi xuống phản hồi có chứa vị trí vừa nhấn, nếu vị trí này nằm trong khoảng của hình chữ nhật thì sẽ push_back hoặc remove vị trí này trong DsToaDo.
              Khi nhấn EXIT, cập nhật lại ChuongTrinh và khaychon bằng 2 biến backup TamThoi như trên. Tức là nếu nhấn OK, thay đổi có hiệu lực trên ChuongTrinh gốc, còn nếu nhấn EXIT thì hủy bỏ thay đổi đó đi.
-             Khi nhấn OK, nếu ở MULTI, hiện thị lại thông tin ở 5 chương trình MODIFY. Còn nếu ở SIMPLE, thì cập nhật lại DSIndexChuongTrinhDuocChon, vẽ khung ở trang _TrangHienThiPhanPhoiThoiGianThuc, hiển thị lại màu được chọn.
+             Khi nhấn OK, nếu ở MULTI, hiện thị lại thông tin ở 5 chương trình MODIFY. Còn nếu ở SIMPLE, thì cập nhật lại DSIndexChuongTrinhDuocChon, vẽ khung ở trang _TrangHienThiPhanPhoiThoiGianThuc_OFF_HOME, hiển thị lại màu được chọn.
         + XuLyConfigChuongTrinh:
             * Nếu nhấn nút _HMIBamNutSetupProgramTrangCaiDat, thì hiện tên các chương trình 1->10.
             * Nếu chọn Chương trình 1->10 thì hiện thông tin chương trình tương ứng.
