@@ -50,11 +50,11 @@
 
 #define KhoangCachGiua2Khay 85U
 
-#define BuachieuDaiXChonToaDo 760U
-#define BuachieuDaiYChonToaDo 170U
+#define BuachieuDaiXChonToaDo 800U
+#define BuachieuDaiYChonToaDo 330U
 
-#define ToaDoXIconHinhTronDauTienKhayChon 740U
-#define ToaDoYIconHinhTronDauTienKhayChon 50U
+#define ToaDoXIconHinhTronDauTienKhayChon 770U
+#define ToaDoYIconHinhTronDauTienKhayChon 60U
 
 #define ToaDoXIconHinhTronDauTienKhay1 35U
 #define ToaDoYIconHinhTronDauTienKhay1 120U
@@ -282,7 +282,7 @@
 #define _HMIBamNutRESETTrangManualControl 0x7001
 
 #define _TrangBatDauChaySetHome 130
-#define _TrangCaiDatCheDoChuongTrinh 131
+#define _TrangCaiDatCheDoChuongTrinh_HOME 131
 #define _TrangChonChuongTrinh 132
 #define _TrangPhanPhoiViTri 133
 #define _TrangHienThiPhanPhoiThoiGianThuc 134
@@ -304,7 +304,7 @@
 #define _TrangBanPhimMoRong 172
 #define _TrangThoiGian 171
 #define _TrangThongTin 151
-#define _TrangCaiDatCheDoChuongTrinhMULTI 170
+#define _TrangCaiDatCheDoChuongTrinh_notHOME 170
 #define _TrangHienThiPhanPhoiThoiGianThucON 153
 #define _TrangPhanPhoiViTriFULL 154
 #define _TrangPhanPhoiViTriCLEAR 155
@@ -336,15 +336,10 @@
 #define _VPChonProgram10TrangCaiDatCheDoChuongTrinh 0x3309
 
 /* Trang 131 */
-#define _VPTextHienThiTenProgramTrangCaiDatCheDoChuongTrinh 0x9500
-#define _VPTextHienThiChucNangProgramTrangCaiDatCheDoChuongTrinh 0x5400
-#define _VPTextProgram1TrangChonCheDo 0xA000
-#define _VPTextProgram2TrangChonCheDo 0xA100
-#define _VPTextProgram3TrangChonCheDo 0xA200
-#define _VPTextProgram4TrangChonCheDo 0xA300
-#define _VPTextProgram5TrangChonCheDo 0xA400
-
-
+#define _VPTextTenProgramArea1 0x9100
+#define _VPTextTenProgramArea2 0x9200
+#define _VPTextHienThiTenProgramTrangCaiDatCheDoChuongTrinh 0x9500     // hiện tại không dùng
+#define _VPTextHienThiChucNangProgramTrangCaiDatCheDoChuongTrinh 0x5400 // có dùng
 
 /* Trang 132*/
 #define _VPTextProgram1TrangChonChuongTrinh 0x8000
@@ -583,8 +578,8 @@ private:
   int TimeNow = 0;
   uint32_t DentaT = 0;
   // uint8_t NutModidyDaBam;                                         // Đây là biến dùng để biết nút modify nào được bấm để hiển thị full chương trình hợp lý           
-  uint8_t IndxchuongTrinhDangModify;                              // Đây là biến dùng để sử dụng ở chế độ multi để biêt chương trình nào đang được thay đổi
-  vector <uint8_t> DSIndexChuongTrinhDuocChon;                    // Đây là biến dùng để xử lý chương trình được chọn ở chê độ MULTI
+  uint8_t IdxKhuVucDangXuLy;                              // Đây là biến dùng để sử dụng ở chế độ multi để biêt chương trình nào đang được thay đổi
+  int8_t DSIndexChuongTrinhDuocChon[SoLuongKhuVucToiDa];                    // Đây là biến dùng để xử lý chương trình được chọn ở chê độ MULTI
   CheDoVaoTrangChonChuongTrinh_t CheDoVaoTrangChonChuongTrinh;
   CheDoVaoTrangBanPhim_t CheDoVaoTrangBanPhim;
   CheDoVaoTrangBanPhimMoRong_t CheDoVaoTrangBanPhimMoRong;
@@ -622,7 +617,10 @@ private:
 
   void CapNhatLaiDanhSachToaDo(ChuongTrinh_t & ChuongTrinh);
 
-  void HienThiNoiDungChuongTrinh(void);
+  void HienThiNoiDungChuongTrinh(uint8_t IdxChuongTrinh, uint32_t VpAddress);
+  bool DangOViTriHome(void);
+  void HienThiThongTinPhanPhoi(void);
+
 };
 
 #endif

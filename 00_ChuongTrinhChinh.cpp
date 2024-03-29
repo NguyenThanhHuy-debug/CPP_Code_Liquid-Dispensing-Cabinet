@@ -96,7 +96,7 @@ void KhoiTao(void){
   _DWIN.restartHMI();
   
   CaiDatNguon();
-
+  // delay(1000);
   //Phải khởi tạo GRBL trước để begin Serial, do GRBL đã viết lại Serial
   _grbl.KhoiTaoGRBL();
   //---------------------------------------------------------------
@@ -584,17 +584,17 @@ void CaiDatNguon(void)
   pinMode(_ChanDocNguon, INPUT);
   pinMode(_ChanKichNguon, OUTPUT);
   digitalWrite(_ChanKichNguon, HIGH);
-  if(!digitalRead(_ChanDocNguon))
-  {
-    digitalWrite(_ChanKichNguon,LOW);
-  }
+  // if(!digitalRead(_ChanDocNguon))
+  // {
+  //   digitalWrite(_ChanKichNguon,LOW);
+  // }
   digitalWrite(2, HIGH);
   delay(100);
   digitalWrite(2, LOW);
-  while (digitalRead(_ChanDocNguon))
-  {
-    delay(1);
-  }
+  // while (digitalRead(_ChanDocNguon))
+  // {
+  //   delay(1);
+  // }
 }
 
 void KiemTraNguon(void)

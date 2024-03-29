@@ -166,7 +166,7 @@ void _GRBL::BatDauPhanPhoi()
 
     TinhKhoangCachGiuaHaiOng(_DSChuongTrinh[IdxChuongTrinh], i);
     //* Sắp xếp lại thứ tự di chuyển của các ống cần phân phối
-    SapXepThuTuOng(_DSChuongTrinh[IdxChuongTrinh].DSToaDo[i]);
+    SapXepThuTuOng(_DSChuongTrinh[IdxChuongTrinh].DsToaDo[i]);
 
     // SoVongDeChongNhoGiot = (signbit(_DSChuongTrinh[i].SoVongDeBom1ml) ? 1 : -1) * (_DSChuongTrinh[i].chongnhogiot / 360.0); //* đảm bảo chiều chống nhỏ giọt luôn ngược với chiều bơm
     float SoVongDeChongNhoGiot = (signbit(_DSChuongTrinh[IdxChuongTrinh].TheTichBomDuocKhiQuay1Vong) ? 1 : -1) * (_DSChuongTrinh[IdxChuongTrinh].chongnhogiot / 360.0); //* đảm bảo chiều chống nhỏ giọt luôn ngược với chiều bơm
@@ -175,7 +175,7 @@ void _GRBL::BatDauPhanPhoi()
     // SoVongCanBom = _DSChuongTrinh[i].SoVongDeBom1ml * _DSChuongTrinh[i].thetich * 1000 * _DSChuongTrinh[i].duongkinhong;
     float SoVongCanBom = (_DSChuongTrinh[IdxChuongTrinh].thetich * 1000 / (_DSChuongTrinh[IdxChuongTrinh].TheTichBomDuocKhiQuay1Vong * _DSChuongTrinh[IdxChuongTrinh].duongkinhong)) ;
 
-    vector<toadoINT_t> DSToaDoCanChay = _DSChuongTrinh[IdxChuongTrinh].DSToaDo[i];
+    vector<toadoINT_t> DSToaDoCanChay = _DSChuongTrinh[IdxChuongTrinh].DsToaDo[i];
     toado_t ViTriACanChay = _DSChuongTrinh[IdxChuongTrinh].ViTriA[i];
     toado_t ViTriBCanChay = _DSChuongTrinh[IdxChuongTrinh].ViTriB[i];
     toado_t ViTriCCanChay = _DSChuongTrinh[IdxChuongTrinh].ViTriC[i];

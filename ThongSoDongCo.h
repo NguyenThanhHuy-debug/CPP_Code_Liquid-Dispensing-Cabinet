@@ -55,11 +55,11 @@
 #define A_DIRECTION_PIN         GPIO_NUM_19
 
 #define X_LIMIT_PIN             36 //* limit 1        //cảm biến hành trình đầu trục X
-#define X2_LIMIT_PIN            39 //limit 2        //cảm biến hành trình cuối trục X
+// #define X2_LIMIT_PIN            39 //limit 2        //cảm biến hành trình cuối trục X
 #define Y_LIMIT_PIN             34 //* limit 3        //cảm biến hành trình đầu trục Y
-#define Y2_LIMIT_PIN            35 //limit 4     //cảm biến Y2 hiên tại đang bị hư nên không dùng
+// #define Y2_LIMIT_PIN            35 //limit 4     //cảm biến Y2 hiên tại đang bị hư nên không dùng
 #define Z_LIMIT_PIN             32 //* limit 5        //cảm biến hành trình đầu trục Z    
-//* #define Z2_LIMIT_PIN            34               //khi mở máy thì cảm biến Z2 sẽ bị kích hoạt, nên không dùng
+// #define Z2_LIMIT_PIN            34               //khi mở máy thì cảm biến Z2 sẽ bị kích hoạt, nên không dùng
 
 
 //* Khai báo số xung trên 1mm để dùng lệnh Gcode
@@ -118,14 +118,14 @@
 
 // *Tốc độ di chuyển khi Set Home
 //* Đặt tốc độ chậm để tránh va đập mạnh
-#define DEFAULT_HOMING_SEEK_RATE 4000.0 
+#define DEFAULT_HOMING_SEEK_RATE 5000.0 
 
 //* Tốc độ di chuyển sau khi gặp được cảm biến hành trình
 //* Sau khi gặp được cảm biến hành trình thì di chuyển về phía ngược lại để không kích hoạt cảm biến nữa
 #define DEFAULT_HOMMING_FEED_RATE 1000.0
 
 //* Khoảng cách di chuyển ngược lại sau khi xác định được vị trí Home
-#define DEFAULT_HOMING_PULLOFF 1.0
+#define DEFAULT_HOMING_PULLOFF 5.0
 
 //* Thứ tự di chuyển của các trục khi Set Home
 //* Đầu tiên di chuyển trục Z, sau đó di chuyển trục X và Y

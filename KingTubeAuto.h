@@ -62,7 +62,7 @@ typedef struct {
     vector<float> ViTriH = { {-380.0},            {-380.0} };
     
     vector<toadoINT_t> DanhSachToaDo;
-    vector< vector<toadoINT_t> > DSToaDo;
+    vector<toadoINT_t> DsToaDo[SoLuongKhuVucToiDa];
 
     float actualweight = 0;
     float density = 1;
