@@ -2280,16 +2280,9 @@ void DWINHMI ::HienThiMau(uint32_t VpAddress, uint16_t X, uint16_t Y, uint16_t M
 
   memset(data, 0, sizeof(data));
 
-  uint16_t KhoangCachGiua2DiemTheoX = chieudaiX / (ChuongTrinh.rackX - 0);
-  if (chieudaiX - KhoangCachGiua2DiemTheoX * (ChuongTrinh.rackX - 1) > KhoangCachGiua2DiemTheoX / 2)
-  {
-    KhoangCachGiua2DiemTheoX += KhoangCachGiua2DiemTheoX / 5.5;
-  }
-  uint16_t KhoangCachGiua2DiemTheoY = chieudaiY / (ChuongTrinh.rackY - 0);
-  if (chieudaiY - KhoangCachGiua2DiemTheoY * (ChuongTrinh.rackY - 1) > KhoangCachGiua2DiemTheoY / 2)
-  {
-    KhoangCachGiua2DiemTheoY += KhoangCachGiua2DiemTheoY / 4.5;
-  }
+  uint16_t KhoangCachGiua2DiemTheoX = chieudaiX / (ChuongTrinh.rackX - 1);
+
+  uint16_t KhoangCachGiua2DiemTheoY = chieudaiY / (ChuongTrinh.rackY - 1);
 
   #pragma endregion KhayDuocChon
   for (uint8_t i = 0; i < 240; i+=10)
@@ -2339,8 +2332,8 @@ void DWINHMI ::HienThiMau(uint32_t VpAddress, uint16_t X, uint16_t Y, uint16_t M
       uint16_t ToaDoXHMITrenTrai = ToaDoXHMI - (KhoangCachGiua2DiemTheoX / 4);
       uint16_t ToaDoXHMIDuoiPhai = ToaDoXHMI + (KhoangCachGiua2DiemTheoX / 4);
 
-      uint16_t ToaDoYHMITrenTrai = ToaDoYHMI - (KhoangCachGiua2DiemTheoY / 4);
-      uint16_t ToaDoYHMIDuoiPhai = ToaDoYHMI + (KhoangCachGiua2DiemTheoY / 4);
+      uint16_t ToaDoYHMITrenTrai = ToaDoYHMI - (KhoangCachGiua2DiemTheoY / 3);
+      uint16_t ToaDoYHMIDuoiPhai = ToaDoYHMI + (KhoangCachGiua2DiemTheoY / 3);
 
       data[i    ] = ToaDoXHMITrenTrai >> 8;
       data[i + 1] = ToaDoXHMITrenTrai & 0xFF;
@@ -2471,16 +2464,10 @@ void DWINHMI::VeToanBoHinhTron(uint32_t VpAddress, ChuongTrinh_t ChuongTrinh)
       break;
   }
 
-  uint16_t KhoangCachGiua2DiemTheoX = chieudaiX / (ChuongTrinh.rackX - 0);
-  if (chieudaiX - KhoangCachGiua2DiemTheoX * (ChuongTrinh.rackX - 1) > KhoangCachGiua2DiemTheoX / 2)
-  {
-    KhoangCachGiua2DiemTheoX += KhoangCachGiua2DiemTheoX / 5.5;
-  }
-  uint16_t KhoangCachGiua2DiemTheoY = chieudaiY / (ChuongTrinh.rackY - 0);
-  if (chieudaiY - KhoangCachGiua2DiemTheoY * (ChuongTrinh.rackY - 1) > KhoangCachGiua2DiemTheoY / 2)
-  {
-    KhoangCachGiua2DiemTheoY += KhoangCachGiua2DiemTheoY / 4.5;
-  }
+  uint16_t KhoangCachGiua2DiemTheoX = chieudaiX / (ChuongTrinh.rackX - 1);
+
+  uint16_t KhoangCachGiua2DiemTheoY = chieudaiY / (ChuongTrinh.rackY - 1);
+
   uint8_t data[240]; /* 24 * 10 */
   memset(data, 0, 240);
   Serial.printf("Size vitrivatoado trước khi push_back: %d\n",vitrivatoado.size());
@@ -2530,8 +2517,8 @@ void DWINHMI::VeToanBoHinhTron(uint32_t VpAddress, ChuongTrinh_t ChuongTrinh)
       uint16_t ToaDoXHMITrenTrai = ToaDoXHMI - (KhoangCachGiua2DiemTheoX / 4);
       uint16_t ToaDoXHMIDuoiPhai = ToaDoXHMI + (KhoangCachGiua2DiemTheoX / 4);
 
-      uint16_t ToaDoYHMITrenTrai = ToaDoYHMI - (KhoangCachGiua2DiemTheoY / 4);
-      uint16_t ToaDoYHMIDuoiPhai = ToaDoYHMI + (KhoangCachGiua2DiemTheoY / 4);
+      uint16_t ToaDoYHMITrenTrai = ToaDoYHMI - (KhoangCachGiua2DiemTheoY / 3);
+      uint16_t ToaDoYHMIDuoiPhai = ToaDoYHMI + (KhoangCachGiua2DiemTheoY / 3);
 
       data[i    ] = ToaDoXHMITrenTrai >> 8;
       data[i + 1] = ToaDoXHMITrenTrai & 0xFF;

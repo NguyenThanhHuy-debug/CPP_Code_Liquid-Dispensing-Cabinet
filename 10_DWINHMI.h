@@ -50,8 +50,8 @@
 
 #define KhoangCachGiua2Khay 85U
 
-#define BuachieuDaiXChonToaDo 800U
-#define BuachieuDaiYChonToaDo 330U
+#define BuachieuDaiXChonToaDo 710U
+#define BuachieuDaiYChonToaDo 270U
 
 #define ToaDoXIconHinhTronDauTienKhayChon 770U
 #define ToaDoYIconHinhTronDauTienKhayChon 60U
