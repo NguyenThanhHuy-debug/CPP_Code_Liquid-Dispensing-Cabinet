@@ -187,8 +187,6 @@ void CapNhatDuLieuLenHMI(void)
   _DWIN.DuLieuBoardGuiLenHMI.RTC_ChuoiGio  = _RTC.ChuanHoaChuoiRTC_Gio();
   _DWIN.DuLieuBoardGuiLenHMI.OngDaPhanPhoi = _grbl.OngDaPhanPhoi;
   _DWIN.DuLieuBoardGuiLenHMI.KhuVucDangChay = _grbl.KhuVucDangChay;
-  _DWIN.DuLieuBoardGuiLenHMI.RackXHienTai = _grbl.RackXHienTai;
-  _DWIN.DuLieuBoardGuiLenHMI.RackYHienTai = _grbl.RackYHienTai;
   _DWIN.DuLieuBoardGuiLenHMI.ToaDoXDaChay = _grbl.ToaDoXDaChay;
   _DWIN.DuLieuBoardGuiLenHMI.ToaDoYDaChay = _grbl.ToaDoYDaChay;
   _DWIN.DuLieuBoardGuiLenHMI.DaChayXongCacKhuVuc = _grbl.DaChayXongCacKhuVuc;
@@ -219,7 +217,7 @@ void XuLyDuLieuNhanTuHMI(void)
   switch (_MaLenhGRBL)
   {
     case GOHOMEKHONGCHUYENTRANG:
-      _grbl.VeViTriHome();
+      _grbl.VeToaDoGoc();
       break;
     case GOHOME:
       #ifdef debug
@@ -400,9 +398,6 @@ void XuLyDuLieuNhanTuHMI(void)
     case CALIB:                                         // khi nhấn CALIB để thay đổi số vòng bơm
     {
       Serial.printf("actualweight: %g, density: %g, duongkinhong: %g, vitriA: %g\n", _DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy].actualweight, _DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy].density, _DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy].duongkinhong, _grbl.ViTriHienTaiCuaSTEP(MayBom));
-      // ChuongTrinh_t* ChuongTrinhDangXuLy = &_DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy];
-      // // ChuongTrinhDangXuLy->SoVongDeBom1ml = (double)(_grbl.ViTriHienTaiCuaSTEP(MayBom) * ChuongTrinhDangXuLy->density / ChuongTrinhDangXuLy->actualweight / ChuongTrinhDangXuLy->duongkinhong);
-      // ChuongTrinhDangXuLy->TheTichBomDuocKhiQuay1Vong = (float)(ChuongTrinhDangXuLy->actualweight * 1000.0f / (ChuongTrinhDangXuLy->density * ChuongTrinhDangXuLy->duongkinhong * _grbl.ViTriHienTaiCuaSTEP(MayBom)));
       _grbl.Calib(&_DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy]);
       _grbl._DSChuongTrinh = _DWIN._ChuongTrinhEEPROM;
       _ThongSoBoard.CaiDatThongSoBoardVaoROM(_ThongSoBoard.ChuyenDoiChuongTrinhSangJsonVar(_grbl._DSChuongTrinh));
@@ -444,10 +439,6 @@ void XuLyDuLieuNhanTuHMI(void)
     case FASTPUMP:
       if (DangFastPump == false){
         ChuongTrinh_t ChuongTrinhDangXuLy = _DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy];
-        // if (ChuongTrinhDangXuLy.SoVongDeBom1ml > 0)
-        //   WebUI::inputBuffer.push("G91A1000\r");
-        // else
-        //   WebUI::inputBuffer.push("G91A-1000\r");
         if (ChuongTrinhDangXuLy.TheTichBomDuocKhiQuay1Vong > 0)
           WebUI::inputBuffer.push("G91A1000\r");
         else

@@ -6,7 +6,7 @@ bool _GRBL::VeViTriHome()
      return false; //* tránh set home liên tục
   if (sys.state == State::Alarm)
   {
-    WebUI::inputBuffer.push("$X\r"); //* unlock khi đang gặp lỗi
+    WebUI::inputBuffer.write(0x18);
     delay(100);
   }
   WebUI::inputBuffer.push("$H\r"); //* set home
@@ -386,7 +386,15 @@ void _GRBL::TestFill(ChuongTrinh_t ChuongTrinh)
 
 void _GRBL::VeToaDoGoc(void)
 {
-  DiChuyenToiViTri(DEFAULT_HOMING_PULLOFF, -DEFAULT_HOMING_PULLOFF, -DEFAULT_HOMING_PULLOFF, TocDoTrungBinh);
+  if (sys.state == State::Alarm)
+  {
+    WebUI::inputBuffer.write(0x18);
+    delay(100);
+    WebUI::inputBuffer.push("$H\n");
+    delay(100);
+    return;
+  }
+  DiChuyenToiViTri(ToaDoGoc, TocDoTrungBinh);
 }
 
 _GRBL _grbl;

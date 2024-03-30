@@ -617,6 +617,8 @@ private:
   bool DangOViTriHome(void);
   void HienThiThongTinPhanPhoi(void);
 
+  void HienThiIconChuongTrinhDuocChon(uint32_t VpAddressNutNhanDauTien);
+
 };
 
 #endif

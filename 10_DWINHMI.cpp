@@ -275,6 +275,8 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
       /* Khi và chỉ khi người dùng xác định được chương trình sẽ chọn thì mới chuyển trang */
       if (lastcodeHMI >= _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh && lastcodeHMI <= _HMIBamNutChonChuongTrinh10TrangChonChuongTrinh)
       {
+        HienThiIconChuongTrinhDuocChon(_HMIBamNutChonChuongTrinh1TrangChonChuongTrinh);
+
         /* Tùy thuộc vào tính năng chọn chương trình để làm gì mà ta có việc chuyển trang tương ứng */
         switch (CheDoVaoTrangChonChuongTrinh)
         {
@@ -743,30 +745,11 @@ void DWINHMI::XuLyChonChuongTrinhSeChay(void)
   {
     GuiTextLenHMI(_VPTextHienThiTenProgramTrangCaiDatCheDoChuongTrinh, "");
     // GuiTextLenHMI(_VPTextHienThiChucNangProgramTrangCaiDatCheDoChuongTrinh, "");
-    
   }
   /* Khi bấm vào các icon để chuyển sang tick xanh để chọn program */
   if (codeHMI >= _HMIBamNutChonProgram1TrangCaiDatCheDoChuongTrinh && codeHMI <= _HMIBamNutChonProgram10TrangCaiDatCheDoChuongTrinh)
   {
-
-    /* Khi nhấn nút sẽ trả về VP của icon tại nút đó */
-    // IndexChuongTrinhDangXuLy = codeHMI % _HMIBamNutChonProgram1TrangCaiDatCheDoChuongTrinh;
-    int vp = _VPChonProgram1TrangCaiDatCheDoChuongTrinh + (codeHMI % _HMIBamNutChonProgram1TrangCaiDatCheDoChuongTrinh);
-
-    /* Cập nhật lại trạng thái chương trình */
-
-    for (uint8_t icon = 0; icon < SoLuongChuongTrinhToiDa; icon++)
-    {
-      if (icon == (codeHMI % _HMIBamNutChonProgram1TrangCaiDatCheDoChuongTrinh))
-      {
-        GuiIconLenHMI(vp, 1);
-        HienThiNoiDungChuongTrinh(icon, _VPTextHienThiChucNangProgramTrangCaiDatCheDoChuongTrinh);
-      }
-      else
-      {
-        GuiIconLenHMI(_VPChonProgram1TrangCaiDatCheDoChuongTrinh + icon, 0);
-      }
-    }
+    HienThiIconChuongTrinhDuocChon(_HMIBamNutChonProgram1TrangCaiDatCheDoChuongTrinh);
   }
   
   /* Kiểm tra nếu như chế độ vào trang chọn chương trình là khi ta thay đổi chương trình hiển thị tại trang cài đặt chế độ chương trình */
@@ -775,7 +758,6 @@ void DWINHMI::XuLyChonChuongTrinhSeChay(void)
     /* Hiển thị dữ liệu khi bấm chọn chương trình */
     if (codeHMI >= _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh && codeHMI <= _HMIBamNutChonChuongTrinh10TrangChonChuongTrinh && lastcodeHMI != codeHMI)
     {
-      // IndexChuongTrinhDangXuLy = codeHMI % _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh;
       CapNhatHienThiThongTinChuongTrinhTrangChonChuongTrinh();
     }
   
@@ -2876,3 +2858,25 @@ void DWINHMI::HienThiThongTinPhanPhoi(void)
   data = rackstr + volstr + fillstr;
   GuiTextLenHMI(_VPTextprogram1TrangThietLapChayCheDoMULTI + IdxKhuVucDangXuLy * 0x100, data);
 }
+
+void DWINHMI::HienThiIconChuongTrinhDuocChon(uint32_t VpAddressNutNhanDauTien)
+{
+  uint32_t VpAddressIcon = _VPChonProgram1TrangCaiDatCheDoChuongTrinh + (codeHMI % VpAddressNutNhanDauTien);
+
+  for (uint8_t icon = 0; icon < SoLuongChuongTrinhToiDa; icon++)
+  {
+    if (icon == (codeHMI % _HMIBamNutChonProgram1TrangCaiDatCheDoChuongTrinh))
+    {
+      GuiIconLenHMI(VpAddressIcon, 1);
+      HienThiNoiDungChuongTrinh(icon, _VPTextHienThiChucNangProgramTrangCaiDatCheDoChuongTrinh);
+    }
+    else
+    {
+      GuiIconLenHMI(_VPChonProgram1TrangCaiDatCheDoChuongTrinh + icon, 0);
+    }
+  }
+}
+
+
+//TODO cho thông tin chương trình ở trang đầu tiên và trang calib cùng 1 ô, khi chọn chương trình để xem thì đồng thời cũng chọn chương trình để calib.
+//TODO ở chế độ calib, khi chọn chương trình thì cũng hiển thị lại icon như trang đầu tiên

@@ -25,6 +25,8 @@ using namespace std;
 #define FIXED                               true
 #define ADJ                                 false
 
+#define ToaDoGoc                            DEFAULT_HOMING_PULLOFF, -DEFAULT_HOMING_PULLOFF, -DEFAULT_HOMING_PULLOFF
+
 typedef struct {
     uint8_t X;
     uint8_t Y;
@@ -149,3 +151,5 @@ typedef enum {
 //                      Y: 160 -> 330 = 170
 // Chiều dài chọn X:    740 -> 1500  = 760
                         // 50 -> 350 = 300
+
+                        
