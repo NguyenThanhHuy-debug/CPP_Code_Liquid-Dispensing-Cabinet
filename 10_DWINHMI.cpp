@@ -2690,7 +2690,10 @@ void DWINHMI::TaskFunction_RunTime(void)
 
     if (DuLieuBoardGuiLenHMI.OngDaPhanPhoi != OngDaPhanPhoi_prev && delay_flag == false)
     {
+      Serial.printf("OngDaPhanPhoi: %d, OngDaPhanPhoi_prev: %d\n",DuLieuBoardGuiLenHMI.OngDaPhanPhoi,OngDaPhanPhoi_prev);
+      Serial.printf("KhuVuc: %d, X: %d, Y: %d\n",DuLieuBoardGuiLenHMI.KhuVucDangChay,DuLieuBoardGuiLenHMI.ToaDoXDaChay,DuLieuBoardGuiLenHMI.ToaDoYDaChay);
       OngDaPhanPhoi_prev = DuLieuBoardGuiLenHMI.OngDaPhanPhoi;
+      IdxKhuVucDangXuLy = DuLieuBoardGuiLenHMI.KhuVucDangChay;
       HienThiMau(DuLieuBoardGuiLenHMI.KhuVucDangChay, DuLieuBoardGuiLenHMI.ToaDoXDaChay, DuLieuBoardGuiLenHMI.ToaDoYDaChay, _ChuongTrinhEEPROM[DSIndexChuongTrinhDuocChon[DuLieuBoardGuiLenHMI.KhuVucDangChay]], MauXanhLa);
       if (DuLieuBoardGuiLenHMI.DaChayXongCacKhuVuc == true)
       {

@@ -133,17 +133,23 @@ void _GRBL::BatDauPhanPhoi()
     float SoVongCanBom = (_DSChuongTrinh[IdxChuongTrinh].thetich * 1000 / (_DSChuongTrinh[IdxChuongTrinh].TheTichBomDuocKhiQuay1Vong * _DSChuongTrinh[IdxChuongTrinh].duongkinhong)) ;
 
     vector<toadoINT_t> DSToaDoCanChay = _DSChuongTrinh[IdxChuongTrinh].DsToaDo[i];
+
+    for (auto ToaDo: _DSChuongTrinh[IdxChuongTrinh].DsToaDo[i])
+    {
+      Serial.printf("Toa do: %d %d\n", ToaDo.X, ToaDo.Y);
+    }
+
     toado_t ViTriACanChay = _DSChuongTrinh[IdxChuongTrinh].ViTriA[i];
     toado_t ViTriBCanChay = _DSChuongTrinh[IdxChuongTrinh].ViTriB[i];
     toado_t ViTriCCanChay = _DSChuongTrinh[IdxChuongTrinh].ViTriC[i];
     float ViTriHCanChay = _DSChuongTrinh[IdxChuongTrinh].ViTriH[i];
 
-    RackXHienTai = _DSChuongTrinh[IdxChuongTrinh].rackX;
-    RackYHienTai = _DSChuongTrinh[IdxChuongTrinh].rackY;
     KhuVucDangChay = i;
 
     for (uint8_t ToaDoHienTai = 0; ToaDoHienTai < DSToaDoCanChay.size(); ToaDoHienTai++)
     {
+
+      Serial.printf("ToaDoXDaChay: %d, ToaDoYDaChay: %d\n", ToaDoXDaChay, ToaDoYDaChay);
       //* Di chuyển đến vị trí X Y Z
       asprintf(&ViTri, "G1G90X%gY%gZ%gF%d\r", ViTriACanChay.X + DSToaDoCanChay[ToaDoHienTai].X * _KhoangCachGiuaHaiOng.X,
                                               ViTriACanChay.Y + DSToaDoCanChay[ToaDoHienTai].Y * _KhoangCachGiuaHaiOng.Y, ViTriHCanChay, 
@@ -161,27 +167,20 @@ void _GRBL::BatDauPhanPhoi()
       WebUI::inputBuffer.push(ChongNhoGiot);
       free(ChongNhoGiot);
       //* phải delay để grbl xử lý xong lệnh
-      delay(100);
+      delay(200);
 
-      while ((sys.state == State::Cycle) || (sys.state == State::Hold) || (sys.state == State::Homing)) {
-
+      while ((sys.state == State::Cycle) || (sys.state == State::Hold)) 
+      {
         if (CoBaoDungPhanPhoi == true) {
           return;
         }
         delay(1);
       }
 
-      if (sys.state != State::Alarm) 
-      {
-        KhuVucDangChay = i;
-        OngDaPhanPhoi = ToaDoHienTai;
-        ToaDoXDaChay = DSToaDoCanChay[ToaDoHienTai].X;
-        ToaDoYDaChay = DSToaDoCanChay[ToaDoHienTai].Y;
-      }
-      else 
-      {
-        break;
-      }
+      OngDaPhanPhoi = ToaDoHienTai;
+      ToaDoXDaChay = _DSChuongTrinh[IdxChuongTrinh].DsToaDo[i][ToaDoHienTai].X;
+      ToaDoYDaChay = _DSChuongTrinh[IdxChuongTrinh].DsToaDo[i][ToaDoHienTai].Y;
+      Serial.printf("OngDaPhanPhoi: %d\n", OngDaPhanPhoi);
     }
   }
   DaChayXongCacKhuVuc = true;

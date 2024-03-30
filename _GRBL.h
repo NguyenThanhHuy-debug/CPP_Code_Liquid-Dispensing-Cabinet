@@ -10,30 +10,7 @@
 #define DoUuTienGRBL      3
 #define DoUuTienPhanPhoi  2
 
-#define SoLuongKhuVucToiDa 5
-
 #define TheTichBomDuocKhiQuay1VongMacDinh 187.125748503 // ul/duongkinhong
-
-//* API Step bơm
-//* BatDauCalibBom();
-//* TamDungCalibBom();
-//* LuuThongSoCalibBom();
-
-//* API Phan phoi
-
-/*
-*   Các biến giá trị:
-*    Tạo ra 1 vector một program
-*   - Struct Program:
-*   + Volume
-*   + Tubing ID
-*   + Pump speed
-*   + Antidrop
-*   + Rack
-*   + Postion A,B,c
-*   + Fill head hight H
-*   + Speed run
-  */
 
 double KhoangCachGiua2Diem(const toadoINT_t& Diem1, const toadoINT_t& Diem2);
 vector<uint8_t> ThuatToanTimDuongDiNganNhat(const vector<toadoINT_t>& DanhSachToaDo);
