@@ -2083,7 +2083,6 @@ void DWINHMI::Debug(vector<ChuongTrinh_t> data)
   for(int i = 0; i < data.size(); i++)
   {
     ESP_LOGI("DULIEUHMI","Ten chuong trinh: %s",data[i].tenchuongtrinh.c_str());
-    ESP_LOGI("DULIEUHMI","Trang thai chuong trinh: %d",data[i].TrangThaiChuongTrinh);  
     ESP_LOGI("DULIEUHMI","So ong phan phoi: %d",data[i].DsToaDo[IdxKhuVucDangXuLy].size());  
   }
 }
@@ -2711,6 +2710,7 @@ void DWINHMI::TaskFunction_RunTime(void)
             {
               continue;
             }
+            IdxKhuVucDangXuLy = i;
             ResetFullMau(DSIndexChuongTrinhDuocChon[i], MauDo, i);
           }
           vTaskSuspend(xTaskHandle_RunTime);

@@ -48,8 +48,6 @@ public:
 
     int8_t KhuVucDangChay = -1;
     int8_t OngDaPhanPhoi = -1;
-    uint8_t RackXHienTai;
-    uint8_t RackYHienTai;
     uint8_t ToaDoXDaChay;
     uint8_t ToaDoYDaChay;
     bool DaChayXongCacKhuVuc = false;

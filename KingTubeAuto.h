@@ -4,38 +4,26 @@
 #include <vector>
 using namespace std;
 
-#define DEBUG_POST_GET
-#define DEBUG_WIFI
-#define DEBUG_LOG_HMI
-// #define CoKetNoiServer  // Khai báo label này để dùng tính năng POST/GET với server.
+#define Serial                              Uart0
 
-#define build_test_chay_khong_Wifi
+#define SoLuongChuongTrinhToiDa             10
+#define SoLuongKhuVucToiDa                  2
+#define SoLuongChuongTrinhCoDinh            5
 
-#define Serial            Uart0
+#define TrucX                               X_AXIS
+#define TrucY                               Y_AXIS
+#define TrucZ                               Z_AXIS
+#define MayBom                              A_AXIS
 
-#define SoLuongChuongTrinhToiDa 10
-#define SoLuongKhuVucToiDa 2
-#define SoLuongChuongTrinhCoDinh 5
+#define Duong                               true
+#define Am                                  false
 
-#define DuocChon          true
-#define KhongDuocChon     false
+#define TocDoCao                            DEFAULT_X_MAX_RATE           
+#define TocDoTrungBinh                      DEFAULT_X_MAX_RATE / 2
+#define TocDoThap                           DEFAULT_X_MAX_RATE / 4
 
-#define TrucX             X_AXIS
-#define TrucY             Y_AXIS
-#define TrucZ             Z_AXIS
-#define MayBom            A_AXIS
-
-#define Duong             true
-#define Am                false
-
-#define TocDoCao          DEFAULT_X_MAX_RATE           
-#define TocDoTrungBinh    DEFAULT_X_MAX_RATE / 2
-#define TocDoThap         DEFAULT_X_MAX_RATE / 4
-
-#define SoBuoc            10 //* 10mm
-
-#define FIXED             true
-#define ADJ               false
+#define FIXED                               true
+#define ADJ                                 false
 
 typedef struct {
     uint8_t X;
@@ -48,7 +36,6 @@ typedef struct {
 }toado_t;
 
 typedef struct {
-    bool TrangThaiChuongTrinh = KhongDuocChon;
     String tenchuongtrinh;
 
     float thetich = 5.0; //ml
@@ -60,10 +47,10 @@ typedef struct {
     uint8_t rackX = 12;
     uint8_t rackY = 8;
 
-    vector<toado_t> ViTriA = { { 21.0, -21.0 },     { 300.0, -21.0 } };
-    vector<toado_t> ViTriB = { { 274.0, -21.0 },    {500.0, -21.0 } };
-    vector<toado_t> ViTriC = { { 274.0, -181.0 },   { 500.0, -181.0 } };
-    vector<float> ViTriH = { {-380.0},            {-380.0} };
+    toado_t ViTriA[SoLuongKhuVucToiDa] = { { 21.0, -21.0 },     { 300.0, -21.0 } };
+    toado_t ViTriB[SoLuongKhuVucToiDa] = { { 274.0, -21.0 },    {500.0, -21.0 } };
+    toado_t ViTriC[SoLuongKhuVucToiDa] = { { 274.0, -181.0 },   { 500.0, -181.0 } };
+    float ViTriH[SoLuongKhuVucToiDa] = { {-380.0},            {-380.0} };
     
     vector<toadoINT_t> DsToaDo[SoLuongKhuVucToiDa];
 
