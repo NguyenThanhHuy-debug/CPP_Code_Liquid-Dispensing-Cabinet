@@ -52,7 +52,7 @@ typedef struct {
     toado_t ViTriA[SoLuongKhuVucToiDa] = { { 21.0, -21.0 },     { 300.0, -21.0 } };
     toado_t ViTriB[SoLuongKhuVucToiDa] = { { 274.0, -21.0 },    {500.0, -21.0 } };
     toado_t ViTriC[SoLuongKhuVucToiDa] = { { 274.0, -181.0 },   { 500.0, -181.0 } };
-    float ViTriH[SoLuongKhuVucToiDa] = { {-380.0},            {-380.0} };
+    float ViTriH[SoLuongKhuVucToiDa] = {-380.0,                -380.0};
     
     vector<toadoINT_t> DsToaDo[SoLuongKhuVucToiDa];
 
