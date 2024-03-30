@@ -4,7 +4,6 @@
 
 #include "KingTubeAuto.h"
 #include <limits>
-#include <algorithm>
 
 // #define debug_grbl
 
@@ -41,7 +40,6 @@ vector<uint8_t> ThuatToanTimDuongDiNganNhat(const vector<toadoINT_t>& DanhSachTo
 
 class _GRBL {
 public:
-    void ResetChuongTrinh();
     bool VeViTriHome();
     void SapXepThuTuOng(vector<toadoINT_t>& DANHSACHTOADO);
     void BatDauPhanPhoi();
@@ -59,9 +57,6 @@ public:
     void TiepTucPhanPhoi(void);
     void DungPhanPhoi(void);
 
-    void BatDauCalib(ChuongTrinh_t& ChuongTrinh);
-    void DungCalib(ChuongTrinh_t& ChuongTrinh);
-    void LuuCalib(ChuongTrinh_t& ChuongTrinh);
     vector<ChuongTrinh_t> _DSChuongTrinh;
 
     void TamDungChay(void);
@@ -72,6 +67,8 @@ public:
 
     void TestFill(ChuongTrinh_t ChuongTrinh);
 
+    void VeToaDoGoc(void);
+
     int8_t KhuVucDangChay = -1;
     int8_t OngDaPhanPhoi = -1;
     uint8_t RackXHienTai;
@@ -79,6 +76,7 @@ public:
     uint8_t ToaDoXDaChay;
     uint8_t ToaDoYDaChay;
     bool DaChayXongCacKhuVuc = false;
+    int8_t KhuVucChay[SoLuongKhuVucToiDa];
 
 private:
     bool CoBaoDungPhanPhoi = false;

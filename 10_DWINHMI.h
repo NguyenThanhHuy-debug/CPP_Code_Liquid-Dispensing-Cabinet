@@ -106,6 +106,7 @@
 /* Define các nút bấm trang 130 */
 #define _HMIBamNutEXITTrangManualControl 0x181
 #define _HMIBamNutGoHomeTrangChaySetHome 0x81
+#define _HMIBamNutGoHome //TODO keycode go home
 #define _HMIBamNutExitTrangSetHome 0x82
 /* Define các nút bấm trang 131 va 152 */
 #define _HMIBamNutRunTrangCaiDatCheDoChuongTrinh 0x83
@@ -560,6 +561,7 @@ public:
   int8_t IndexChuongTrinhDangXuLy;                           // Đây là biến tạm để biết chương trình nào đang xử lý
   uint8_t countTest = 1;
   // vector<toadoINT_t> DSToaDoKhuVuc[SoLuongKhuVucToiDa];
+  int8_t DSIndexChuongTrinhDuocChon[SoLuongKhuVucToiDa];                   
 
 private:
   uint16_t KichThuocHcnDaVeTheoX;  // kích thước X / 2
@@ -576,7 +578,6 @@ private:
   uint32_t DentaT = 0;
   // uint8_t NutModidyDaBam;                                         // Đây là biến dùng để biết nút modify nào được bấm để hiển thị full chương trình hợp lý           
   uint8_t IdxKhuVucDangXuLy;                              // Đây là biến dùng để sử dụng ở chế độ multi để biêt chương trình nào đang được thay đổi
-  int8_t DSIndexChuongTrinhDuocChon[SoLuongKhuVucToiDa];                    // Đây là biến dùng để xử lý chương trình được chọn ở chê độ MULTI
   CheDoVaoTrangChonChuongTrinh_t CheDoVaoTrangChonChuongTrinh;
   CheDoVaoTrangBanPhim_t CheDoVaoTrangBanPhim;
   CheDoVaoTrangBanPhimMoRong_t CheDoVaoTrangBanPhimMoRong;

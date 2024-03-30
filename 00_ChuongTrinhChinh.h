@@ -25,4 +25,6 @@ void CapNhatDanhSachChuongTrinhLuuTrongEEPROM();
 void CaiDatNguon(void);
 void KiemTraNguon(void);
 
+void Shutdown(void);
+
 #endif

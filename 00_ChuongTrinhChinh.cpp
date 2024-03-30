@@ -242,6 +242,7 @@ void XuLyDuLieuNhanTuHMI(void)
         #ifdef debug
         Serial.println("RUN PhanPhoi");
         #endif
+        memcpy(_grbl.KhuVucChay, _DWIN.DSIndexChuongTrinhDuocChon, SoLuongKhuVucToiDa);
         _grbl.PhanPhoi();
       }
       break;
@@ -273,7 +274,8 @@ void XuLyDuLieuNhanTuHMI(void)
         _grbl.DungPhanPhoi();
       }
       //TODO reset thứ tự chạy và tọa độ hiện tại
-      _grbl.VeViTriHome();
+      // _grbl.VeViTriHome();
+      _grbl.VeToaDoGoc();
       // _grbl._DSChuongTrinh = DSChuongTrinhLuuTrongEeprom;
       break;
     // case CAPNHATCHUONGTRINH:
@@ -290,7 +292,7 @@ void XuLyDuLieuNhanTuHMI(void)
       _ThongSoBoard.CaiDatThongSoBoardVaoROM(_ThongSoBoard.ChuyenDoiChuongTrinhSangJsonVar(_grbl._DSChuongTrinh));
       break;
     case BAMNUTDICHUYENXTRU:
-      // if (_DWIN.DuLieuBoardGuiLenHMI.ViTriHienTaiX - SoBuocTamThoi < DEFAULT_HOMING_PULLOFF)
+      // if (_DWIN.DuLieuBoardGuiLenHMI.V iTriHienTaiX - SoBuocTamThoi < DEFAULT_HOMING_PULLOFF)
       //   break;
       _grbl.DiChuyenX(Am,SoBuocTamThoi,TocDoTamThoi);
       #ifdef debug
@@ -570,8 +572,11 @@ void CapNhatDanhSachChuongTrinhLuuTrongEEPROM()
     {
       DSChuongTrinhLuuTrongEeprom[i].TheTichBomDuocKhiQuay1Vong = TheTichBomDuocKhiQuay1VongMacDinh;
     }
+  }
 
-    
+  for (uint8_t i = 0; i < SoLuongChuongTrinhCoDinh; i++)
+  {
+    DSChuongTrinhLuuTrongEeprom[i].type = FIXED;
   }
 
   _grbl._DSChuongTrinh = DSChuongTrinhLuuTrongEeprom;
@@ -639,4 +644,9 @@ void ThucThiCacTacVuTheoFlag()
     _RTC.LayRTCTuDS3231();
     KiemTraNguon();
   }
+}
+
+void Shutdown(void)
+{
+  digitalWrite(_ChanKichNguon, LOW);
 }

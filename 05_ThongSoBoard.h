@@ -8,7 +8,7 @@
 // #define debug
 // // Từ vị trí 0-409 là vùng EEPROM chứa thông số board.
 #define _ChieuDaiMaxThongSoBoard 409
-#define _ChieuDaiI2CEEPROM 1700
+#define _ChieuDaiI2CEEPROM 2000
 #define _SoChuongTrinh 10  // Số chương trình cài đặt để user chọn khi chạy máy
 #define _ChieuDaiMaxTenChuongTrinh 20
 #define _KyTu '\r'

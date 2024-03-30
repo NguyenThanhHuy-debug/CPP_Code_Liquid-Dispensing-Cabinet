@@ -1,5 +1,5 @@
 #include "_GRBL.h"
-// #define debug_grbl
+#define debug_grbl
 bool _GRBL::VeViTriHome()
 {
   if (sys.state == State::Homing)
@@ -97,72 +97,29 @@ void _GRBL::BatDauPhanPhoi()
 
   // Chờ đến khi về Home xong
   // while (sys.state == State::Homing) delay(1);
-  // TODO: Hiển thị các giá trị của danh sách tọa độ lên màn hình dwin
-  // TODO: Hiển thị thời gian bắt đầu 0:00
+
 
   //* Xử lý vụ multi với simple
   char* ViTri;
   char* SoVongDeBomDungTheTich;
   char* ChongNhoGiot;
 
-#ifdef debug_grbl
-  for (uint8_t i = 0; i < _DSChuongTrinh.size(); i++){
-    Serial.printf("Chuongtrinh: %s, ToaDoHienTai: %d\n", _DSChuongTrinh[i].tenchuongtrinh.c_str(), _DSChuongTrinh[i].ToaDoHienTai);
-    if (_DSChuongTrinh[i].TrangThaiChuongTrinh == DuocChon){
-      Serial.printf("ChuongTrinh %s - Size %d\n", _DSChuongTrinh[i].tenchuongtrinh.c_str(), _DSChuongTrinh[i].DanhSachToaDo.size());
-    }
-  }
-
-  for (uint8_t i = 0; i < _DSChuongTrinh.size(); i++)
-  {
-    if (_DSChuongTrinh[i].TrangThaiChuongTrinh == DuocChon)
-    {
-      for (uint8_t j = 0; j < _DSChuongTrinh[i].DanhSachToaDo.size(); j++)
-      {
-        Serial.printf("ChuongTrinh: %s, Toa do X: %d, Y: %d\n", _DSChuongTrinh[i].tenchuongtrinh.c_str(), _DSChuongTrinh[i].DanhSachToaDo[j].X, _DSChuongTrinh[i].DanhSachToaDo[j].Y);
-        _DSChuongTrinh[i].ToaDoHienTai = -1;
-      }
-    }
-  }
-
-#endif
   DaChayXongCacKhuVuc = false;
-  // Sắp xếp thứ tự chạy của các chương trình được chọn dựa vào TrangThaiChuongTrinh và ThuTuChuongTrinhCanChay
-  int8_t ThuTuChuongTrinhCanChay[SoLuongKhuVucToiDa];
-  memset(ThuTuChuongTrinhCanChay, -1, sizeof(ThuTuChuongTrinhCanChay));
 
-  vector<ChuongTrinh_t> DsChuongTrinhCanChay;
-
-  for (uint8_t i = 0; i < _DSChuongTrinh.size(); i++)
-  {
-    if (_DSChuongTrinh[i].KhuVucChay.size() > 0)
-    {
-      sort(_DSChuongTrinh[i].KhuVucChay.begin(), _DSChuongTrinh[i].KhuVucChay.end()); //TODO bỏ nếu không thật sự cần
-      for (auto j : _DSChuongTrinh[i].KhuVucChay)
-      {
-        ThuTuChuongTrinhCanChay[j] = i;
-      }
-    }
-    
-  }
-
-  for (auto i : ThuTuChuongTrinhCanChay)
+  for (auto i : KhuVucChay)
   {
     Serial.printf("Thu tu chay: %d\n", i);
   }
-
+  OngDaPhanPhoi = -1;
   // Chạy các chương trình theo thứ tự đã sắp xếp
-  for (uint8_t i = 0; i < sizeof(ThuTuChuongTrinhCanChay); i++)
+  for (uint8_t i = 0; i < sizeof(KhuVucChay); i++)
   {
-    int8_t IdxChuongTrinh = ThuTuChuongTrinhCanChay[i];
+    int8_t IdxChuongTrinh = KhuVucChay[i];
     if (IdxChuongTrinh == -1) continue;
     //* Nếu chương trình không được chọn hoặc không có ống cần phân phối thì bỏ qua
-    #ifdef debug_grbl
-    for (uint8_t ToaDo = 0; ToaDo < _DSChuongTrinh[IdxChuongTrinh].DanhSachToaDo.size();ToaDo++)
-    {
-      Serial.printf("Toa do %d: %d %d\n", ToaDo, _DSChuongTrinh[IdxChuongTrinh].DanhSachToaDo[ToaDo].X, _DSChuongTrinh[IdxChuongTrinh].DanhSachToaDo[ToaDo].Y);
-    }
-    #endif
+
+
+    OngDaPhanPhoi = -1;
 
     TinhKhoangCachGiuaHaiOng(_DSChuongTrinh[IdxChuongTrinh], i);
     //* Sắp xếp lại thứ tự di chuyển của các ống cần phân phối
@@ -192,11 +149,6 @@ void _GRBL::BatDauPhanPhoi()
                                               ViTriACanChay.Y + DSToaDoCanChay[ToaDoHienTai].Y * _KhoangCachGiuaHaiOng.Y, ViTriHCanChay, 
                                               _DSChuongTrinh[IdxChuongTrinh].tocdoXY); //thêm F để đặt tôc độ trục XY
       WebUI::inputBuffer.push(ViTri);
-      #ifdef debug_grbl
-      Serial.printf("X: %g Y: %g Z: %g\n", _DSChuongTrinh[IdxChuongTrinh].vitriA.X + _DSChuongTrinh[IdxChuongTrinh].DanhSachToaDo[ToaDoHienTai].X * _KhoangCachGiuaHaiOng.X,
-        _DSChuongTrinh[IdxChuongTrinh].vitriA.Y + _DSChuongTrinh[IdxChuongTrinh].DanhSachToaDo[ToaDoHienTai].Y * _KhoangCachGiuaHaiOng.Y,
-        _DSChuongTrinh[IdxChuongTrinh].docaoH);
-      #endif
       free(ViTri);
 
       //* Xoay ống bơm 
@@ -239,12 +191,7 @@ void _GRBL::BatDauPhanPhoi()
 float _GRBL::ViTriHienTaiCuaSTEP(uint8_t STEP) {
   return sys_position[STEP] / axis_settings[STEP]->steps_per_mm->get();
 }
-//* Nhấn nút RESET PROGRAME ở RUNTIME USER INTERFACE để chạy lại chương trình
-void _GRBL::ResetChuongTrinh()
-{
-  // TODO: Hiển thị các giá trị reset lại từ đầu
-  BatDauPhanPhoi();
-}
+
 
 void _GRBL::TamDungPhanPhoi(void) {
   WebUI::inputBuffer.push("!\r");
@@ -265,27 +212,6 @@ void _GRBL::DungPhanPhoi(void) {
   WebUI::inputBuffer.push("$X\n");
   delay(100);
 }
-
-void _GRBL::BatDauCalib(ChuongTrinh_t& ChuongTrinh) {
-  sys_position[MayBom] = 0;
-
-  char* ViTri;
-  asprintf(&ViTri, "A1000F%d\r", ChuongTrinh.tocdobom);
-  WebUI::inputBuffer.push("A1000\r");
-  free(ViTri);
-
-  //TODO: Bắt đầu đếm thời gian
-}
-
-void _GRBL::DungCalib(ChuongTrinh_t& ChuongTrinh) {
-  TamDungChay();
-}
-
-// void _GRBL::LuuCalib(ChuongTrinh_t& ChuongTrinh) {
-//   float SoVongDaQuayCuaMayBom = ViTriHienTaiCuaSTEP(MayBom);
-//   float TheTichThuc = _KhoiLuongThuc / _KhoiLuongRieng;
-//   _SoVongDeBomDungTheTich = ChuongTrinh.thetich * SoVongDaQuayCuaMayBom / TheTichThuc;
-// }
 
 
 //* Các hàm điều khiển X+, X-, Y+, Y-, Z+, Z-
@@ -459,5 +385,9 @@ void _GRBL::TestFill(ChuongTrinh_t ChuongTrinh)
 
 }
 
+void _GRBL::VeToaDoGoc(void)
+{
+  DiChuyenToiViTri(DEFAULT_HOMING_PULLOFF, -DEFAULT_HOMING_PULLOFF, -DEFAULT_HOMING_PULLOFF, TocDoTrungBinh);
+}
 
 _GRBL _grbl;

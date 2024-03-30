@@ -15,6 +15,7 @@ using namespace std;
 
 #define SoLuongChuongTrinhToiDa 10
 #define SoLuongKhuVucToiDa 2
+#define SoLuongChuongTrinhCoDinh 5
 
 #define DuocChon          true
 #define KhongDuocChon     false
@@ -32,6 +33,9 @@ using namespace std;
 #define TocDoThap         DEFAULT_X_MAX_RATE / 4
 
 #define SoBuoc            10 //* 10mm
+
+#define FIXED             true
+#define ADJ               false
 
 typedef struct {
     uint8_t X;
@@ -61,14 +65,13 @@ typedef struct {
     vector<toado_t> ViTriC = { { 274.0, -181.0 },   { 500.0, -181.0 } };
     vector<float> ViTriH = { {-380.0},            {-380.0} };
     
-    vector<toadoINT_t> DanhSachToaDo;
     vector<toadoINT_t> DsToaDo[SoLuongKhuVucToiDa];
 
     float actualweight = 0;
     float density = 1;
     // float SoVongDeBom1ml = 0.521875;
     float TheTichBomDuocKhiQuay1Vong = 187.125748503; // ul/duongkinhong
-    vector<uint8_t> KhuVucChay;
+    bool type = ADJ;
 }ChuongTrinh_t;
 
 typedef enum {

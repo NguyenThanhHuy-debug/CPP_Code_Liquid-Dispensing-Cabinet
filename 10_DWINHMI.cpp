@@ -229,6 +229,16 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
     /* =============================== BEGIN: CODE TRANG 131 CÀI ĐẶT CHẾ ĐỘ CHƯƠNG TRÌNH ===============================*/
     case _HMIBamNutRunTrangCaiDatCheDoChuongTrinh:
     {
+
+      for (uint8_t Idx = 0; Idx < sizeof(DSIndexChuongTrinhDuocChon); Idx++)
+      {
+        if (DSIndexChuongTrinhDuocChon[Idx] == -1)
+        {
+          continue;
+        }
+        // _ChuongTrinhEEPROM[DSIndexChuongTrinhDuocChon[Idx]].KhuVucChay.push_back()
+      }
+
       for (uint8_t i = 0; i < sizeof(DSIndexChuongTrinhDuocChon); i++)
       {
         if (DSIndexChuongTrinhDuocChon[i] == -1)
@@ -298,7 +308,14 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
           DWIN::setPage(_TrangCaiDat);
           break;
         case _VaoTrangTuCacNutProgramTrangCaiDatCheDoChuongTrinh:
-          //TODO quay lại trang chính 131
+          if (DangOViTriHome() == true)
+          {
+            DWIN::setPage(_TrangCaiDatCheDoChuongTrinh_HOME);
+          }
+          else
+          {
+            DWIN::setPage(_TrangCaiDatCheDoChuongTrinh_notHOME);
+          }
           break;
         case _VaoTrangTuNutCopyTrangThongSoChuongTrinh:
           DWIN::setPage(_TrangThongSoChuongTrinh);
@@ -343,7 +360,8 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
     }
     case _HMIBamNutEXITTrangPhanPhoiViTri:
     {
-      //TODO quay lại trang chính
+      //TODO reset lại các giá trị
+
       if (DangOViTriHome() == true)
       {
         DWIN::setPage(_TrangCaiDatCheDoChuongTrinh_HOME);
@@ -370,7 +388,6 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
       /* Chỉ thực hiện Exit khi đã máy đã tắt */
       if (BamNutRunON == false)
       {
-        //TODO quay lại trang chính
         if (DangOViTriHome() == true)
         {
           DWINHMI::setPage(_TrangCaiDatCheDoChuongTrinh_HOME);
@@ -774,7 +791,6 @@ void DWINHMI::XuLyChonChuongTrinhSeChay(void)
 
       DSIndexChuongTrinhDuocChon[IdxKhuVucDangXuLy] = lastcodeHMI % _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh;
 
-      //TODO hiển thị tên chương trình ở trang 131 và thông tin ở trang chọn chương trình
       GuiTextLenHMI(_VPTextHienThiTenProgramTrangCaiDatCheDoChuongTrinh, _ChuongTrinhEEPROM[DSIndexChuongTrinhDuocChon[IdxKhuVucDangXuLy]].tenchuongtrinh);
       HienThiNoiDungChuongTrinh(DSIndexChuongTrinhDuocChon[IdxKhuVucDangXuLy], _VPTextHienThiChuongTrinhTrangChonChuongTrinh);
       HienThiThongTinPhanPhoi();

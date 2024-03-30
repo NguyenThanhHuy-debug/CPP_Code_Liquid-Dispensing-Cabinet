@@ -112,16 +112,6 @@ void ThongSoBoard::ThietLapThongSoBoardMacDinh(void) {
     ChuongTrinhGoc.tenchuongtrinh = "Program " + String(i + 1);
     this->ThongSo["ChuongTrinh" + String((i + 1))] = ChuyenChuongTrinhThanhJsonString(ChuongTrinhGoc);
   }
-  // this->ThongSo["ChuongTrinh1"] =   "Program 1           &05.0&03.0&1000&1000&90&12&8&21.0%-21.0&21.0%-181.0&274.0%-181.0&-380.0&1&"; //73
-  // this->ThongSo["ChuongTrinh2"] =   "Program 2           &05.0&03&1000&1000&90&12&8&21.0%-21.0&21.0%-181.0&274.0%-181.0&-380.0&1&";
-  // this->ThongSo["ChuongTrinh3"] =   "Program 3           &05.0&03&1000&1000&90&12&8&21.0%-21.0&21.0%-181.0&274.0%-181.0&-380.0&1&";
-  // this->ThongSo["ChuongTrinh4"] =   "Program 4           &05.0&03&1000&1000&90&12&8&21.0%-21.0&21.0%-181.0&274.0%-181.0&-380.0&1&";
-  // this->ThongSo["ChuongTrinh5"] =   "Program 5           &05.0&03&1000&1000&90&12&8&21.0%-21.0&21.0%-181.0&274.0%-181.0&-380.0&1&";
-  // this->ThongSo["ChuongTrinh6"] =   "Program 6           &05.0&03&1000&1000&90&12&8&21.0%-21.0&21.0%-181.0&274.0%-181.0&-380.0&1&";
-  // this->ThongSo["ChuongTrinh7"] =   "Program 7           &05.0&03&1000&1000&90&12&8&21.0%-21.0&21.0%-181.0&274.0%-181.0&-380.0&1&";
-  // this->ThongSo["ChuongTrinh8"] =   "Program 8           &05.0&03&1000&1000&90&12&8&21.0%-21.0&21.0%-181.0&274.0%-181.0&-380.0&1&";
-  // this->ThongSo["ChuongTrinh9"] =   "Program 9           &05.0&03&1000&1000&90&12&8&21.0%-21.0&21.0%-181.0&274.0%-181.0&-380.0&1&";
-  // this->ThongSo["ChuongTrinh10"] =  "Program 10          &05.0&03&1000&1000&90&12&8&21.0%-21.0&21.0%-181.0&274.0%-181.0&-380.0&1&";
 
 #ifdef debug
   Serial.println("Thông số board mặc định: ");
@@ -225,7 +215,7 @@ void ThongSoBoard::XoaEEPROM(int start, int end) {
 String ThongSoBoard::ChuyenChuongTrinhThanhJsonString(ChuongTrinh_t ChuongTrinh){
   String strChuongTrinh = "";
   char *ThongSoChuongTrinh;
-  asprintf(&ThongSoChuongTrinh, "%s&%07.3f&%07.3f&%05d&%05d&%07.3f&%02d&%02d&%07.3f%%%07.3f&%07.3f%%%07.3f&%07.3f%%%07.3f&%07.3f&%07.3f&", 
+  asprintf(&ThongSoChuongTrinh, "%s&%07.3f&%07.3f&%05d&%05d&%07.3f&%02d&%02d&%07.3f%%%07.3f&%07.3f%%%07.3f&%07.3f%%%07.3f&%07.3f&%07.3f%%%07.3f&%07.3f%%%07.3f&%07.3f%%%07.3f&%07.3f&%07.3f", 
           DienVaoChoTrong(ChuongTrinh.tenchuongtrinh).c_str(), ChuongTrinh.thetich, ChuongTrinh.duongkinhong, ChuongTrinh.tocdobom, 
           ChuongTrinh.tocdoXY, ChuongTrinh.chongnhogiot, ChuongTrinh.rackX, ChuongTrinh.rackY, ChuongTrinh.ViTriA[0].X, ChuongTrinh.ViTriA[0].Y, ChuongTrinh.ViTriB[0].X, ChuongTrinh.ViTriB[0].Y, ChuongTrinh.ViTriC[0].X, ChuongTrinh.ViTriC[0].Y, ChuongTrinh.ViTriH[0],
           ChuongTrinh.ViTriA[1].X, ChuongTrinh.ViTriA[1].Y, ChuongTrinh.ViTriB[1].X, ChuongTrinh.ViTriB[1].Y, ChuongTrinh.ViTriC[1].X, ChuongTrinh.ViTriC[1].Y, ChuongTrinh.ViTriH[1],
