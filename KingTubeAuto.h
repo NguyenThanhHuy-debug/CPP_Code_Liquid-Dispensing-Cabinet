@@ -27,6 +27,8 @@ using namespace std;
 
 #define ToaDoGoc                            DEFAULT_HOMING_PULLOFF, -DEFAULT_HOMING_PULLOFF, -DEFAULT_HOMING_PULLOFF
 
+#define MatKhau                             "000000"
+
 typedef struct {
     uint8_t X;
     uint8_t Y;
@@ -56,8 +58,8 @@ typedef struct {
     
     vector<toadoINT_t> DsToaDo[SoLuongKhuVucToiDa];
 
-    float actualweight = 0;
-    float density = 1;
+    float actualweight = 1.0;
+    float density = 1.0;
     // float SoVongDeBom1ml = 0.521875;
     float TheTichBomDuocKhiQuay1Vong = 187.125748503; // ul/duongkinhong
     bool type = ADJ;

@@ -484,6 +484,7 @@ typedef enum {
   _VaoTrangThietLapTocDoTrucXY,
   _VaoTrangBanPhimSecondLoop,
   _VaoTrangBanPhimCaiDatThoiGian,
+  _VaoTrangBanPhimMatKhau,
 }CheDoVaoTrangBanPhim_t;
 typedef enum {
   _VaoTrangBanPhimMoRongTuNutEDITTrangThongSoChuongTrinh,

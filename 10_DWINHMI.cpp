@@ -288,6 +288,17 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
             break;
           case _VaoTrangTuNutCopyTrangThongSoChuongTrinh:
           case _VaoTrangTuNutSetupProgramTrangCaiDatCheDoChuongTrinh:
+            if (lastcodeHMI >= _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh && lastcodeHMI < _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh + SoLuongChuongTrinhCoDinh)
+            {
+              //TODO setPage mat khau
+              CheDoVaoTrangBanPhim = _VaoTrangBanPhimMatKhau;
+            }
+            else
+            {
+              DWIN::setPage(_TrangThongSoChuongTrinh);
+            }
+            break;
+
           case _VaoTrangTuNutOK_EXITTrangThongSoChuongTrinh:
             DWIN::setPage(_TrangThongSoChuongTrinh);
             break;
@@ -1168,6 +1179,10 @@ void DWINHMI::XuLyBanPhim(void)
   {
     ChuoiDangNhap = "";
   }
+  if (codeHMI == _HMIBamNutOKTrangChonChuongTrinh && CheDoVaoTrangChonChuongTrinh == _VaoTrangTuNutSetupProgramTrangCaiDatCheDoChuongTrinh /* && getPage() == _TrangMatKhau*/)
+  {
+    ChuoiDangNhap = "";
+  }
   /* Khi bấm nút trên bàn phím */
   if( (codeHMI >= _HMIBamNutBanPhim0 && codeHMI <= _HMIBamNutBanPhim9) 
   || (codeHMI == _HMIBamNutBanPhimdelete && ChuoiDangNhap.length() > 0)
@@ -1238,6 +1253,9 @@ void DWINHMI::XuLyBanPhim(void)
       case _VaoTrangBanPhimCaiDatThoiGian:
         GuiTextLenHMI(_VPTextTimeTrangBanPhimDaynTime,ChuoiDangNhap);
         break;
+      case _VaoTrangBanPhimMatKhau:
+        //TODO gui text chuoidangnhap len vp text mat khau
+        break;
     } 
   }
 
@@ -1306,6 +1324,15 @@ void DWINHMI::XuLyBanPhim(void)
           break;
         }
         break;
+      case _VaoTrangBanPhimMatKhau:
+        if (ChuoiDangNhap == MatKhau)
+        {
+          DWIN::setPage(_TrangThongSoChuongTrinh);
+        }
+        else
+        {
+          //TODO thông báo mật khẩu không đúng
+        }
     }
 
     switch (CheDoVaoTrangBanPhim)
