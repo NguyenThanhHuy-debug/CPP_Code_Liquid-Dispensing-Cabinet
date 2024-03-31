@@ -93,20 +93,13 @@ void vTaskDWINCode(void* pvParameters)
 void KhoiTao(void){
   #pragma region KhoiTao
   //MMMMMMMMM7MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM//
-  _DWIN.restartHMI();
+  // _DWIN.restartHMI();
   
   CaiDatNguon();
   // delay(1000);
   //Phải khởi tạo GRBL trước để begin Serial, do GRBL đã viết lại Serial
   _grbl.KhoiTaoGRBL();
   //---------------------------------------------------------------
-  // Để có thể kết nối với các mô-đun đọc cảm biến SHT3x,
-  // mô-đun thời gian thực, mô-đun mở rộng port PCF8574
-  // thì trước tiên cần phải khởi tạo giao tiếp I2C
-  // (Start the I2C interface firtly).
-  // Wire.begin();
-
-  // EEPROM.begin(512);
 
   #pragma region Các khởi tạo cơ bản của máy
     #ifndef build_test_chay_khong_Wifi
@@ -114,10 +107,6 @@ void KhoiTao(void){
     Serial.print("ID: ");
     Serial.println(_ID);
     #endif
-
-
-    // _TrangThaiONOFF = _OFF;
-    // _ThoiGianDaON = 0;
 
     _Firmware.SETPhienBanFirmware("KingTubeAuto_2024.01.10_v01");
     Serial.print("Phiên bản firmware: ");

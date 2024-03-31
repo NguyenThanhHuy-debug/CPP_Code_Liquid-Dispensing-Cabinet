@@ -1501,26 +1501,8 @@ void DWINHMI::XuLySetupProgram(void)
   }
   if(codeHMI == _HMIBamNutNEXTTrangThietLapChuongTrinhDiChuyen)
   {
-      //TODO thêm tọa độ khay 2
-    // String HZ = String(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].docaoH);
-    // String AX = String(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].vitriA.X);
-    // String AY = String(-_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].vitriA.Y);
-    // String BX = String(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].vitriB.X);
-    // String BY = String(-_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].vitriB.Y);
-    // String CX = String(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].vitriC.X);
-    // String CY = String(-_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].vitriC.Y);
-    // String temp = "H: Z=" + HZ + "\r\n" 
-    // + "A: X=" + AX + "; Y=" + AY + "\r\n" 
-    // + "B: X=" + BX + "; Y=" + BY + "\r\n" 
-    // + "C: X=" + CX + "; Y=" + CY + "\r\n" ;
-    // GuiTextLenHMI(_VPTextInformationLocation,temp);
+    HienThiThongTinABCH();
   }
-  // if(codeHMI >= _HMIBamNutGETATrangLayViTriChonDiem && codeHMI <= _HMIBamNutGETCTrangLayViTriChonDiem)
-  // {
-  //   GuiTextLenHMI(_VPTextGetLocationStep,"1.0");
-  //   GuiTextLenHMI(_VPTextGetLocationFeed,"500");
-  //   GuiTextLenHMI(_VPTextSPEEDXYZTrangLayViTri,"LOW");
-  // }
   if(codeHMI == _HMIBamNutLOW)
   {
     GuiTextLenHMI(_VPTextGetLocationStep,"1.0");
@@ -1591,19 +1573,7 @@ void DWINHMI::XuLySetupProgram(void)
   }
   if(codeHMI == _HMIBamNutBackTrangLayViTriXacNhan)
   {
-    //TODO thêm tọa độ khu vực 2
-    // String HZ = String(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].docaoH);
-    // String AX = String(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].vitriA.X);
-    // String AY = String(-_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].vitriA.Y);
-    // String BX = String(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].vitriB.X);
-    // String BY = String(-_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].vitriB.Y);
-    // String CX = String(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].vitriC.X);
-    // String CY = String(-_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].vitriC.Y);
-    // String temp = "H: Z=" + HZ + "\r\n" 
-    // + "A: X=" + AX + ";Y=" + AY + "\r\n" 
-    // + "B: X=" + BX + ";Y=" + BY + "\r\n" 
-    // + "C: X=" + CX + ";Y=" + CY + "\r\n" ;
-    // GuiTextLenHMI(_VPTextInformationLocation,temp);
+    HienThiThongTinABCH();
   }
 }
 //=============================================================================================================================
@@ -2098,32 +2068,45 @@ void DWINHMI::Debug(vector<ChuongTrinh_t> data)
 //=============================================================================================================================
 void DWINHMI::CapNhatHienThiThongTinChiTietChuongTrinh()
 {
-      //TODO thêm tọa độ khu vực 2
-    // ChuongTrinh_t chuongtrinhxuly = _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy];
-    // String program = String(chuongtrinhxuly.tenchuongtrinh);
-    // GuiTextLenHMI(_VPTextTenChuongTrinhTrangThietLapChuongTrinh, program);
-    // String Volume = String(chuongtrinhxuly.thetich);
-    // String DKOng = String(chuongtrinhxuly.duongkinhong);
-    // String PumpSpeed = String(chuongtrinhxuly.tocdobom);
-    // String Antidrop = String(chuongtrinhxuly.chongnhogiot);
-    // String rackX = String(chuongtrinhxuly.rackX);
-    // String rackY = String(chuongtrinhxuly.rackY);
-    // String PositionAx = String(chuongtrinhxuly.vitriA.X);
-    // String PositionAy = String(-chuongtrinhxuly.vitriA.Y);
-    // String PositionBx = String(chuongtrinhxuly.vitriB.X);
-    // String PositionBy = String(-chuongtrinhxuly.vitriB.Y);
-    // String PositionCx = String(chuongtrinhxuly.vitriC.X);
-    // String PositionCy = String(-chuongtrinhxuly.vitriC.Y);
-    // String heightH = String(-chuongtrinhxuly.docaoH);
-    // String SpeedXY = String(chuongtrinhxuly.tocdoXY);
-    // String data = "Volume: " + Volume + "ml, " + "Tubing ID: " + DKOng + " mm\r\n" +
-    //   "Pump speed: " + PumpSpeed + " rpm, " + "Antidrop: " + Antidrop + " degree\r\n" +
-    //   "Rack " + rackX + "x" + rackY + " tube\r\n" +
-    //   "Position A: " + "X=" + PositionAx + " Y=" + PositionAy + "\r\n" +
-    //   "Position B: " + "X=" + PositionBx + " Y=" + PositionBy + "\r\n" +
-    //   "Position C: " + "X=" + PositionCx + " Y=" + PositionCy + "\r\n" +
-    //   "Fill head height H:" + heightH + ", " + "Speed run: " + SpeedXY + " mm/min";
-    // GuiTextLenHMI(_VPTextThongSoTrangThietLapChuongTrinh, data);
+    ChuongTrinh_t chuongtrinhxuly = _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy];
+    String program = String(chuongtrinhxuly.tenchuongtrinh);
+    GuiTextLenHMI(_VPTextTenChuongTrinhTrangThietLapChuongTrinh, program);
+    String Volume = String(chuongtrinhxuly.thetich);
+    String DKOng = String(chuongtrinhxuly.duongkinhong);
+    String PumpSpeed = String(chuongtrinhxuly.tocdobom);
+    String Antidrop = String(chuongtrinhxuly.chongnhogiot);
+    String rackX = String(chuongtrinhxuly.rackX);
+    String rackY = String(chuongtrinhxuly.rackY);
+    String SpeedXY = String(chuongtrinhxuly.tocdoXY);
+
+    String PositionAx1 = String(chuongtrinhxuly.ViTriA[0].X);
+    String PositionAy1 = String(-chuongtrinhxuly.ViTriA[0].Y);
+    String PositionBx1 = String(chuongtrinhxuly.ViTriB[0].X);
+    String PositionBy1 = String(-chuongtrinhxuly.ViTriB[0].Y);
+    String PositionCx1 = String(chuongtrinhxuly.ViTriC[0].X);
+    String PositionCy1 = String(-chuongtrinhxuly.ViTriC[0].Y);
+    String heightH1 = String(-chuongtrinhxuly.ViTriH[0]);
+
+    String PositionAx2 = String(chuongtrinhxuly.ViTriA[1].X);
+    String PositionAy2 = String(-chuongtrinhxuly.ViTriA[1].Y);
+    String PositionBx2 = String(chuongtrinhxuly.ViTriB[1].X);
+    String PositionBy2 = String(-chuongtrinhxuly.ViTriB[1].Y);
+    String PositionCx2 = String(chuongtrinhxuly.ViTriC[1].X);
+    String PositionCy2 = String(-chuongtrinhxuly.ViTriC[1].Y);
+    String heightH2 = String(-chuongtrinhxuly.ViTriH[1]);
+
+    String data = "Volume: " + Volume + "ml, " + "Tubing ID: " + DKOng + " mm\r\n" +
+      "Pump speed: " + PumpSpeed + " rpm, " + "Antidrop: " + Antidrop + " degree\r\n" +
+      "Rack " + rackX + "x" + rackY + " tube\r\n" +
+      "Position A1: " + "X=" + PositionAx1 + " Y=" + PositionAy1 + "\r\n" +
+      "Position B1: " + "X=" + PositionBx1 + " Y=" + PositionBy1 + "\r\n" +
+      "Position C1: " + "X=" + PositionCx1 + " Y=" + PositionCy1 + "\r\n" +
+      "Postion A2: " + "X=" + PositionAx2 + " Y=" + PositionAy2 + "\r\n" +
+      "Position B2: " + "X=" + PositionBx2 + " Y=" + PositionBy2 + "\r\n" +
+      "Position C2: " + "X=" + PositionCx2 + " Y=" + PositionCy2 + "\r\n" +
+      "Height H1:" + heightH1 + ", Height H2:" + heightH2 + "\r\n"
+      "Speed run: " + SpeedXY + " mm/min";
+    GuiTextLenHMI(_VPTextThongSoTrangThietLapChuongTrinh, data);
 }
 //=============================================================================================================================
 void DWINHMI::CapNhatHienThiThongTinChuongTrinhTrangChonChuongTrinh()
@@ -2907,3 +2890,32 @@ void DWINHMI::HienThiIconChuongTrinhDuocChon(uint32_t VpAddressNutNhanDauTien)
 
 //TODO cho thông tin chương trình ở trang đầu tiên và trang calib cùng 1 ô, khi chọn chương trình để xem thì đồng thời cũng chọn chương trình để calib.
 //TODO ở chế độ calib, khi chọn chương trình thì cũng hiển thị lại icon như trang đầu tiên
+
+void DWINHMI::HienThiThongTinABCH(void)
+{
+  String HZ1 = String(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriH[0]);
+  String AX1 = String(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriA[0].X);
+  String AY1 = String(-_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriA[0].Y);
+  String BX1 = String(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriB[0].X);
+  String BY1 = String(-_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriB[0].Y);
+  String CX1 = String(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriC[0].X);
+  String CY1 = String(-_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriC[0].Y);
+
+  String HZ2 = String(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriH[1]);
+  String AX2 = String(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriA[1].X);
+  String AY2 = String(-_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriA[1].Y);
+  String BX2 = String(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriB[1].X);
+  String BY2 = String(-_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriB[1].Y);
+  String CX2 = String(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriC[1].X);
+  String CY2 = String(-_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriC[1].Y);
+
+  String temp = "H1: Z=" + HZ1 + "\r\n" 
+  + "A1: X=" + AX1 + "; Y=" + AY1 + "\r\n" 
+  + "B1: X=" + BX1 + "; Y=" + BY1 + "\r\n" 
+  + "C1: X=" + CX1 + "; Y=" + CY1 + "\r\n" 
+  + "H2: Z=" + HZ2 + "\r\n"
+  + "A2: X=" + AX2 + "; Y=" + AY2 + "\r\n"
+  + "B2: X=" + BX2 + "; Y=" + BY2 + "\r\n"
+  + "C2: X=" + CX2 + "; Y=" + CY2 + "\r\n";
+  GuiTextLenHMI(_VPTextInformationLocation,temp);
+}

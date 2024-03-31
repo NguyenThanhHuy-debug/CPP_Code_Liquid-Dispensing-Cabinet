@@ -596,7 +596,6 @@ private:
   void CapNhatHienThiThongTinTenChuongTrinhKhiVaoTrangChonChuongTrinh();
   void CapNhatHienThiThongTinChuongTrinhTrangThietLapTheTichPhanPhoi();
   void CapNhatHienThiThongTinChuongTrinhTrangThietLapChuongTrinhDiChuyen();
-  void CapNhatHienThiTenCacChuongTrinhTrangCaiDatCheDoChuongTrinh();
   void CapNhatHienThiDuLieuThoiGianTuDS3231();
   void HienThiMau(uint32_t VpAddress, uint16_t X, uint16_t Y, uint16_t Mau, ChuongTrinh_t ChuongTrinh);
   void HienThiMau(int8_t SoKhay, uint16_t X, uint16_t Y, ChuongTrinh_t ChuongTrinh,uint16_t Mau);
@@ -619,6 +618,8 @@ private:
   void HienThiThongTinPhanPhoi(void);
 
   void HienThiIconChuongTrinhDuocChon(uint32_t VpAddressNutNhanDauTien);
+
+  void HienThiThongTinABCH(void);
 
 };
 
