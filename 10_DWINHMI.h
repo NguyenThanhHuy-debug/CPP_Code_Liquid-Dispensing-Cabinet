@@ -6,6 +6,7 @@
 #include <DWIN.h>  
 
 // #define debug_dwin
+//TODO vẽ sai khi chọn kích thước 2x2 và 3x3
 
 #define AddrPressXcong    "1010"
 #define AddrHoldXcong     "1020"
@@ -169,7 +170,6 @@
 #define _HMIBamNutEDITTrangThongSoChuongTrinh 0xA7
 #define _HMIBamNutCOPYTrangThongSoChuongTrinh 0xA8
 #define _HMIBamNutMODIFYTrangThongSoChuongTrinh 0xA9
-#define _HMIBamNutOKTrangThongSoChuongTrinh 0xAA
 #define _HMIBamNutEXITTrangThongSoChuongTrinh 0xAB
 
 /* Define các nút bấm trang 137*/
@@ -177,7 +177,6 @@
 #define _HMIBamNutTUBEPERCOLUMNTrangThietLapChuongTrinhDiChuyen 0xAD
 #define _HMIBamNutSPEEDXYAXISrangThietLapChuongTrinhDiChuyen 0xAE
 #define _HMIBamNutNEXTTrangThietLapChuongTrinhDiChuyen 0xAF
-#define _HMIBamNutBACKTrangThietLapChuongTrinhDiChuyen 0xB0
 
 /* Define bàn phím trang 138 139 140 158 159 160 161 162 163 166*/
 #define _HMIBamNutBanPhim0 0xB1
@@ -470,13 +469,13 @@ typedef enum {
   _VaoTrangTuCacNutProgramTrangCaiDatCheDoChuongTrinh,
   _VaoTrangTuNutSetupProgramTrangCaiDatCheDoChuongTrinh,
   _VaoTrangTuNutCopyTrangThongSoChuongTrinh,
-  _VaoTrangTuNutOK_EXITTrangThongSoChuongTrinh,
   _VaoTrangTuNutChangeTrangPhanPhoiViTri,
   _VaoTrangTuNutSelectTrangCalib,
   _VaoTrangTuNutSelectTrangXemConfig,
 }CheDoVaoTrangChonChuongTrinh_t;
 
 typedef enum {
+  _RESETBanPhim,
   _VaoTrangBanPhimActualWeight,
   _VaoTrangBanPhimDensity,
   _VaoTrangBanPhimVolume,
@@ -580,7 +579,8 @@ private:
   int TimeNow = 0;
   uint32_t DentaT = 0;
   // uint8_t NutModidyDaBam;                                         // Đây là biến dùng để biết nút modify nào được bấm để hiển thị full chương trình hợp lý           
-  uint8_t IdxKhuVucDangXuLy;                              // Đây là biến dùng để sử dụng ở chế độ multi để biêt chương trình nào đang được thay đổi
+  uint8_t IdxKhuVucDangXuLy;                             
+  bool CanCapNhatThongSo = false;
   CheDoVaoTrangChonChuongTrinh_t CheDoVaoTrangChonChuongTrinh;
   CheDoVaoTrangBanPhim_t CheDoVaoTrangBanPhim;
   CheDoVaoTrangBanPhimMoRong_t CheDoVaoTrangBanPhimMoRong;

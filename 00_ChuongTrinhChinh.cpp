@@ -19,22 +19,10 @@ bool DangFastPump = false;
 float TocDoTamThoi = TocDoLOW;
 float SoBuocTamThoi = SoBuocLOW;
 
-ChuongTrinh_t ChuongTrinh1, ChuongTrinh2, ChuongTrinh3, ChuongTrinh4, ChuongTrinh5, ChuongTrinh6, ChuongTrinh7, ChuongTrinh8, ChuongTrinh9, ChuongTrinh10;
-
-#define _ON 1                     // ON thiết bị
-#define _OFF 0                    // OFF thiết bị
-#define _ONOFFBangNutBam 0        // Chạy/dừng bằng nút bấm tay.
-#define _TuDongOFFTheoThoiGian 1  // Chạy/dừng theo thời gian cài đặt.
-#define CORE_1 1         
-#define CORE_0 0                
-#define TASK_POST 1
-#define TASK_GET 0
-
 Flags _Flags;
 #ifndef build_test_chay_khong_Wifi
 WIFI _WiFi;                  // Kết nối WiFi cho board.
 #endif                       //build_test_chay_khong_Wifi
-// POSTGET _POSTGET;            // Các hàm thực thi POST - GET giữa device và serve.
 Firmware _Firmware;          // Phiên bản firmware hiện tại của board.
 ThongSoBoard _ThongSoBoard;  // Thông số cài đặt cho board lưu trong EEPROM.
 RTC _RTC;                    // Mô-đun thời gian thực DS3231.
@@ -43,19 +31,9 @@ DWINHMI _DWIN;               // Các thao tác trên màn hình HMI DWIN
 String _ID;                  // Số ID của ESP32, đây là số IMEI của board.
 int _CODE;                   // Mã CODE gửi từ app xuống board để thực thi các tác vụ.
 int _MODE;                   // Chế độ làm việc của máy.
-// ThoiGian _ThoiDiemBamNutON;  // Ghi nhận thời điểm lúc user bấm nút ON để chạy động cơ.
-// float _ThoiGianDaON = 0;     // Thời gian máy được bật lên ON tính từ thời điểm user bấm ON.
-// int _TrangThaiONOFF;         // Trạng thái của máy hiện tại là ON hay OFF.
-
-// TaskHandle_t _POST, _GET;         // xác định các địa chỉ task để thao tác như xóa task, ...
-// SemaphoreHandle_t _mutexPostGet;  // khóa không cho post get cùng lúc
 //--------------------------------------------------------------------------------------------------------//
 
 //--------------------------------------------------------------------------------------------------------//
-JSONVar _LenhGuiXuongBoard;
-
-// uint32_t ThoiDiemHienTai;
-// uint32_t ThoiDiemTruoc;
 
 void vTaskDWINCode(void* pvParameters)
 {
@@ -83,17 +61,10 @@ void vTaskDWINCode(void* pvParameters)
   }
 }
 
-// void vTaskLangNgheDWIN(void* pvParameters){
-//   while (1){
-//   //_DWIN.LangNgheDWIN();
-//   delay(1);
-//   }
-// }
-
 void KhoiTao(void){
   #pragma region KhoiTao
   //MMMMMMMMM7MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM//
-  // _DWIN.restartHMI();
+  _DWIN.restartHMI();
   
   CaiDatNguon();
   // delay(1000);
@@ -148,22 +119,14 @@ void KhoiTao(void){
 
   // Khởi tạo HMI và chạy giao diện khởi động.
   _DWIN.KhoiTaoDWIN();
-  // _DWIN.HienThiIconWIFITrenHMITheoCuongDoWIFI(0);
   DWINCapNhatDSChuongTrinhBanDau();
   xTaskCreate(vTaskDWINCode, "Task DWIN", 4096, NULL, 2, NULL);
-  // xTaskCreate(vTaskLangNgheDWIN, "Task LangNgheDWIN", 4096, NULL, 2, NULL);
 
   CapNhatDuLieuLenHMI();
 
-// Lưu ý: Phải khởi tạo thông số board xong thì mới gọi đến các hàm này.
 /////////////////////////////////////////////////////////////////////////
 
     // _ThongSoBoard.XoaEEPROM(0,_ChieuDaiI2CEEPROM);
-
-
-    // _mutexPostGet = xSemaphoreCreateMutex();  // khởi tạo khóa không cho post get cùng lúc
-
-    // _RTC.CapNhatRTCChoDS3231(2, 8, 1, 2024, 9, 6, 30);
 }
 
 void CapNhatDuLieuLenHMI(void) 
@@ -267,6 +230,7 @@ void XuLyDuLieuNhanTuHMI(void)
       // _grbl._DSChuongTrinh = DSChuongTrinhLuuTrongEeprom;
       break;
     case CAPNHATTHONGSO:            // khi nhấn enter lúc nhập các thông số trong SETUP PROGRAM
+      Serial.println("CapNhatThongSo");
       _grbl._DSChuongTrinh = _DWIN._ChuongTrinhEEPROM;
       /* Lưu vào Eeprom */
       _ThongSoBoard.CaiDatThongSoBoardVaoROM(_ThongSoBoard.ChuyenDoiChuongTrinhSangJsonVar(_grbl._DSChuongTrinh));
@@ -566,10 +530,7 @@ void CaiDatNguon(void)
   pinMode(_ChanDocNguon, INPUT);
   pinMode(_ChanKichNguon, OUTPUT);
   digitalWrite(_ChanKichNguon, HIGH);
-  // if(!digitalRead(_ChanDocNguon))
-  // {
-  //   digitalWrite(_ChanKichNguon,LOW);
-  // }
+
   digitalWrite(2, HIGH);
   delay(100);
   digitalWrite(2, LOW);

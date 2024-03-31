@@ -2,14 +2,12 @@
 #ifndef _ThongSoBoard_h
 #define _ThongSoBoard_h
 
-#include "_GRBL.h"
+#include "KingTubeAuto.h"
 #include <Arduino.h>       // Để khai báo kiểu String
 #include <Arduino_JSON.h>  // Thư viện xử lý dữ liệu kiểu JSON
 // #define debug
 // // Từ vị trí 0-409 là vùng EEPROM chứa thông số board.
-#define _ChieuDaiMaxThongSoBoard 409
-#define _ChieuDaiI2CEEPROM 2000
-#define _SoChuongTrinh 10  // Số chương trình cài đặt để user chọn khi chạy máy
+#define _ChieuDaiI2CEEPROM 2023
 #define _ChieuDaiMaxTenChuongTrinh 20
 #define _KyTu '\r'
 

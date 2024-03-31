@@ -276,6 +276,15 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
             DWIN::setPage(_TrangThietLapCheDoChayMulti);
             break;
           case _VaoTrangTuNutCopyTrangThongSoChuongTrinh:
+            if (DangOViTriHome() == true)
+            {
+              DWIN::setPage(_TrangCaiDatCheDoChuongTrinh_HOME);
+            }
+            else
+            {
+              DWIN::setPage(_TrangCaiDatCheDoChuongTrinh_notHOME);
+            }
+            break;
           case _VaoTrangTuNutSetupProgramTrangCaiDatCheDoChuongTrinh:
             if (lastcodeHMI >= _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh && lastcodeHMI < _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh + SoLuongChuongTrinhCoDinh)
             {
@@ -288,10 +297,6 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
             {
               DWIN::setPage(_TrangThongSoChuongTrinh);
             }
-            break;
-
-          case _VaoTrangTuNutOK_EXITTrangThongSoChuongTrinh:
-            DWIN::setPage(_TrangThongSoChuongTrinh);
             break;
           case _VaoTrangTuNutSelectTrangCalib:
             DWIN::setPage(_TrangCalib);
@@ -326,9 +331,6 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
           break;
         case _VaoTrangTuNutChangeTrangPhanPhoiViTri:
           DWIN::setPage(_TrangPhanPhoiViTri);
-          break;
-        case _VaoTrangTuNutOK_EXITTrangThongSoChuongTrinh:
-          DWIN::setPage(_TrangCaiDat);
           break;
         case _VaoTrangTuNutSelectTrangCalib:
           DWIN::setPage(_TrangCalib);
@@ -436,20 +438,10 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
       DWIN::setPage(_TrangThietLapChuongTrinhDiChuyen);
       break;
     }
-    case _HMIBamNutOKTrangThongSoChuongTrinh:
     case _HMIBamNutEXITTrangThongSoChuongTrinh:
     {
-      if (CheDoVaoTrangBanPhim == _VaoTrangBanPhimMatKhau)
-      {
-        CheDoVaoTrangChonChuongTrinh = _VaoTrangTuNutSetupProgramTrangCaiDatCheDoChuongTrinh;
-      }
-      else
-      {
-      /* Dòng code này giúp ta xác định việc chọn chương trình để làm gì ?? */
-        CheDoVaoTrangChonChuongTrinh = _VaoTrangTuNutOK_EXITTrangThongSoChuongTrinh;
-      }
-      DWIN::setPage(_TrangChonChuongTrinh);
       CapNhatHienThiThongTinTenChuongTrinhKhiVaoTrangChonChuongTrinh();
+      DWIN::setPage(_TrangChonChuongTrinh);
       GuiTextLenHMI(_VPTextHienThiChuongTrinhTrangChonChuongTrinh,"");
       codeHMI = -1;
       break;
@@ -491,12 +483,6 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
 
       break;
     }
-    case _HMIBamNutBACKTrangThietLapChuongTrinhDiChuyen:
-    {
-      DWIN::setPage(_TrangThongSoChuongTrinh);
-      codeHMI = -1;
-      break;
-    }
     case _HMIBamNutGETATrangLayViTriChonDiem:
     {
       DWIN::setPage(_TrangLayViTriXacNhanA);
@@ -523,7 +509,14 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
     }
     case _HMIBamNutNEXTTrangLayViTriChonDiem:
     {
-      DWIN::setPage(_TrangThongSoChuongTrinh);
+      if (DangOViTriHome() == true)
+      {
+        DWIN::setPage(_TrangCaiDatCheDoChuongTrinh_HOME);
+      }
+      else
+      {
+        DWIN::setPage(_TrangCaiDatCheDoChuongTrinh_notHOME);
+      }
       break;
     }
     case _HMIBamNutBACKTrangLayViTriChonDiem:
@@ -804,8 +797,7 @@ void DWINHMI::XuLyConfigChuongTrinh(void)
       CapNhatHienThiThongTinTenChuongTrinhKhiVaoTrangChonChuongTrinh();
       codeHMI = -1;
   }
-  if (CheDoVaoTrangChonChuongTrinh == _VaoTrangTuNutSetupProgramTrangCaiDatCheDoChuongTrinh 
-  || CheDoVaoTrangChonChuongTrinh == _VaoTrangTuNutOK_EXITTrangThongSoChuongTrinh)
+  if (CheDoVaoTrangChonChuongTrinh == _VaoTrangTuNutSetupProgramTrangCaiDatCheDoChuongTrinh)
   {
     /* Hiển thị dữ liệu khi bấm chọn chương trình */
     if (codeHMI >= _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh 
@@ -1253,34 +1245,39 @@ void DWINHMI::XuLyBanPhim(void)
         break;
     } 
   }
-
   if(codeHMI == _HMIBamNutEnterTrangBanPhim)
   {
     //byte IDPage = DWIN::getPage();
-    
     switch (CheDoVaoTrangBanPhim)
     {
       case _VaoTrangThietLapSoOngTrenMotCot:
+        CanCapNhatThongSo = true;
         _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].rackY = ChuoiDangNhap.toInt();
         CapNhatLaiDanhSachToaDo(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy]); // reset lại danh sách tọa độ do số lượng ống thay đổi
         break;
       case _VaoTrangThietLapSoOngTrenMotHang:
+        CanCapNhatThongSo = true;
         _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].rackX = ChuoiDangNhap.toInt();
         CapNhatLaiDanhSachToaDo(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy]);
         break;
       case _VaoTrangThietLapTocDoTrucXY:
+        CanCapNhatThongSo = true;
         _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].tocdoXY = ChuoiDangNhap.toInt();
         break;
       case _VaoTrangBanPhimVolume:
+        CanCapNhatThongSo = true;
         _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].thetich = ChuoiDangNhap.toFloat();
         break;
       case _VaoTrangBanPhimTubeID:
+        CanCapNhatThongSo = true;
         _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].duongkinhong = ChuoiDangNhap.toFloat();
         break;
       case _VaoTrangBanPhimPumpSpeed:
+        CanCapNhatThongSo = true;
         _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].tocdobom = ChuoiDangNhap.toInt();
         break;
       case _VaoTrangBanPhimAntiDrop:
+        CanCapNhatThongSo = true;
         _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].chongnhogiot = ChuoiDangNhap.toFloat();
         break;
       case _VaoTrangBanPhimDensity:
@@ -1357,6 +1354,7 @@ void DWINHMI::XuLyBanPhim(void)
       case _VaoTrangBanPhimMatKhau:
         if (ChuoiDangNhap == MatKhau)
         {
+          CheDoVaoTrangBanPhim = _RESETBanPhim;
           DWIN::setPage(_TrangThongSoChuongTrinh);
         }
         else
@@ -1493,11 +1491,6 @@ void DWINHMI::XuLySetupProgram(void)
       CapNhatHienThiThongTinChiTietChuongTrinh();
     }
     /* Reset lai hien thi */
-  }
-  if(codeHMI == _HMIBamNutNEXTTrangLayViTriChonDiem)
-  {
-    CapNhatHienThiThongTinChiTietChuongTrinh();
-    codeHMI = 0;
   }
   if(codeHMI == _HMIBamNutNEXTTrangThietLapChuongTrinhDiChuyen)
   {
@@ -1705,22 +1698,23 @@ DanhSachMaLenh_t DWINHMI::ReturnMaLenhGRBL()
         else
          return EXITVETRANGCAIDATCHEDOCHUONGTRINH;
       }
-      // case _HMIBamNutRunTrangCaiDatCheDoChuongTrinh:
-      //   return CAPNHATCHUONGTRINH;
 
       case _HMIBamNutOKTrangPhanPhoiViTri:
       case _HMIBamNutRunTrangCaiDatCheDoChuongTrinh:
         return CAPNHATTOADO;
 
-      // case _HMIBamNutSetupProgramTrangCaiDat:
-      //   return CONFIGCHUONGTRINH;
-      case _HMIBamNutEnterTrangBanPhim:
-      case _HMIBamNutEnterTrangBanPhimMoRong:
-        if (CheDoVaoTrangBanPhim == _VaoTrangBanPhimMatKhau)
+      case _HMIBamNutNEXTTrangLayViTriChonDiem:
+        Serial.println("Luu ThongSo");
+        codeHMI = -1;
+        if (CanCapNhatThongSo == true)
         {
-          break;
+          CanCapNhatThongSo = false;
+          return CAPNHATTHONGSO;
         }
-        return CAPNHATTHONGSO;
+        else
+        {
+          return RESETMALENH;
+        }
 
       case _HMIBamNutOKTrangChonChuongTrinh:
         if(CheDoVaoTrangChonChuongTrinh == _VaoTrangTuNutCopyTrangThongSoChuongTrinh)
@@ -2136,9 +2130,14 @@ void DWINHMI::CapNhatHienThiThongTinTenChuongTrinhKhiVaoTrangChonChuongTrinh()
 {
   for (uint8_t i = 0; i < SoLuongChuongTrinhToiDa; i++) 
   {
-    GuiTextLenHMI(_VPTextProgram1TrangChonChuongTrinh + (i % _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh) * 0x100,
-    _ChuongTrinhEEPROM[i % _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh].tenchuongtrinh);
+    String TenChuongTrinh = _ChuongTrinhEEPROM[i % _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh].tenchuongtrinh + "(ADJ)";
+    if (i <= SoLuongChuongTrinhCoDinh)
+    {
+      TenChuongTrinh = _ChuongTrinhEEPROM[i % _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh].tenchuongtrinh + "(FIXED)";
+    }
+    GuiTextLenHMI(_VPTextProgram1TrangChonChuongTrinh + (i % _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh) * 0x100, TenChuongTrinh);
   }
+
   GuiTextLenHMI(_VPTextHienThiChuongTrinhTrangChonChuongTrinh, "");
 }
 void DWINHMI::CapNhatHienThiThongTinChuongTrinhTrangThietLapTheTichPhanPhoi()
@@ -2186,6 +2185,7 @@ void DWINHMI::ThayDoiTenChuongTrinh()
     }
     if( codeHMI == _HMIBamNutEnterTrangBanPhimMoRong)
     {
+      CanCapNhatThongSo = true;
       DWIN::setPage(_TrangThongSoChuongTrinh);
       _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].tenchuongtrinh = stringdangxuly;
       GuiTextLenHMI(_VPTextTenChuongTrinhTrangThietLapChuongTrinh,stringdangxuly);

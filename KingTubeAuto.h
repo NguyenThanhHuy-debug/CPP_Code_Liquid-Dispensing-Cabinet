@@ -4,6 +4,8 @@
 #include <vector>
 using namespace std;
 
+// #define DEBUG_THONGSOBOARD
+
 #define Serial                              Uart0
 
 #define SoLuongChuongTrinhToiDa             10

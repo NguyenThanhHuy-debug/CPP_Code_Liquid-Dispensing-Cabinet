@@ -11,11 +11,10 @@ void ThongSoBoard::KhoiTao(void)
 {
 
 #pragma region KhoiTao
-  // EEPROM.begin(_ChieuDaiMaxThongSoBoard);
   _i2c_eeprom.begin(extEEPROM::twiClock100kHz);
   LayThongSoBoardTuROM();
 
-#ifdef debug
+#ifdef DEBUG_THONGSOBOARD
   Serial.print("Chiều dài thông số:");
   Serial.println(this->ThongSo.keys().length());
   Serial.println("Thông số đã cài đặt cho board:");
@@ -25,7 +24,7 @@ void ThongSoBoard::KhoiTao(void)
   if (this->ThongSo.keys().length() <= 0) {
     ThietLapThongSoBoardMacDinh();
     CaiDatThongSoBoardVaoROM(this->ThongSo);
-#ifdef debug
+#ifdef DEBUG_THONGSOBOARD
     Serial.println("Board trắng chưa có thông số.");
 #endif
   }
@@ -51,7 +50,7 @@ void ThongSoBoard::LayThongSoBoardTuROM(void)
       strThongSo += char(e);
   }
 
-#ifdef debug
+#ifdef DEBUG_THONGSOBOARD
   Serial.println("Chuỗi string trong EEPROM chứa thông số board: ");
   Serial.println(strThongSo);
 #endif
@@ -77,7 +76,7 @@ void ThongSoBoard::LayThongSoBoardTuROM(void)
     this->ThongSo["ChuongTrinh10"] = TachChuoi(para, ';',9);
 
   }
-#ifdef debug
+#ifdef DEBUG_THONGSOBOARD
   Serial.println("Thông số board đọc từ EEPROM");
   Serial.println(this->ThongSo);
 #endif
@@ -107,13 +106,13 @@ void ThongSoBoard::ThietLapThongSoBoardMacDinh(void) {
   this->ThongSo["ID"] = this->ID;
 
   ChuongTrinh_t ChuongTrinhGoc;
-  for (uint8_t i = 0; i < _SoChuongTrinh; i++){
+  for (uint8_t i = 0; i < SoLuongChuongTrinhToiDa; i++){
     // ChuongTrinhGoc.tenchuongtrinh = "Program " + String(i + 1);
     ChuongTrinhGoc.tenchuongtrinh = "Program " + String(i + 1);
     this->ThongSo["ChuongTrinh" + String((i + 1))] = ChuyenChuongTrinhThanhJsonString(ChuongTrinhGoc);
   }
 
-#ifdef debug
+#ifdef DEBUG_THONGSOBOARD
   Serial.println("Thông số board mặc định: ");
   Serial.println(this->ThongSo);
 #endif
@@ -143,7 +142,7 @@ String ThongSoBoard::TachChuoi(String data, char separator, int index) {
 void ThongSoBoard::CaiDatThongSoBoardVaoROM(JSONVar ThongSo) {
 #pragma region CaiDatThongSoBoardVaoROM
 
-#ifdef debug
+#ifdef DEBUG_THONGSOBOARD
   Serial.println("Thông số board sẽ cài vào EPPROM: ");
   Serial.println(ThongSo);
 #endif
@@ -162,12 +161,12 @@ void ThongSoBoard::CaiDatThongSoBoardVaoROM(JSONVar ThongSo) {
   JSONVar jsThongSo;
   jsThongSo["ID"] = (const char *)ThongSo["ID"];
   jsThongSo["ThongSo"] = ChuongTrinh1 + ";"  + ChuongTrinh2 + ";"  + ChuongTrinh3 + ";" + ChuongTrinh4 + ';'
-  + ChuongTrinh5 + ";" + ChuongTrinh6 + ";" + ChuongTrinh7 + ";" + ChuongTrinh8 + ";" + ChuongTrinh9 + ";" + ChuongTrinh10;
+  + ChuongTrinh5 + ";" + ChuongTrinh6 + ";" + ChuongTrinh7 + ";" + ChuongTrinh8 + ";" + ChuongTrinh9 + ";" + ChuongTrinh10 + ";";
 
   // Chuyển dữ liệu thông số board dạng json sang string
   String strThongSo = JSON.stringify(jsThongSo);
 
-#ifdef debug
+#ifdef DEBUG_THONGSOBOARD
   Serial.println("Chuỗi string thông số board sẽ lưu vào ROM: ");
   Serial.println(strThongSo);
   Serial.print("Độ dài: ");
@@ -183,7 +182,7 @@ void ThongSoBoard::CaiDatThongSoBoardVaoROM(JSONVar ThongSo) {
   }
   // delay(5000);
 
-#ifdef debug
+#ifdef DEBUG_THONGSOBOARD
   Serial.println("Đã lưu thông số board vào ROM thành công!");
   Serial.println("-------------------------------------------------------------");
 #endif
@@ -215,7 +214,7 @@ void ThongSoBoard::XoaEEPROM(int start, int end) {
 String ThongSoBoard::ChuyenChuongTrinhThanhJsonString(ChuongTrinh_t ChuongTrinh){
   String strChuongTrinh = "";
   char *ThongSoChuongTrinh;
-  asprintf(&ThongSoChuongTrinh, "%s&%07.3f&%07.3f&%05d&%05d&%07.3f&%02d&%02d&%07.3f%%%07.3f&%07.3f%%%07.3f&%07.3f%%%07.3f&%07.3f&%07.3f%%%07.3f&%07.3f%%%07.3f&%07.3f%%%07.3f&%07.3f&%07.3f", 
+  asprintf(&ThongSoChuongTrinh, "%s&%07.3f&%07.3f&%05d&%05d&%07.3f&%02d&%02d&%07.3f%%%07.3f&%07.3f%%%07.3f&%07.3f%%%07.3f&%07.3f&%07.3f%%%07.3f&%07.3f%%%07.3f&%07.3f%%%07.3f&%07.3f&%07.3f&", 
           DienVaoChoTrong(ChuongTrinh.tenchuongtrinh).c_str(), ChuongTrinh.thetich, ChuongTrinh.duongkinhong, ChuongTrinh.tocdobom, 
           ChuongTrinh.tocdoXY, ChuongTrinh.chongnhogiot, ChuongTrinh.rackX, ChuongTrinh.rackY, ChuongTrinh.ViTriA[0].X, ChuongTrinh.ViTriA[0].Y, ChuongTrinh.ViTriB[0].X, ChuongTrinh.ViTriB[0].Y, ChuongTrinh.ViTriC[0].X, ChuongTrinh.ViTriC[0].Y, ChuongTrinh.ViTriH[0],
           ChuongTrinh.ViTriA[1].X, ChuongTrinh.ViTriA[1].Y, ChuongTrinh.ViTriB[1].X, ChuongTrinh.ViTriB[1].Y, ChuongTrinh.ViTriC[1].X, ChuongTrinh.ViTriC[1].Y, ChuongTrinh.ViTriH[1],
@@ -228,7 +227,7 @@ String ThongSoBoard::ChuyenChuongTrinhThanhJsonString(ChuongTrinh_t ChuongTrinh)
 ChuongTrinh_t ThongSoBoard::ChuyenDoiJSONVarSangChuongTrinh(JSONVar data,uint8_t idxchuongtrinh)
 {
   String strdata = (const char *)data;
-  #ifdef debug
+  #ifdef DEBUG_THONGSOBOARD
   Serial.print("Data: ");
   Serial.println(strdata);
   #endif
@@ -277,7 +276,7 @@ ChuongTrinh_t ThongSoBoard::ChuyenDoiJSONVarSangChuongTrinh(JSONVar data,uint8_t
 
   chuongtrinh.TheTichBomDuocKhiQuay1Vong = TachChuoi(str,'&',16).toFloat();
 
-#ifdef debug
+#ifdef DEBUG_THONGSOBOARD
   Serial.println(chuongtrinh.tenchuongtrinh);
   Serial.println(chuongtrinh.thetich);
   Serial.println(chuongtrinh.duongkinhong);
@@ -309,7 +308,7 @@ JSONVar ThongSoBoard::ChuyenDoiChuongTrinhSangJsonVar(vector<ChuongTrinh_t> DsCh
   JSONVar DsChuongTrinhJsonVar;
   DsChuongTrinhJsonVar["ID"] = ID;
   ChuongTrinh_t ChuongTrinh;
-  for (uint8_t i = 0; i < _SoChuongTrinh; i++){
+  for (uint8_t i = 0; i < SoLuongChuongTrinhToiDa; i++){
     ChuongTrinh = DsChuongTrinhCanChuyenDoi[i];
     DsChuongTrinhJsonVar["ChuongTrinh" + String(i + 1)] = ChuyenChuongTrinhThanhJsonString(ChuongTrinh);
   }
