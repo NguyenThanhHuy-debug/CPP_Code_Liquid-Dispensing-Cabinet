@@ -103,6 +103,7 @@ typedef enum {
     HOLDZTRU,
     HOLDZCONG,
     DUNGDICHUYEN,
+    SHUTDOWN,
     RESET,
 }DanhSachMaLenh_t;
 

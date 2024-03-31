@@ -172,6 +172,7 @@ void _GRBL::BatDauPhanPhoi()
       while ((sys.state == State::Cycle) || (sys.state == State::Hold)) 
       {
         if (CoBaoDungPhanPhoi == true) {
+          CoBaoDungPhanPhoi = false;
           return;
         }
         delay(1);
@@ -204,10 +205,9 @@ void _GRBL::TiepTucPhanPhoi(void) {
 
 void _GRBL::DungPhanPhoi(void) {
   CoBaoDungPhanPhoi = true;
-  delay(1); /* NOTE delay(100)*/
+  delay(100); /* NOTE delay(100)*/
   WebUI::inputBuffer.write(0x18);
-  CoBaoDungPhanPhoi = false;
-  delay(600); /* NOTE delay(100)*/
+  delay(100); /* NOTE delay(100)*/
   WebUI::inputBuffer.push("$X\n");
   delay(100);
 }

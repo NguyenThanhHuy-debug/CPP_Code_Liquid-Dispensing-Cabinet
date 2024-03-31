@@ -257,6 +257,7 @@ void XuLyDuLieuNhanTuHMI(void)
       Serial.println("EXITVETRANGCAIDATCHEDOCHUONGTRINH");
       if (DangTamDungPhanPhoi == true)
       {
+        Serial.println("DungPhanPhoi");
         DangTamDungPhanPhoi = false;
         _grbl.DungPhanPhoi();
       }
@@ -265,14 +266,6 @@ void XuLyDuLieuNhanTuHMI(void)
       _grbl.VeToaDoGoc();
       // _grbl._DSChuongTrinh = DSChuongTrinhLuuTrongEeprom;
       break;
-    // case CAPNHATCHUONGTRINH:
-    //   _grbl._DSChuongTrinh = _DWIN._ChuongTrinhEEPROM;
-    //   /* Lưu vào EEPROM*/
-    //   _ThongSoBoard.CaiDatThongSoBoardVaoROM(ChuyenDoiChuongTrinhSangJsonVar(_grbl._DSChuongTrinh));
-    //   break;
-    // case CONFIGCHUONGTRINH:
-    //   // _grbl._DSChuongTrinh = DSChuongTrinhLuuTrongEeprom;
-    //   break;
     case CAPNHATTHONGSO:            // khi nhấn enter lúc nhập các thông số trong SETUP PROGRAM
       _grbl._DSChuongTrinh = _DWIN._ChuongTrinhEEPROM;
       /* Lưu vào Eeprom */
@@ -512,6 +505,10 @@ void XuLyDuLieuNhanTuHMI(void)
       WebUI::inputBuffer.push("$X\n");
       delay(100);
       break;
+
+    case SHUTDOWN:
+      Shutdown();
+      break;
   }
 }
 
@@ -628,5 +625,12 @@ void ThucThiCacTacVuTheoFlag()
 
 void Shutdown(void)
 {
+  _grbl.VeToaDoGoc();
+  delay(100);
+  while (sys.state == State::Cycle)
+  {
+    delay(1);
+  }
+  
   digitalWrite(_ChanKichNguon, LOW);
 }

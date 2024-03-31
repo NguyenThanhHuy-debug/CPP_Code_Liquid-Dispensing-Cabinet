@@ -230,15 +230,6 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
     case _HMIBamNutRunTrangCaiDatCheDoChuongTrinh:
     {
 
-      for (uint8_t Idx = 0; Idx < sizeof(DSIndexChuongTrinhDuocChon); Idx++)
-      {
-        if (DSIndexChuongTrinhDuocChon[Idx] == -1)
-        {
-          continue;
-        }
-        // _ChuongTrinhEEPROM[DSIndexChuongTrinhDuocChon[Idx]].KhuVucChay.push_back()
-      }
-
       for (uint8_t i = 0; i < sizeof(DSIndexChuongTrinhDuocChon); i++)
       {
         if (DSIndexChuongTrinhDuocChon[i] == -1)
@@ -257,8 +248,6 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
       {
         DWINHMI::setPage(_TrangHienThiPhanPhoiThoiGianThuc_OFF_notHOME);
       }
-
-      
       break;
     }
     case _HMIBamNutSetupProgramTrangCaiDat:
@@ -290,8 +279,10 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
           case _VaoTrangTuNutSetupProgramTrangCaiDatCheDoChuongTrinh:
             if (lastcodeHMI >= _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh && lastcodeHMI < _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh + SoLuongChuongTrinhCoDinh)
             {
-              //TODO setPage mat khau
               CheDoVaoTrangBanPhim = _VaoTrangBanPhimMatKhau;
+              GuiTextLenHMI(_VpTextMatKhau, "");
+              GuiTextLenHMI(_VpTextCanhBaoMatKhau, "");
+              setPage(_TrangBanPhimMauKhau);
             }
             else
             {
@@ -373,8 +364,6 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
     }
     case _HMIBamNutEXITTrangPhanPhoiViTri:
     {
-      //TODO reset lại các giá trị
-
       if (DangOViTriHome() == true)
       {
         DWIN::setPage(_TrangCaiDatCheDoChuongTrinh_HOME);
@@ -450,9 +439,15 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
     case _HMIBamNutOKTrangThongSoChuongTrinh:
     case _HMIBamNutEXITTrangThongSoChuongTrinh:
     {
-
+      if (CheDoVaoTrangBanPhim == _VaoTrangBanPhimMatKhau)
+      {
+        CheDoVaoTrangChonChuongTrinh = _VaoTrangTuNutSetupProgramTrangCaiDatCheDoChuongTrinh;
+      }
+      else
+      {
       /* Dòng code này giúp ta xác định việc chọn chương trình để làm gì ?? */
-      CheDoVaoTrangChonChuongTrinh = _VaoTrangTuNutOK_EXITTrangThongSoChuongTrinh;
+        CheDoVaoTrangChonChuongTrinh = _VaoTrangTuNutOK_EXITTrangThongSoChuongTrinh;
+      }
       DWIN::setPage(_TrangChonChuongTrinh);
       CapNhatHienThiThongTinTenChuongTrinhKhiVaoTrangChonChuongTrinh();
       GuiTextLenHMI(_VPTextHienThiChuongTrinhTrangChonChuongTrinh,"");
@@ -534,7 +529,6 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
     case _HMIBamNutBACKTrangLayViTriChonDiem:
     {
       DWIN::setPage(_TrangThietLapTheTichPhanPhoi);
-      //DWIN::setPage(_TrangThietLapChuongTrinhDiChuyen);
       break;
     }
     /* =============================== END: CODE TRANG 141 TRANG LẤY VỊ TRÍ CHỌN ĐIỂM ===============================*/
@@ -818,6 +812,7 @@ void DWINHMI::XuLyConfigChuongTrinh(void)
     && codeHMI <= _HMIBamNutChonChuongTrinh10TrangChonChuongTrinh && lastcodeHMI != codeHMI)
     {
       IndexChuongTrinhDangXuLy = codeHMI % _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh;
+      CapNhatHienThiThongTinChuongTrinhTrangChonChuongTrinh();
     }
     if (codeHMI == _HMIBamNutOKTrangChonChuongTrinh)
     {
@@ -1254,7 +1249,7 @@ void DWINHMI::XuLyBanPhim(void)
         GuiTextLenHMI(_VPTextTimeTrangBanPhimDaynTime,ChuoiDangNhap);
         break;
       case _VaoTrangBanPhimMatKhau:
-        //TODO gui text chuoidangnhap len vp text mat khau
+        GuiTextLenHMI(_VpTextMatKhau, ChuoiDangNhap);
         break;
     } 
   }
@@ -1324,15 +1319,6 @@ void DWINHMI::XuLyBanPhim(void)
           break;
         }
         break;
-      case _VaoTrangBanPhimMatKhau:
-        if (ChuoiDangNhap == MatKhau)
-        {
-          DWIN::setPage(_TrangThongSoChuongTrinh);
-        }
-        else
-        {
-          //TODO thông báo mật khẩu không đúng
-        }
     }
 
     switch (CheDoVaoTrangBanPhim)
@@ -1368,6 +1354,17 @@ void DWINHMI::XuLyBanPhim(void)
          DWIN::setPage(_TrangThoiGian);
         break;
       }
+      case _VaoTrangBanPhimMatKhau:
+        if (ChuoiDangNhap == MatKhau)
+        {
+          DWIN::setPage(_TrangThongSoChuongTrinh);
+        }
+        else
+        {
+          //TODO thông báo mật khẩu không đúng
+          GuiTextLenHMI(_VpTextCanhBaoMatKhau, "Wrong password");
+        }
+        break;
     }  
   }
 
@@ -1444,6 +1441,9 @@ void DWINHMI::XuLyBanPhim(void)
         DWIN::setPage(_TrangThoiGian);
         break;
       }
+      case _VaoTrangBanPhimMatKhau:
+        setPage(_TrangChonChuongTrinh);
+        break;
     }  
   }
   if(codeHMI == _HMIBamNutEnterTrangBanPhim || codeHMI == _HMIBamNutReturnTrangBanPhim)
@@ -1716,6 +1716,10 @@ DanhSachMaLenh_t DWINHMI::ReturnMaLenhGRBL()
       //   return CONFIGCHUONGTRINH;
       case _HMIBamNutEnterTrangBanPhim:
       case _HMIBamNutEnterTrangBanPhimMoRong:
+        if (CheDoVaoTrangBanPhim == _VaoTrangBanPhimMatKhau)
+        {
+          break;
+        }
         return CAPNHATTHONGSO;
 
       case _HMIBamNutOKTrangChonChuongTrinh:
@@ -1782,6 +1786,10 @@ DanhSachMaLenh_t DWINHMI::ReturnMaLenhGRBL()
       case _HMIBamNutRESETTrangManualControl:
         codeHMI = -1;
         return RESET;
+
+      case _HMIBamNutShutdownTrangCaiDat:
+        codeHMI = -1;
+        return SHUTDOWN;
     }
   }
   if ((ManualControl == true))

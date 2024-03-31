@@ -106,7 +106,6 @@
 /* Define các nút bấm trang 130 */
 #define _HMIBamNutEXITTrangManualControl 0x181
 #define _HMIBamNutGoHomeTrangChaySetHome 0x81
-#define _HMIBamNutGoHome //TODO keycode go home
 #define _HMIBamNutExitTrangSetHome 0x82
 /* Define các nút bấm trang 131 va 152 */
 #define _HMIBamNutRunTrangCaiDatCheDoChuongTrinh 0x83
@@ -225,6 +224,7 @@
 #define _HMIBamNutINFORTrangCaiDat 0xF3
 #define _HMIBamNutSetupProgramTrangCaiDat 0xF4
 #define _HMIBamNutTimeTrangCaiDat 0xF5
+#define _HMIBamNutShutdownTrangCaiDat 0xF6
 /* Define nút bấm trang 147 */
 #define _HMIBamNutSelectTrangCalib 0xF7
 #define _HMIBamNutTestTrangCalib 0xF8
@@ -319,7 +319,7 @@
 #define _TrangBanPhimSecondLoop 166
 #define _TrangBanPhimCaiDatThoiGian 167
 #define _TrangBanPhimMoRongSo 168
-
+#define _TrangBanPhimMauKhau 176
 
 
 #define _VPChonProgram1TrangCaiDatCheDoChuongTrinh 0x3300
@@ -436,11 +436,15 @@
 
 #define _VPTextTenChuongTrinhDangChay 0xCA00
 
+#define _VpTextMatKhau        0x3100
+#define _VpTextCanhBaoMatKhau 0x3200
+
 #define _HMIBamNutHourTrangSecondLoop 0x7010
 #define _HMIBamNutMinutesTrangSecondLoop 0x7020
 #define _HMIBamNutSecondsTrangSecondLoop 0x7030
 
 #define _HMIBamNutGoHomeTrangDieuKhien 0x801
+
 typedef enum {
   _CaiDatGioLoop,
   _CaiDatPhutLoop,
