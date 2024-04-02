@@ -51,6 +51,15 @@
 #define BuachieuDaiXChonToaDo 710U
 #define BuachieuDaiYChonToaDo 265U
 
+#define ToaDoX0KhayChon 700U
+#define ToaDoY0KhayChon 25U
+
+#define ToaDoX0Khay1 125U
+#define ToaDoY0Khay1 125U
+
+#define ToaDoX0Khay2 525U
+#define ToaDoY0Khay2 125U
+
 #define ToaDoXIconHinhTronDauTienKhayChon 775U
 #define ToaDoYIconHinhTronDauTienKhayChon 55U
 
@@ -59,13 +68,6 @@
 
 #define ToaDoXIconHinhTronDauTienKhay2 550U
 #define ToaDoYIconHinhTronDauTienKhay2 ToaDoYIconHinhTronDauTienKhay1
-
-#define ToaDoX0Khay1 30U
-#define ToaDoY0Khay 105U
-#define ToaDoY1Khay ToaDoY0Khay + ChieuDaiY /* + BanKinhIconOng * 4U */ + 10
-
-#define ToaDoX0Khay(x) ToaDoX0Khay1 + x * (ChieuDaiX /* + BanKinhIconOng * 4U */ + KhoangCachGiua2Khay) + 45U
-#define ToaDoX1Khay(x) ToaDoX0Khay(x) + ChieuDaiX /* + BanKinhIconOng * 4U */ + 5U
 
 #define _VpAddressVung1KhayChon  0x3800UL
 #define _VpAddressVung2KhayChon  0x3900UL

@@ -64,7 +64,6 @@ typedef struct {
     float density = 1.0;
     // float SoVongDeBom1ml = 0.521875;
     float TheTichBomDuocKhiQuay1Vong = 187.125748503; // ul/duongkinhong
-    bool type = ADJ;
 }ChuongTrinh_t;
 
 typedef enum {

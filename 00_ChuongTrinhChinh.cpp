@@ -515,11 +515,6 @@ void CapNhatDanhSachChuongTrinhLuuTrongEEPROM()
     }
   }
 
-  for (uint8_t i = 0; i < SoLuongChuongTrinhCoDinh; i++)
-  {
-    DSChuongTrinhLuuTrongEeprom[i].type = FIXED;
-  }
-
   _grbl._DSChuongTrinh = DSChuongTrinhLuuTrongEeprom;
 }
 
