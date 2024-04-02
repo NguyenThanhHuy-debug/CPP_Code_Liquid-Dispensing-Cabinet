@@ -11,6 +11,7 @@ using namespace std;
 #define SoLuongChuongTrinhToiDa             10
 #define SoLuongKhuVucToiDa                  2
 #define SoLuongChuongTrinhCoDinh            5
+#define _ChieuDaiMaxTenChuongTrinh 20
 
 #define TrucX                               X_AXIS
 #define TrucY                               Y_AXIS

@@ -1739,7 +1739,6 @@ DanhSachMaLenh_t DWINHMI::ReturnMaLenhGRBL()
         return CAPNHATTOADO;
 
       case _HMIBamNutNEXTTrangLayViTriChonDiem:
-        Serial.println("Luu ThongSo");
         codeHMI = -1;
         if (CanCapNhatThongSo == true)
         {
@@ -1750,6 +1749,9 @@ DanhSachMaLenh_t DWINHMI::ReturnMaLenhGRBL()
         {
           return RESETMALENH;
         }
+
+      case _HMIBamNutEnterTrangBanPhimMoRong:
+        return CAPNHATTHONGSO;
 
       case _HMIBamNutOKTrangChonChuongTrinh:
         if(CheDoVaoTrangChonChuongTrinh == _VaoTrangTuNutCopyTrangThongSoChuongTrinh)
@@ -2220,7 +2222,12 @@ void DWINHMI::ThayDoiTenChuongTrinh()
     }
     if( codeHMI == _HMIBamNutEnterTrangBanPhimMoRong)
     {
-      CanCapNhatThongSo = true;
+      if ((stringdangxuly.length() > _ChieuDaiMaxTenChuongTrinh) || (stringdangxuly.length() == 0))
+      {
+        GuiTextLenHMI(_VpTextCanhBaoChuoiDangNhap, "ERROR: Valid length 1 to " + String(_ChieuDaiMaxTenChuongTrinh) + " characters");
+        codeHMI = -1;
+        return;
+      }
       DWIN::setPage(_TrangThongSoChuongTrinh);
       _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].tenchuongtrinh = stringdangxuly;
       GuiTextLenHMI(_VPTextTenChuongTrinhTrangThietLapChuongTrinh,stringdangxuly);
