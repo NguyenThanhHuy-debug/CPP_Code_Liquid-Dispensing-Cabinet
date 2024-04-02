@@ -290,7 +290,7 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
             {
               CheDoVaoTrangBanPhim = _VaoTrangBanPhimMatKhau;
               GuiTextLenHMI(_VpTextMatKhau, "");
-              GuiTextLenHMI(_VpTextCanhBaoMatKhau, "");
+              GuiTextLenHMI(_VpTextCanhBaoChuoiDangNhap, "");
               setPage(_TrangBanPhimMauKhau);
             }
             else
@@ -1251,16 +1251,34 @@ void DWINHMI::XuLyBanPhim(void)
     switch (CheDoVaoTrangBanPhim)
     {
       case _VaoTrangThietLapSoOngTrenMotCot:
+        if ((ChuoiDangNhap.toInt() > RACK_Y_UPPER_LIMIT) || (ChuoiDangNhap.toInt() == RACK_Y_LOWER_LIMIT))
+        {
+          GuiTextLenHMI(_VpTextCanhBaoChuoiDangNhap, "ERROR: Quantity's range from " + String(RACK_Y_LOWER_LIMIT) + " to " + String(RACK_Y_UPPER_LIMIT));
+          codeHMI = -1;
+          return;
+        }
         CanCapNhatThongSo = true;
         _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].rackY = ChuoiDangNhap.toInt();
         CapNhatLaiDanhSachToaDo(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy]); // reset lại danh sách tọa độ do số lượng ống thay đổi
         break;
       case _VaoTrangThietLapSoOngTrenMotHang:
+        if ((ChuoiDangNhap.toInt() > RACK_X_UPPER_LIMIT) || (ChuoiDangNhap.toInt() == RACK_X_LOWER_LIMIT))
+        {
+          GuiTextLenHMI(_VpTextCanhBaoChuoiDangNhap, "ERROR: Quantity's range from " + String(RACK_X_LOWER_LIMIT) + " to " + String(RACK_X_UPPER_LIMIT));
+          codeHMI = -1;
+          return;
+        }
         CanCapNhatThongSo = true;
         _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].rackX = ChuoiDangNhap.toInt();
         CapNhatLaiDanhSachToaDo(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy]);
         break;
       case _VaoTrangThietLapTocDoTrucXY:
+        if (ChuoiDangNhap.toInt() > SPEED_XY_UPPER_LIMIT)
+        {
+          GuiTextLenHMI(_VpTextCanhBaoChuoiDangNhap, "ERROR: Max XY Speed " + String(SPEED_XY_UPPER_LIMIT));
+          codeHMI = -1;
+          return;
+        }
         CanCapNhatThongSo = true;
         _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].tocdoXY = ChuoiDangNhap.toInt();
         break;
@@ -1269,10 +1287,22 @@ void DWINHMI::XuLyBanPhim(void)
         _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].thetich = ChuoiDangNhap.toFloat();
         break;
       case _VaoTrangBanPhimTubeID:
+        if (ChuoiDangNhap.toFloat() == TUBE_ID_LOWER_LIMIT)
+        {
+          GuiTextLenHMI(_VpTextCanhBaoChuoiDangNhap, "ERROR: Tube ID must be greater than " + String(TUBE_ID_LOWER_LIMIT));
+          codeHMI = -1;
+          return;
+        }
         CanCapNhatThongSo = true;
         _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].duongkinhong = ChuoiDangNhap.toFloat();
         break;
       case _VaoTrangBanPhimPumpSpeed:
+        if (ChuoiDangNhap.toInt() > SPEED_PUMP_UPPER_LIMIT)
+        {
+          GuiTextLenHMI(_VpTextCanhBaoChuoiDangNhap, "ERROR: Max Pump Speed " + String(SPEED_PUMP_UPPER_LIMIT));
+          codeHMI = -1;
+          return;
+        }
         CanCapNhatThongSo = true;
         _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].tocdobom = ChuoiDangNhap.toInt();
         break;
@@ -1281,6 +1311,12 @@ void DWINHMI::XuLyBanPhim(void)
         _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].chongnhogiot = ChuoiDangNhap.toFloat();
         break;
       case _VaoTrangBanPhimDensity:
+        if (ChuoiDangNhap.toFloat() == DENSITY_LOWER_LIMIT)
+        {
+          GuiTextLenHMI(_VpTextCanhBaoChuoiDangNhap, "ERROR: Density must be greater than " + String(DENSITY_LOWER_LIMIT));
+          codeHMI = -1;
+          return;
+        }
         _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].density = ChuoiDangNhap.toFloat();
         break;
       case _VaoTrangBanPhimActualWeight:
@@ -1359,8 +1395,7 @@ void DWINHMI::XuLyBanPhim(void)
         }
         else
         {
-          //TODO thông báo mật khẩu không đúng
-          GuiTextLenHMI(_VpTextCanhBaoMatKhau, "Wrong password");
+          GuiTextLenHMI(_VpTextCanhBaoChuoiDangNhap, "Wrong password");
         }
         break;
     }  
@@ -1756,13 +1791,13 @@ DanhSachMaLenh_t DWINHMI::ReturnMaLenhGRBL()
       case _HMIBamNutFastPumpTrangXemConfig:
         codeHMI = -1;
         return FASTPUMP;
-      case _HMIBamNutGoATrangXemConfig:
+      case _HMIBamNutGoA1TrangXemConfig:
         codeHMI = -1;
         return GOA;
-      case _HMIBamNutGoBTrangXemConfig:
+      case _HMIBamNutGoB1TrangXemConfig:
         codeHMI = -1;
         return GOB;
-      case _HMIBamNutGoCTrangXemConfig:
+      case _HMIBamNutGoC1TrangXemConfig:
         codeHMI = -1;
         return GOC;
       case _HMIBamNutLOW:
@@ -1955,9 +1990,9 @@ void DWINHMI::XuLyXemConfig()
   {
     ManualControl = false;
   }
-  if( codeHMI == _HMIBamNutGoATrangXemConfig || 
-    codeHMI == _HMIBamNutGoBTrangXemConfig ||
-    codeHMI == _HMIBamNutGoCTrangXemConfig || 
+  if( codeHMI == _HMIBamNutGoA1TrangXemConfig || 
+    codeHMI == _HMIBamNutGoB1TrangXemConfig ||
+    codeHMI == _HMIBamNutGoC1TrangXemConfig || 
     codeHMI == _HMIBamNutManualControlTrangXemConfig ||
     codeHMI == _HMIBamNutGETATrangLayViTriChonDiem ||
     codeHMI == _HMIBamNutGETBTrangLayViTriChonDiem ||

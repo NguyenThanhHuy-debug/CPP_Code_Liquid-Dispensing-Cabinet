@@ -352,7 +352,7 @@ void _GRBL::DiChuyenToiViTri(float X, float Y, float Z, uint16_t TocDo) {
 
 void _GRBL::Calib(ChuongTrinh_t * ChuongTrinh)
 {
-  ChuongTrinh->TheTichBomDuocKhiQuay1Vong = ChuongTrinh->TheTichBomDuocKhiQuay1Vong = (float)(ChuongTrinh->actualweight * 1000.0f / (ChuongTrinh->density * ChuongTrinh->duongkinhong * ViTriHienTaiCuaSTEP(MayBom)));
+  ChuongTrinh->TheTichBomDuocKhiQuay1Vong = (float)(ChuongTrinh->actualweight * 1000.0f / (ChuongTrinh->density * ChuongTrinh->duongkinhong * ViTriHienTaiCuaSTEP(MayBom)));
 }
 
 void _GRBL::TestFill(ChuongTrinh_t ChuongTrinh)

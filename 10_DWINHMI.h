@@ -8,6 +8,20 @@
 // #define debug_dwin
 //TODO vẽ sai khi chọn kích thước 2x2 và 3x3
 
+
+#define RACK_X_UPPER_LIMIT 12
+#define RACK_X_LOWER_LIMIT 1
+
+#define RACK_Y_UPPER_LIMIT 8
+#define RACK_Y_LOWER_LIMIT 1
+
+#define DENSITY_LOWER_LIMIT 0
+
+#define TUBE_ID_LOWER_LIMIT 0
+#define SPEED_XY_UPPER_LIMIT DEFAULT_X_MAX_RATE
+
+#define SPEED_PUMP_UPPER_LIMIT DEFAULT_A_MAX_RATE
+
 #define AddrPressXcong    "1010"
 #define AddrHoldXcong     "1020"
 #define AddrReleaseXcong  "1030"
@@ -36,9 +50,9 @@
 #define AddrReleaseZtru   "2080"
 
 // #define OffsetIconOng   15
-#define BanKinhIconOng  10U
+#define BanKinhIconOng  10U0
 
-#define ChieuDaiX 330
+#define ChieuDaiX 3300
 #define ChieuDaiY 150
 
 #define MauDo 0xF800U
@@ -51,14 +65,14 @@
 #define BuachieuDaiXChonToaDo 710U
 #define BuachieuDaiYChonToaDo 265U
 
-#define ToaDoX0KhayChon 700U
+#define ToaDoX0KhayChon 710U
 #define ToaDoY0KhayChon 25U
 
-#define ToaDoX0Khay1 125U
-#define ToaDoY0Khay1 125U
+#define ToaDoX0Khay1 120U
+#define ToaDoY0Khay1 130U
 
-#define ToaDoX0Khay2 525U
-#define ToaDoY0Khay2 125U
+#define ToaDoX0Khay2 520U
+#define ToaDoY0Khay2 130U
 
 #define ToaDoXIconHinhTronDauTienKhayChon 775U
 #define ToaDoYIconHinhTronDauTienKhayChon 55U
@@ -215,6 +229,15 @@
 #define _HMIBamNutLOW 0xEA
 #define _HMIBamNutMEDIUM 0xEB
 #define _HMIBamNutFAST 0xEC
+#define _HMIBamNutGetA1 0xD0
+#define _HMIBamNutGetA2 0xD1
+#define _HMIBamNutGetB1 0xD2
+#define _HMIBamNutGetB2 0xD3
+#define _HMIBamNutGetC1 0xD4
+#define _HMIBamNutGetC2 0xD5
+#define _HMIBamNutGetH1 0xD6
+#define _HMIBamNutGetH2 0xD7
+
 #define _HMIBamNutGET 0xED
 #define _HMIBamNutBackTrangLayViTriXacNhan 0xEE
 
@@ -262,9 +285,13 @@
 #define _HMIBamNutTestFillTrangXemConfig 0x1012
 #define _HMIBamNutDirectionTrangXemConfig 0x1013
 #define _HMIBamNutFastPumpTrangXemConfig 0x1014
-#define _HMIBamNutGoATrangXemConfig 0x1015
-#define _HMIBamNutGoBTrangXemConfig 0x1016
-#define _HMIBamNutGoCTrangXemConfig 0x1017
+#define _HMIBamNutGoA1TrangXemConfig 0x1015
+#define _HMIBamNutGoB1TrangXemConfig 0x1016
+#define _HMIBamNutGoC1TrangXemConfig 0x1017
+#define _HMIBamNutGoA2TrangXemConfig 0x101D
+#define _HMIBamNutGoB2TrangXemConfig 0x101E
+#define _HMIBamNutGoC2TrangXemConfig 0x101F
+
 #define _HMIBamNutModifyProgramTrangXemConfig 0x1018
 #define _HMIBamNutManualControlTrangXemConfig 0x1019
 #define _HMIBamNutExitTrangXemConfig 0x101A
@@ -438,7 +465,7 @@
 #define _VPTextTenChuongTrinhDangChay 0xCA00
 
 #define _VpTextMatKhau        0x3100
-#define _VpTextCanhBaoMatKhau 0x3200
+#define _VpTextCanhBaoChuoiDangNhap 0x3200
 
 #define _HMIBamNutHourTrangSecondLoop 0x7010
 #define _HMIBamNutMinutesTrangSecondLoop 0x7020
