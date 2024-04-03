@@ -169,13 +169,24 @@ void _GRBL::BatDauPhanPhoi()
       //* phải delay để grbl xử lý xong lệnh
       delay(200);
 
-      while ((sys.state == State::Cycle) || (sys.state == State::Hold)) 
+      while ((sys.state == State::Cycle) || (sys.state == State::Hold) ) 
       {
         if (CoBaoDungPhanPhoi == true) {
           CoBaoDungPhanPhoi = false;
           return;
         }
-        delay(1);
+        if (CoBaoPhanPhoiLaiOng == true)
+          {
+            break;
+          }
+        delay(10);
+      }
+
+      if (CoBaoPhanPhoiLaiOng == true)
+      {
+        ToaDoHienTai--;
+        CoBaoPhanPhoiLaiOng = false;
+        continue;
       }
 
       OngDaPhanPhoi = ToaDoHienTai;
@@ -194,12 +205,20 @@ float _GRBL::ViTriHienTaiCuaSTEP(uint8_t STEP) {
 
 
 void _GRBL::TamDungPhanPhoi(void) {
+  if (CoBaoPhanPhoiLaiOng == true)
+  {
+    vTaskSuspend(_PhanPhoiTaskHandle);
+  }
   WebUI::inputBuffer.push("!\r");
-  // vTaskSuspend(_PhanPhoiTaskHandle);
 }
 
 void _GRBL::TiepTucPhanPhoi(void) {
-  WebUI::inputBuffer.push("~\r");
+  if (CoBaoPhanPhoiLaiOng == true)
+  {
+    vTaskResume(_PhanPhoiTaskHandle);
+    return;
+  }
+  WebUI::inputBuffer.push("~\n");
   // vTaskResume(_PhanPhoiTaskHandle);
 }
 

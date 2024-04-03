@@ -795,6 +795,7 @@ void DWINHMI::XuLyConfigChuongTrinh(void)
   if (codeHMI == _HMIBamNutSetupProgramTrangCaiDat)
   {
       CapNhatHienThiThongTinTenChuongTrinhKhiVaoTrangChonChuongTrinh();
+      
       codeHMI = -1;
   }
   if (CheDoVaoTrangChonChuongTrinh == _VaoTrangTuNutSetupProgramTrangCaiDatCheDoChuongTrinh)

@@ -169,6 +169,17 @@ void XuLyDuLieuNhanTuHMI(void)
   switch (_MaLenhGRBL)
   {
     case GOHOMEKHONGCHUYENTRANG:
+      if (DangTamDungPhanPhoi == true)
+      {
+        Serial.println("Set Home khi dang phan phoi");
+        _grbl.CoBaoPhanPhoiLaiOng = true;
+        _grbl.TamDungPhanPhoi();
+        WebUI::inputBuffer.write(0x18);
+        delay(100);
+        WebUI::inputBuffer.push("$H\n");
+        delay(100);
+        break;
+      }
       _grbl.VeToaDoGoc();
       break;
     case GOHOME:

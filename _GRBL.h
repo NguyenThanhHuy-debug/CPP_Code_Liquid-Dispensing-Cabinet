@@ -52,6 +52,7 @@ public:
     uint8_t ToaDoYDaChay;
     bool DaChayXongCacKhuVuc = false;
     int8_t KhuVucChay[SoLuongKhuVucToiDa];
+    bool CoBaoPhanPhoiLaiOng = false;
 
 private:
     bool CoBaoDungPhanPhoi = false;
@@ -64,7 +65,7 @@ private:
     static void StaticPhanPhoiTask(void* _this);
     void PhanPhoiTask(void);
     TaskHandle_t _PhanPhoiTaskHandle;
-
+    
     void TinhKhoangCachGiuaHaiOng(ChuongTrinh_t ChuongTrinh, uint8_t KhuVuc);
 
 };
