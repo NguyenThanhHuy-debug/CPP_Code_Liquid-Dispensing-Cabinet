@@ -60,7 +60,7 @@ void DWINHMI::onHMIEvent(String address, int lastByte, String message, String re
   {
     return;
   }
-#ifdef debug_dwin
+#ifdef DEBUG_DWIN
   Serial.println("OnEvent : [ A : " + address + " | D : " + String(lastByte, HEX) + " | M : " + message + " | R : " + response + " ]");
   // Serial.print("lastByte: ");
   // Serial.println(lastByte);
@@ -87,7 +87,7 @@ void DWINHMI::onHMIEvent(String address, int lastByte, String message, String re
 
     static String prevAddr = address;
 
-    #ifdef debug_dwin
+    #ifdef DEBUG_DWIN
     Serial.println("address: " + address);
     Serial.println("prevAddr: " + prevAddr);
     #endif
@@ -442,7 +442,7 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
     {
       CapNhatHienThiThongTinTenChuongTrinhKhiVaoTrangChonChuongTrinh();
       DWIN::setPage(_TrangChonChuongTrinh);
-      GuiTextLenHMI(_VPTextHienThiChuongTrinhTrangChonChuongTrinh,"");
+      // GuiTextLenHMI(_VPTextHienThiChuongTrinhTrangChonChuongTrinh,"");
       codeHMI = -1;
       break;
     }
@@ -1354,6 +1354,8 @@ void DWINHMI::XuLyBanPhim(void)
         break;
     }
 
+    GuiTextLenHMI(_VpTextCanhBaoChuoiDangNhap, "");
+
     switch (CheDoVaoTrangBanPhim)
     {
       case _VaoTrangThietLapSoOngTrenMotCot:
@@ -1700,7 +1702,7 @@ DanhSachMaLenh_t DWINHMI::ReturnMaLenhGRBL()
         if (BamNutRunON == false)
         {
           BamNutRunON = true;
-#ifdef debug_dwin
+#ifdef DEBUG_DWIN
           Serial.print("DSIndexChuongTrinhDuocChon: ");
           for (uint8_t i : DSIndexChuongTrinhDuocChon)
           {
@@ -2168,14 +2170,14 @@ void DWINHMI::CapNhatHienThiThongTinTenChuongTrinhKhiVaoTrangChonChuongTrinh()
   for (uint8_t i = 0; i < SoLuongChuongTrinhToiDa; i++) 
   {
     String TenChuongTrinh = _ChuongTrinhEEPROM[i % _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh].tenchuongtrinh + "(ADJ)";
-    if (i <= SoLuongChuongTrinhCoDinh)
+    if (i < SoLuongChuongTrinhCoDinh)
     {
       TenChuongTrinh = _ChuongTrinhEEPROM[i % _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh].tenchuongtrinh + "(FIXED)";
     }
     GuiTextLenHMI(_VPTextProgram1TrangChonChuongTrinh + (i % _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh) * 0x100, TenChuongTrinh);
   }
 
-  GuiTextLenHMI(_VPTextHienThiChuongTrinhTrangChonChuongTrinh, "");
+  // GuiTextLenHMI(_VPTextHienThiChuongTrinhTrangChonChuongTrinh, "");
 }
 void DWINHMI::CapNhatHienThiThongTinChuongTrinhTrangThietLapTheTichPhanPhoi()
 {
@@ -2250,7 +2252,7 @@ void DWINHMI ::HienThiMau(uint32_t VpAddress, uint16_t X, uint16_t Y, uint16_t M
   uint16_t chieudaiY = ChieuDaiY;
   uint16_t GioiHanX0Khay;
   uint16_t GioiHanY0Khay;
-  #ifdef debug_dwin
+  #ifdef DEBUG_DWIN
   // Serial.println("vvvvvvvvvvvvvvvvvvvvvvv");
   #endif
   #pragma region KhayDuocChon
@@ -2381,10 +2383,11 @@ void DWINHMI ::HienThiMau(uint32_t VpAddress, uint16_t X, uint16_t Y, uint16_t M
     }
     else
     {
-      int16_t OffsetUpperLeftX = (toadoXIcondautien - KhoangCachGiua2DiemTheoX / 4) - GioiHanX0Khay;
-      if (OffsetUpperLeftX <=0 )
+      int16_t OffsetUpperLeftCornerX = (toadoXIcondautien - KhoangCachGiua2DiemTheoX / 4) - GioiHanX0Khay;
+      if (OffsetUpperLeftCornerX <=0 )
       {
-        toadoXIcondautien -= OffsetUpperLeftX - 10;
+        toadoXIcondautien -= OffsetUpperLeftCornerX - 10;
+        KhoangCachGiua2DiemTheoX += OffsetUpperLeftCornerX - KhoangCachGiua2DiemTheoX / 6;
       }
       ToaDoXHMI = toadoXIcondautien + KhoangCachGiua2DiemTheoX * ToaDoXMaTran;
     }
@@ -2394,10 +2397,11 @@ void DWINHMI ::HienThiMau(uint32_t VpAddress, uint16_t X, uint16_t Y, uint16_t M
       KhoangCachGiua2DiemTheoY = chieudaiY / 2;
     }
     else{
-      int16_t OffsetUpperLeftY = (toadoYIcondautien - KhoangCachGiua2DiemTheoY / 4) - GioiHanY0Khay;
-      if (OffsetUpperLeftY <=0 )
+      int16_t OffsetUpperLeftCornerY = (toadoYIcondautien - KhoangCachGiua2DiemTheoY / 4) - GioiHanY0Khay;
+      if (OffsetUpperLeftCornerY <=0 )
       {
-        toadoYIcondautien -= OffsetUpperLeftY - 10;
+        toadoYIcondautien -= OffsetUpperLeftCornerY - 10;
+        KhoangCachGiua2DiemTheoY += OffsetUpperLeftCornerY - KhoangCachGiua2DiemTheoY / 6;
       }
       ToaDoYHMI = toadoYIcondautien + KhoangCachGiua2DiemTheoY * ToaDoYMaTran;
     }
@@ -2448,11 +2452,11 @@ void DWINHMI ::HienThiMau(uint32_t VpAddress, uint16_t X, uint16_t Y, uint16_t M
   memcpy(buffer + 250, endBuffer, 2);
   DGUS_SERIAL.write(buffer, 252);
 
-  #ifdef debug_dwin
+  #ifdef DEBUG_DWIN
   for (uint8_t i = 0; i < 156; i++){
-    // Serial.printf("%02X ", buffer[i]);
+    Serial.printf("%02X ", buffer[i]);
   }
-  // Serial.println();
+  Serial.println();
   #endif
 }
 void DWINHMI::ResetFullMauChonToaDo(uint16_t Mau) 
@@ -2494,30 +2498,30 @@ void DWINHMI::ResetFullMau(uint8_t IdxChuongTrinhDuocChon, uint16_t Mau, uint8_t
       HienThiMau(_VpAddressVung3Khay2HienThiMau, 0, 0, Mau, ChuongTrinhDuocChon);
       HienThiMau(_VpAddressVung4Khay2HienThiMau, 0, 0, Mau, ChuongTrinhDuocChon);
       break;
-    case 2:
-      for (uint8_t i = 0; i < 12; i++){
-        for (uint8_t j = 0; j < 8; j++){
-          khay3[i][j] = Mau;
-        }
-      }
-      HienThiMau(_VpAddressVung1Khay3HienThiMau, 0, 0, Mau, ChuongTrinhDuocChon);
-      HienThiMau(_VpAddressVung2Khay3HienThiMau, 0, 0, Mau, ChuongTrinhDuocChon);
-      HienThiMau(_VpAddressVung3Khay3HienThiMau, 0, 0, Mau, ChuongTrinhDuocChon);
-      HienThiMau(_VpAddressVung4Khay3HienThiMau, 0, 0, Mau, ChuongTrinhDuocChon);
-      break;
-    case 3:
-      for (uint8_t i = 0; i < 12; i++){
-        for (uint8_t j = 0; j < 8; j++){
-          khay4[i][j] = Mau;
-        }
-      }
-      HienThiMau(_VpAddressVung1Khay4HienThiMau, 0, 0, Mau, ChuongTrinhDuocChon);
-      HienThiMau(_VpAddressVung2Khay4HienThiMau, 0, 0, Mau, ChuongTrinhDuocChon);
-      HienThiMau(_VpAddressVung3Khay4HienThiMau, 0, 0, Mau, ChuongTrinhDuocChon);
-      HienThiMau(_VpAddressVung4Khay4HienThiMau, 0, 0, Mau, ChuongTrinhDuocChon);
-      break;
-    default:
-      break;
+    // case 2:
+    //   for (uint8_t i = 0; i < 12; i++){
+    //     for (uint8_t j = 0; j < 8; j++){
+    //       khay3[i][j] = Mau;
+    //     }
+    //   }
+    //   HienThiMau(_VpAddressVung1Khay3HienThiMau, 0, 0, Mau, ChuongTrinhDuocChon);
+    //   HienThiMau(_VpAddressVung2Khay3HienThiMau, 0, 0, Mau, ChuongTrinhDuocChon);
+    //   HienThiMau(_VpAddressVung3Khay3HienThiMau, 0, 0, Mau, ChuongTrinhDuocChon);
+    //   HienThiMau(_VpAddressVung4Khay3HienThiMau, 0, 0, Mau, ChuongTrinhDuocChon);
+    //   break;
+    // case 3:
+    //   for (uint8_t i = 0; i < 12; i++){
+    //     for (uint8_t j = 0; j < 8; j++){
+    //       khay4[i][j] = Mau;
+    //     }
+    //   }
+    //   HienThiMau(_VpAddressVung1Khay4HienThiMau, 0, 0, Mau, ChuongTrinhDuocChon);
+    //   HienThiMau(_VpAddressVung2Khay4HienThiMau, 0, 0, Mau, ChuongTrinhDuocChon);
+    //   HienThiMau(_VpAddressVung3Khay4HienThiMau, 0, 0, Mau, ChuongTrinhDuocChon);
+    //   HienThiMau(_VpAddressVung4Khay4HienThiMau, 0, 0, Mau, ChuongTrinhDuocChon);
+    //   break;
+    // default:
+    //   break;
   }
 
 }
@@ -2589,6 +2593,7 @@ void DWINHMI::VeToanBoHinhTron(uint32_t VpAddress, ChuongTrinh_t ChuongTrinh)
       if (OffsetUpperLeftCornerX <= 0)
       {
         toadoXIcondautien -= OffsetUpperLeftCornerX - 10; 
+        KhoangCachGiua2DiemTheoX += OffsetUpperLeftCornerX - KhoangCachGiua2DiemTheoX / 6;
       }
       ToaDoXHMI = toadoXIcondautien + KhoangCachGiua2DiemTheoX * ToaDoXMaTran;
     }
@@ -2604,6 +2609,7 @@ void DWINHMI::VeToanBoHinhTron(uint32_t VpAddress, ChuongTrinh_t ChuongTrinh)
       if (OffsetUpperLeftCornerY <= 0)
       {
         toadoYIcondautien -= OffsetUpperLeftCornerY - 10; 
+        KhoangCachGiua2DiemTheoY += OffsetUpperLeftCornerY - KhoangCachGiua2DiemTheoY / 6;
       }
       ToaDoYHMI = toadoYIcondautien + KhoangCachGiua2DiemTheoY * ToaDoYMaTran;
     }
@@ -2617,7 +2623,7 @@ void DWINHMI::VeToanBoHinhTron(uint32_t VpAddress, ChuongTrinh_t ChuongTrinh)
     }
     if(include)
     {
-      #ifdef debug_dwin
+      #ifdef DEBUG_DWIN
       // Serial.println("^^^^^^^^^^^^^^^^^^");
       #endif
 
@@ -2653,7 +2659,7 @@ void DWINHMI::VeToanBoHinhTron(uint32_t VpAddress, ChuongTrinh_t ChuongTrinh)
   this->KichThuocHcnDaVeTheoX = KhoangCachGiua2DiemTheoX / 4;
   this->KichThuocHcnDaVeTheoY = KhoangCachGiua2DiemTheoY / 4;
 
-  #ifdef debug_dwin
+  #ifdef DEBUG_DWIN
   // for (uint8_t i = 0; i < 252; i++){
   //   // Serial.printf("%02X ", buffer[i]);
   // }

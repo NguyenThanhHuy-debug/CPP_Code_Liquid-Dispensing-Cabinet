@@ -5,6 +5,7 @@
 using namespace std;
 
 // #define DEBUG_THONGSOBOARD
+// #define DEBUG_DWIN
 
 #define Serial                              Uart0
 

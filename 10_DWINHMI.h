@@ -5,7 +5,6 @@
 #include <Arduino.h>  
 #include <DWIN.h>  
 
-// #define debug_dwin
 //TODO vẽ sai khi chọn kích thước 2x2 và 3x3
 
 
@@ -50,35 +49,33 @@
 #define AddrReleaseZtru   "2080"
 
 // #define OffsetIconOng   15
-#define BanKinhIconOng  10U0
+#define BanKinhIconOng  10U
 
-#define ChieuDaiX 3300
-#define ChieuDaiY 150
+#define ChieuDaiX 350
+#define ChieuDaiY 180
 
 #define MauDo 0xF800U
 #define MauXanhLa 0x07E0U
 #define MauTrang 0xFFFFU
 #define MauDen 0x0000U
 
-#define KhoangCachGiua2Khay 85U
-
-#define BuachieuDaiXChonToaDo 710U
-#define BuachieuDaiYChonToaDo 265U
+#define BuachieuDaiXChonToaDo 740U
+#define BuachieuDaiYChonToaDo 300U
 
 #define ToaDoX0KhayChon 710U
 #define ToaDoY0KhayChon 25U
 
-#define ToaDoX0Khay1 120U
+#define ToaDoX0Khay1 115U
 #define ToaDoY0Khay1 130U
 
 #define ToaDoX0Khay2 520U
 #define ToaDoY0Khay2 130U
 
-#define ToaDoXIconHinhTronDauTienKhayChon 775U
-#define ToaDoYIconHinhTronDauTienKhayChon 55U
+#define ToaDoXIconHinhTronDauTienKhayChon 765U
+#define ToaDoYIconHinhTronDauTienKhayChon 45U
 
-#define ToaDoXIconHinhTronDauTienKhay1 152U
-#define ToaDoYIconHinhTronDauTienKhay1 150U
+#define ToaDoXIconHinhTronDauTienKhay1 150U
+#define ToaDoYIconHinhTronDauTienKhay1 140U
 
 #define ToaDoXIconHinhTronDauTienKhay2 550U
 #define ToaDoYIconHinhTronDauTienKhay2 ToaDoYIconHinhTronDauTienKhay1

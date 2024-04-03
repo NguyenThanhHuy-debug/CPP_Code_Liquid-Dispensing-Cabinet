@@ -8,7 +8,6 @@
 // #define debug
 // // Từ vị trí 0-409 là vùng EEPROM chứa thông số board.
 #define _ChieuDaiI2CEEPROM 2023
-#define _ChieuDaiMaxTenChuongTrinh 20
 #define _KyTu '\r'
 
 class ThongSoBoard {
