@@ -225,7 +225,7 @@ void XuLyDuLieuNhanTuHMI(void)
       }
       _grbl.OngDaPhanPhoi = -1;
       _DWIN.DuLieuBoardGuiLenHMI.OngDaPhanPhoi = -1;
-      _grbl.VeViTriHome();
+      _grbl.VeToaDoGoc();
       break;
     case EXITVETRANGCAIDATCHEDOCHUONGTRINH:
       Serial.println("EXITVETRANGCAIDATCHEDOCHUONGTRINH");
@@ -417,36 +417,34 @@ void XuLyDuLieuNhanTuHMI(void)
         DangFastPump = false;
       }
       break;
-    case GOA:
+    case GOA1:
+    case GOA2:
     {
-      ChuongTrinh_t ChuongTrinhDangXuLy = _DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy];
-      //TODO thêm nút nhấn di chuyển tới A khu vực 1
-      // _grbl.DiChuyenToiViTri(ChuongTrinhDangXuLy.vitriA.X, ChuongTrinhDangXuLy.vitriA.Y, ChuongTrinhDangXuLy.docaoH, ChuongTrinhDangXuLy.tocdoXY);
-      #ifdef debug
-      Serial.println("Di chuyển tới A");
-      #endif
+      ChuongTrinh_t ChuongTrinhDangConfig = _DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy];
+      uint8_t KhuVucDangChon = _MaLenhGRBL % GOA1;
+      Serial.println(_MaLenhGRBL);
+      Serial.println(KhuVucDangChon);
+      Serial.println("X: " + String(ChuongTrinhDangConfig.ViTriA[KhuVucDangChon].X) + " Y: " + String(ChuongTrinhDangConfig.ViTriA[KhuVucDangChon].Y) + " H: " + String(ChuongTrinhDangConfig.ViTriH[KhuVucDangChon]) + " tocdo: " + String(ChuongTrinhDangConfig.tocdoXY));
+      _grbl.DiChuyenToiViTri(ChuongTrinhDangConfig.ViTriA[KhuVucDangChon].X, ChuongTrinhDangConfig.ViTriA[KhuVucDangChon].Y, ChuongTrinhDangConfig.ViTriH[KhuVucDangChon], ChuongTrinhDangConfig.tocdoXY);
       break;
     }
-    case GOB:
+    case GOB1:
+    case GOB2:
     {
-      ChuongTrinh_t ChuongTrinhDangXuLy = _DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy];
-      //TODO
-      // _grbl.DiChuyenToiViTri(ChuongTrinhDangXuLy.vitriB.X, ChuongTrinhDangXuLy.vitriB.Y, ChuongTrinhDangXuLy.docaoH, ChuongTrinhDangXuLy.tocdoXY);
-      #ifdef debug
-      Serial.println("Di chuyển tới B");
-      #endif
+      ChuongTrinh_t ChuongTrinhDangConfig = _DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy];
+      uint8_t KhuVucDangChon = _MaLenhGRBL % GOB1;
+      _grbl.DiChuyenToiViTri(ChuongTrinhDangConfig.ViTriB[KhuVucDangChon].X, ChuongTrinhDangConfig.ViTriB[KhuVucDangChon].Y, ChuongTrinhDangConfig.ViTriH[KhuVucDangChon], ChuongTrinhDangConfig.tocdoXY);
       break;
     }
-    case GOC:
+    case GOC1:
+    case GOC2:
     {
-      ChuongTrinh_t ChuongTrinhDangXuLy = _DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy];
-      //TODO
-      // _grbl.DiChuyenToiViTri(ChuongTrinhDangXuLy.vitriC.X, ChuongTrinhDangXuLy.vitriC.Y, ChuongTrinhDangXuLy.docaoH, ChuongTrinhDangXuLy.tocdoXY);
-      #ifdef debug
-      Serial.println("Di chuyển tới C");
-      #endif
+      ChuongTrinh_t ChuongTrinhDangConfig = _DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy];
+      uint8_t KhuVucDangChon = _MaLenhGRBL % GOC1;
+      _grbl.DiChuyenToiViTri(ChuongTrinhDangConfig.ViTriC[KhuVucDangChon].X, ChuongTrinhDangConfig.ViTriC[KhuVucDangChon].Y, ChuongTrinhDangConfig.ViTriH[KhuVucDangChon], ChuongTrinhDangConfig.tocdoXY);
       break;
     }
+
     case LOWSPEED:
     {
       #ifdef debug
@@ -604,7 +602,7 @@ void Shutdown(void)
 {
   _grbl.VeToaDoGoc();
   delay(100);
-  while (sys.state == State::Cycle)
+  while (sys.state == State::Homing)
   {
     delay(1);
   }

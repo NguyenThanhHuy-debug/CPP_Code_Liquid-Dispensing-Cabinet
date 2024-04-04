@@ -142,6 +142,9 @@
 #define _HMIBamNutChonProgram9TrangCaiDatCheDoChuongTrinh 0x208
 #define _HMIBamNutChonProgram10TrangCaiDatCheDoChuongTrinh 0x209
 
+#define _HMIBamNutXoaArea1 0x70
+#define _HMIBamNutXoaArea2 0x71
+
 /* Define các nút bấm trang 132*/
 #define _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh 0x8B         // nút chọn chương trình cần đổi 1->10
 #define _HMIBamNutChonChuongTrinh2TrangChonChuongTrinh 0x8C
@@ -340,7 +343,7 @@
 #define _TrangBanPhimDensity 162
 #define _TrangBanPhimActualWeight 163
 #define _TrangPhanPhoiViTriSub 164
-#define _TrangXemThongSoConfig 169
+#define _TrangXemThongSoConfig 165
 #define _TrangBanPhimSecondLoop 166
 #define _TrangBanPhimCaiDatThoiGian 167
 #define _TrangBanPhimMoRongSo 168
@@ -614,7 +617,7 @@ private:
   CheDoCaiDatThoiGian_t CheDoCaiDatThoiGian;
   CheDoCaiDatTimeLoop_t CheDoCaiDatTimeLoop;
   CheDoVaoTrangGETABCH_t CheDoVaoTrangGETABCH;
-  bool oneTimeMulti = false; // Xác định chế độ multi chỉ chạy một lần
+  bool oneTimeMulti = true; // Xác định chế độ multi chỉ chạy một lần
   bool resetTimeRunStart = true;
   static int lastcodeHMI;                  // Mã code cũ mỗi khi user bấm các nút trên màn hình HMI.
   static int codeHMI;                      // Mã code mỗi khi user bấm các nút trên màn hình HMI.

@@ -144,8 +144,6 @@ void _GRBL::BatDauPhanPhoi()
     toado_t ViTriCCanChay = _DSChuongTrinh[IdxChuongTrinh].ViTriC[i];
     float ViTriHCanChay = _DSChuongTrinh[IdxChuongTrinh].ViTriH[i];
 
-    KhuVucDangChay = i;
-
     for (uint8_t ToaDoHienTai = 0; ToaDoHienTai < DSToaDoCanChay.size(); ToaDoHienTai++)
     {
 
@@ -193,11 +191,12 @@ void _GRBL::BatDauPhanPhoi()
       OngDaPhanPhoi = ToaDoHienTai;
       ToaDoXDaChay = _DSChuongTrinh[IdxChuongTrinh].DsToaDo[i][ToaDoHienTai].X;
       ToaDoYDaChay = _DSChuongTrinh[IdxChuongTrinh].DsToaDo[i][ToaDoHienTai].Y;
+      KhuVucDangChay = i;
       Serial.printf("OngDaPhanPhoi: %d\n", OngDaPhanPhoi);
     }
   }
   DaChayXongCacKhuVuc = true;
-  // VeViTriHome();
+  VeToaDoGoc();
 }
 //* Trả về vị trí hiện tại của STEP
 float _GRBL::ViTriHienTaiCuaSTEP(uint8_t STEP) {
