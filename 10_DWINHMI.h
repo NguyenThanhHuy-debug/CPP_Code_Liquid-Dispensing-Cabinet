@@ -589,7 +589,8 @@ public:
   int8_t IndexChuongTrinhDangXuLy;                           // Đây là biến tạm để biết chương trình nào đang xử lý
   uint8_t countTest = 1;
   // vector<toadoINT_t> DSToaDoKhuVuc[SoLuongKhuVucToiDa];
-  int8_t DSIndexChuongTrinhDuocChon[SoLuongKhuVucToiDa];                   
+  int8_t DSIndexChuongTrinhDuocChon[SoLuongKhuVucToiDa];      
+  int8_t OngDaPhanPhoi_prev = -1;             
 
 private:
   uint16_t KichThuocHcnDaVeTheoX;  // kích thước X / 2

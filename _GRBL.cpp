@@ -173,6 +173,7 @@ void _GRBL::BatDauPhanPhoi()
       {
         if (CoBaoDungPhanPhoi == true) {
           CoBaoDungPhanPhoi = false;
+          Serial.println("TaskPhanPhoi DungPhanPhoi");
           return;
         }
         if (CoBaoPhanPhoiLaiOng == true)
@@ -223,6 +224,16 @@ void _GRBL::TiepTucPhanPhoi(void) {
 }
 
 void _GRBL::DungPhanPhoi(void) {
+
+  if (CoBaoPhanPhoiLaiOng == true)
+  {
+    WebUI::inputBuffer.push("!\n");
+    CoBaoDungPhanPhoi = true;
+    CoBaoPhanPhoiLaiOng = false;
+    delay(100);
+    vTaskResume(_PhanPhoiTaskHandle);
+    return;
+  }
   CoBaoDungPhanPhoi = true;
   delay(100); /* NOTE delay(100)*/
   WebUI::inputBuffer.write(0x18);

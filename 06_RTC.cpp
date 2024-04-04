@@ -249,7 +249,7 @@ String RTC::ChuanHoaChuoiRTCDeGuiVeServer(void) {
 String RTC::ChuanHoaChuoiRTC_Ngay(void) {
   String Ngay = String(dt.Ngay);
   String Thang = String(dt.Thang);
-  String Nam = String(dt.Nam);
+  String Nam = String(dt.Nam).substring(2);
   if (dt.Ngay < 10) Ngay = "0" + Ngay;
   if (dt.Thang < 10) Thang = "0" + Thang;
 

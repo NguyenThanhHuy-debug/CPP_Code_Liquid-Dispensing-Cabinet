@@ -1724,6 +1724,7 @@ DanhSachMaLenh_t DWINHMI::ReturnMaLenhGRBL()
       {
         if (BamNutRunON == false) 
         {
+          OngDaPhanPhoi_prev = -1;
           GuiTextLenHMI(_VPTextFillNumberTrangHienThiPhanPhoiThoiGianThuc, "0");
           return RESETPROGRAM;
         }
@@ -1734,7 +1735,10 @@ DanhSachMaLenh_t DWINHMI::ReturnMaLenhGRBL()
         if (BamNutRunON == true)
          break;
         else
+        {
+          OngDaPhanPhoi_prev = -1;
          return EXITVETRANGCAIDATCHEDOCHUONGTRINH;
+        }
       }
 
       case _HMIBamNutOKTrangPhanPhoiViTri:
@@ -2770,7 +2774,6 @@ void DWINHMI::TaskFunction_RunTime(void)
       time1s = millis();
     }
 
-    static int8_t OngDaPhanPhoi_prev = -1;
 
     if (DuLieuBoardGuiLenHMI.OngDaPhanPhoi != OngDaPhanPhoi_prev && delay_flag == false)
     {
@@ -2778,6 +2781,7 @@ void DWINHMI::TaskFunction_RunTime(void)
       Serial.printf("KhuVuc: %d, X: %d, Y: %d\n",DuLieuBoardGuiLenHMI.KhuVucDangChay,DuLieuBoardGuiLenHMI.ToaDoXDaChay,DuLieuBoardGuiLenHMI.ToaDoYDaChay);
       OngDaPhanPhoi_prev = DuLieuBoardGuiLenHMI.OngDaPhanPhoi;
       IdxKhuVucDangXuLy = DuLieuBoardGuiLenHMI.KhuVucDangChay;
+      GuiTextLenHMI(_VPTextFillNumberTrangHienThiPhanPhoiThoiGianThuc, String(OngDaPhanPhoi_prev));
       HienThiMau(DuLieuBoardGuiLenHMI.KhuVucDangChay, DuLieuBoardGuiLenHMI.ToaDoXDaChay, DuLieuBoardGuiLenHMI.ToaDoYDaChay, _ChuongTrinhEEPROM[DSIndexChuongTrinhDuocChon[DuLieuBoardGuiLenHMI.KhuVucDangChay]], MauXanhLa);
       if (DuLieuBoardGuiLenHMI.DaChayXongCacKhuVuc == true)
       {

@@ -224,11 +224,21 @@ void XuLyDuLieuNhanTuHMI(void)
         _grbl.DungPhanPhoi();
       }
       _grbl.OngDaPhanPhoi = -1;
-      _grbl.KhuVucDangChay = -1;
+      _DWIN.DuLieuBoardGuiLenHMI.OngDaPhanPhoi = -1;
       _grbl.VeViTriHome();
       break;
     case EXITVETRANGCAIDATCHEDOCHUONGTRINH:
       Serial.println("EXITVETRANGCAIDATCHEDOCHUONGTRINH");
+      _grbl.OngDaPhanPhoi = -1;
+      _DWIN.DuLieuBoardGuiLenHMI.OngDaPhanPhoi = -1;
+      if (_grbl.CoBaoPhanPhoiLaiOng == true)
+      {
+        //TODO
+        Serial.println("EXITVETRANGCAIDATCHEDOCHUONGTRINH CoBaoPhanPhoiLaiOng");
+        DangTamDungPhanPhoi = false;
+        _grbl.DungPhanPhoi();
+        break;
+      }
       if (DangTamDungPhanPhoi == true)
       {
         Serial.println("DungPhanPhoi");
