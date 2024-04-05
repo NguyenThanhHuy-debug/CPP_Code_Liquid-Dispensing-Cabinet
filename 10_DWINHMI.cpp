@@ -1312,7 +1312,7 @@ void DWINHMI::XuLyBanPhim(void)
     switch (CheDoVaoTrangBanPhim)
     {
       case _VaoTrangThietLapSoOngTrenMotCot:
-        if ((ChuoiDangNhap.toInt() > RACK_Y_UPPER_LIMIT) || (ChuoiDangNhap.toInt() == RACK_Y_LOWER_LIMIT))
+        if ((ChuoiDangNhap.toInt() > RACK_Y_UPPER_LIMIT) || (ChuoiDangNhap.toInt() < RACK_Y_LOWER_LIMIT))
         {
           GuiTextLenHMI(_VpTextCanhBaoChuoiDangNhap, "ERROR: Quantity's range from " + String(RACK_Y_LOWER_LIMIT) + " to " + String(RACK_Y_UPPER_LIMIT));
           codeHMI = -1;
@@ -1323,7 +1323,7 @@ void DWINHMI::XuLyBanPhim(void)
         CapNhatLaiDanhSachToaDo(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy]); // reset lại danh sách tọa độ do số lượng ống thay đổi
         break;
       case _VaoTrangThietLapSoOngTrenMotHang:
-        if ((ChuoiDangNhap.toInt() > RACK_X_UPPER_LIMIT) || (ChuoiDangNhap.toInt() == RACK_X_LOWER_LIMIT))
+        if ((ChuoiDangNhap.toInt() > RACK_X_UPPER_LIMIT) || (ChuoiDangNhap.toInt() < RACK_X_LOWER_LIMIT))
         {
           GuiTextLenHMI(_VpTextCanhBaoChuoiDangNhap, "ERROR: Quantity's range from " + String(RACK_X_LOWER_LIMIT) + " to " + String(RACK_X_UPPER_LIMIT));
           codeHMI = -1;
@@ -2095,8 +2095,8 @@ void DWINHMI::XuLyXemConfig()
   if(codeHMI == _HMIBamNutConfigTrangCaiDatCheDoChuongTrinh)
   {
     GuiTextLenHMI(_VPTextGetLocationX, String(DuLieuBoardGuiLenHMI.ViTriHienTaiX));
-    GuiTextLenHMI(_VPTextGetLocationY, String(DuLieuBoardGuiLenHMI.ViTriHienTaiY));
-    GuiTextLenHMI(_VPTextGetLocationZ, String(DuLieuBoardGuiLenHMI.ViTriHienTaiZ));
+    GuiTextLenHMI(_VPTextGetLocationY, String(-DuLieuBoardGuiLenHMI.ViTriHienTaiY));
+    GuiTextLenHMI(_VPTextGetLocationZ, String(-DuLieuBoardGuiLenHMI.ViTriHienTaiZ));
     GuiTextLenHMI(_VPTextTenChuongTrinhTrangXemConfig, _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].tenchuongtrinh);
     GuiTextLenHMI(_VPTextTotalFillTubeTrangXemConfig,"0");
     GuiTextLenHMI(_VpTextPumpControlTrangXemConfig, String(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].thetich));
@@ -2136,12 +2136,15 @@ void DWINHMI::XuLyXemConfig()
   }
   if(codeHMI == _HMIBamNutDirectionTrangXemConfig)
   {
-    static bool direction = false;
-    direction = !direction;
-    if (direction == true)
+    static bool RevertDirection = false;
+    CanCapNhatThongSo = true;
+    RevertDirection = !RevertDirection;
+    if (RevertDirection == true)
       GuiIconLenHMI(_VPIconDIRECTION, 0);
     else
+    {
       GuiIconLenHMI(_VPIconDIRECTION, 1);
+    }
     // codeHMI = -1;
   }
   if(codeHMI == _HMIBamNutModifyProgramTrangXemConfig)
@@ -2285,11 +2288,8 @@ void DWINHMI::CapNhatHienThiThongTinTenChuongTrinhKhiVaoTrangChonChuongTrinh()
 {
   for (uint8_t i = 0; i < SoLuongChuongTrinhToiDa; i++) 
   {
-    String TenChuongTrinh = _ChuongTrinhEEPROM[i % _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh].tenchuongtrinh + "(ADJ)";
-    if (i < SoLuongChuongTrinhCoDinh)
-    {
-      TenChuongTrinh = _ChuongTrinhEEPROM[i % _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh].tenchuongtrinh + "(FIXED)";
-    }
+    String TenChuongTrinh = _ChuongTrinhEEPROM[i % _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh].tenchuongtrinh;
+
     GuiTextLenHMI(_VPTextProgram1TrangChonChuongTrinh + (i % _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh) * 0x100, TenChuongTrinh);
   }
 
@@ -2750,9 +2750,6 @@ void DWINHMI::VeToanBoHinhTron(uint32_t VpAddress, ChuongTrinh_t ChuongTrinh)
   memcpy(buffer + 250, endBuffer, 2);
   DGUS_SERIAL.write(buffer, 252);
 
-  this->KichThuocHcnDaVeTheoX = KhoangCachGiua2DiemTheoX / 4;
-  this->KichThuocHcnDaVeTheoY = KhoangCachGiua2DiemTheoY / 4;
-
   #ifdef DEBUG_DWIN
   // for (uint8_t i = 0; i < 252; i++){
   //   // Serial.printf("%02X ", buffer[i]);
@@ -2858,7 +2855,6 @@ void DWINHMI::TaskFunction_RunTime(void)
         GuiTextLenHMI(_VPTextTimeRunTrangHienThiPhanPhoiThoiGianThuc, String(TimeRunStart_c));
       }
       GuiTextLenHMI(_VPTextGetLocationX,(String)DuLieuBoardGuiLenHMI.ViTriHienTaiX);
-      Serial.println("X: " + String(DuLieuBoardGuiLenHMI.ViTriHienTaiX));
       GuiTextLenHMI(_VPTextGetLocationY,(String)(-DuLieuBoardGuiLenHMI.ViTriHienTaiY));
 
       GuiTextLenHMI(_VPTextGetLocationZ,(String)(-DuLieuBoardGuiLenHMI.ViTriHienTaiZ));
@@ -3100,25 +3096,28 @@ void DWINHMI::HienThiIconChuongTrinhDuocChon(uint32_t VpAddressNutNhanDauTien)
 
 void DWINHMI::HienThiThongTinABCH(void)
 {
-  String HZ1 = String(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriH[0]);
-  String AX1 = String(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriA[0].X);
-  String AY1 = String(-_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriA[0].Y);
-  String BX1 = String(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriB[0].X);
-  String BY1 = String(-_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriB[0].Y);
-  String CX1 = String(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriC[0].X);
-  String CY1 = String(-_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriC[0].Y);
+  float HZ1 = _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriH[0];
+  float AX1 = _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriA[0].X;
+  float AY1 = -_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriA[0].Y;
+  float BX1 = _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriB[0].X;
+  float BY1 = -_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriB[0].Y;
+  float CX1 = _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriC[0].X;
+  float CY1 = -_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriC[0].Y;
 
-  String HZ2 = String(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriH[1]);
-  String AX2 = String(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriA[1].X);
-  String AY2 = String(-_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriA[1].Y);
-  String BX2 = String(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriB[1].X);
-  String BY2 = String(-_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriB[1].Y);
-  String CX2 = String(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriC[1].X);
-  String CY2 = String(-_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriC[1].Y);
+  float HZ2 = _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriH[1];
+  float AX2 = _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriA[1].X;
+  float AY2 = -_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriA[1].Y;
+  float BX2 = _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriB[1].X;
+  float BY2 = -_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriB[1].Y;
+  float CX2 = _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriC[1].X;
+  float CY2 = -_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriC[1].Y;
 
-  String temp = "H1:" + HZ1 + " H2:" + HZ2 + "\r\n" 
-  + "A1:(" + AX1 + "," + AY1 + ") A2:()" + AX2 + "," + AY2 + ")\r\n"
-  + "B1:(" + BX1 + "," + BY1 + ") B2:()" + BX2 + "," + BY2 + ")\r\n"
-  + "C1:(" + CX1 + "," + CY1 + ") C2:()" + CX2 + "," + CY2 + ")";
-  GuiTextLenHMI(_VPTextInformationLocation,temp);
+  char * temp;
+  asprintf(&temp, "H1:%g H2:%g\r\n"
+            "A1:(%g,%g) A2:(%g,%g)\r\n" 
+            "B1:(%g,%g) B2:(%g,%g)\r\n" 
+            "C1:(%g,%g) C2:(%g,%g)\r\n", 
+            HZ1, HZ2, AX1, AY1, AX2, AY2, BX1, BY1, BX2, BY2, CX1, CY1, CX2, CY2);
+  GuiTextLenHMI(_VPTextInformationLocation,String(temp));
+  free(temp);
 }

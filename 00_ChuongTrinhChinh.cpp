@@ -393,7 +393,7 @@ void XuLyDuLieuNhanTuHMI(void)
       // ChuongTrinhDangXuLy->SoVongDeBom1ml *= -1.0f;
       ChuongTrinhDangXuLy->TheTichBomDuocKhiQuay1Vong *= -1.0f;
       _grbl._DSChuongTrinh = _DWIN._ChuongTrinhEEPROM;
-      _ThongSoBoard.CaiDatThongSoBoardVaoROM(_ThongSoBoard.ChuyenDoiChuongTrinhSangJsonVar(_grbl._DSChuongTrinh));
+      // _ThongSoBoard.CaiDatThongSoBoardVaoROM(_ThongSoBoard.ChuyenDoiChuongTrinhSangJsonVar(_grbl._DSChuongTrinh));
       #ifdef debug
       Serial.println("DIRECTION");
       // Serial.printf("SoVongDeBom1ml: %g\n", ChuongTrinhDangXuLy->SoVongDeBom1ml);

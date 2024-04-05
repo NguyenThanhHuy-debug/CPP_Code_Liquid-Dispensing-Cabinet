@@ -596,8 +596,7 @@ public:
   int8_t OngDaPhanPhoi_prev = -1;             
 
 private:
-  uint16_t KichThuocHcnDaVeTheoX;  // kích thước X / 2
-  uint16_t KichThuocHcnDaVeTheoY;  // kích thước Y / 2
+
   vector<ViTrivaToaDo_t> vitrivatoado;
   uint16_t khaychon[12][8];
   uint16_t khay1[12][8];

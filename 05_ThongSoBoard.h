@@ -7,7 +7,7 @@
 #include <Arduino_JSON.h>  // Thư viện xử lý dữ liệu kiểu JSON
 // #define debug
 // // Từ vị trí 0-409 là vùng EEPROM chứa thông số board.
-#define _ChieuDaiI2CEEPROM 2023
+#define _ChieuDaiI2CEEPROM 2025
 #define _KyTu '\r'
 
 class ThongSoBoard {

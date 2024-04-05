@@ -49,9 +49,9 @@ typedef struct {
     float thetich = 5.0; //ml
     float duongkinhong = 3.2; //mm
     uint16_t tocdobom = 500; //vòng/phút
-    uint16_t tocdoXY = TocDoTrungBinh; //vòng/phút
+    uint16_t tocdoXY = TocDoCao; //vòng/phút
 
-    float chongnhogiot = 90; //độ
+    float chongnhogiot = 45; //độ
     uint8_t rackX = 12;
     uint8_t rackY = 8;
 
