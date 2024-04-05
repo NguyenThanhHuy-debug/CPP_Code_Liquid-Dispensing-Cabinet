@@ -233,7 +233,6 @@ void XuLyDuLieuNhanTuHMI(void)
       _DWIN.DuLieuBoardGuiLenHMI.OngDaPhanPhoi = -1;
       if (_grbl.CoBaoPhanPhoiLaiOng == true)
       {
-        //TODO
         Serial.println("EXITVETRANGCAIDATCHEDOCHUONGTRINH CoBaoPhanPhoiLaiOng");
         DangTamDungPhanPhoi = false;
         _grbl.DungPhanPhoi();
@@ -248,7 +247,6 @@ void XuLyDuLieuNhanTuHMI(void)
       //TODO reset thứ tự chạy và tọa độ hiện tại
       // _grbl.VeViTriHome();
       _grbl.VeToaDoGoc();
-      // _grbl._DSChuongTrinh = DSChuongTrinhLuuTrongEeprom;
       break;
     case CAPNHATTHONGSO:            // khi nhấn enter lúc nhập các thông số trong SETUP PROGRAM
       Serial.println("CapNhatThongSo");
