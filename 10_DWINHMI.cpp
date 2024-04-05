@@ -845,6 +845,7 @@ void DWINHMI::XuLyConfigChuongTrinh(void)
       }
       IndexChuongTrinhDangXuLy = lastcodeHMI % _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh;
       CapNhatHienThiThongTinChiTietChuongTrinh();
+      HienThiThongTinABCH();
     }
   }
 }
@@ -1658,7 +1659,8 @@ void DWINHMI::XuLySetupProgram(void)
 
   if( codeHMI == _HMIBamNutGETATrangLayViTriChonDiem ||
     codeHMI == _HMIBamNutGETBTrangLayViTriChonDiem ||
-    codeHMI == _HMIBamNutGETCTrangLayViTriChonDiem )
+    codeHMI == _HMIBamNutGETCTrangLayViTriChonDiem ||
+    codeHMI == _HMIBamNutGETHTrangLayViTriChonDiem)
   {
     ManualControl = true;
   }
@@ -1667,34 +1669,41 @@ void DWINHMI::XuLySetupProgram(void)
   {
     case _HMIBamNutGetA1:
       _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriA[0].X = DuLieuBoardGuiLenHMI.ViTriHienTaiX;
+      HienThiThongTinABCH();
       break;
     case _HMIBamNutGetA2:
       _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriA[1].X = DuLieuBoardGuiLenHMI.ViTriHienTaiY;
+      HienThiThongTinABCH();
       break;
     case _HMIBamNutGetB1:
       _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriB[0].X = DuLieuBoardGuiLenHMI.ViTriHienTaiX;
+      HienThiThongTinABCH();
       break;
     case _HMIBamNutGetB2:
       _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriB[1].X = DuLieuBoardGuiLenHMI.ViTriHienTaiY;
+      HienThiThongTinABCH();
       break;
     case _HMIBamNutGetC1:
       _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriC[0].X = DuLieuBoardGuiLenHMI.ViTriHienTaiX;
+      HienThiThongTinABCH();
       break;
     case _HMIBamNutGetC2:
       _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriC[1].X = DuLieuBoardGuiLenHMI.ViTriHienTaiY;
+      HienThiThongTinABCH();
       break;
     case _HMIBamNutGetH1:
       _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriH[0] = DuLieuBoardGuiLenHMI.ViTriHienTaiZ;
+      HienThiThongTinABCH();
       break;
     case _HMIBamNutGetH2:
       _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriH[1] = DuLieuBoardGuiLenHMI.ViTriHienTaiZ;
+      HienThiThongTinABCH();
       break;
   }
 
-  if(codeHMI == _HMIBamNutBackTrangLayViTriXacNhan)
-  {
-    HienThiThongTinABCH();
-  }
+  // if(codeHMI == _HMIBamNutBackTrangLayViTriXacNhan)
+  // {
+  // }
 }
 //=============================================================================================================================
 void DWINHMI::HienThiThongSoHienThiThoiGianThuc(void)
@@ -3073,11 +3082,33 @@ void DWINHMI::HienThiThongTinPhanPhoi(void)
 
 void DWINHMI::HienThiIconChuongTrinhDuocChon(uint32_t VpAddressNutNhanDauTien)
 {
-  uint32_t VpAddressIcon = _VPChonProgram1TrangCaiDatCheDoChuongTrinh + (codeHMI % VpAddressNutNhanDauTien);
-  IndexChuongTrinhDangXuLy = codeHMI % VpAddressNutNhanDauTien;
+  uint32_t VpAddressIcon;
+  int Code;
+  if (VpAddressNutNhanDauTien == _HMIBamNutChonProgram1TrangCaiDatCheDoChuongTrinh)
+  {
+    if (!(codeHMI >= _HMIBamNutChonProgram1TrangCaiDatCheDoChuongTrinh && codeHMI <= _HMIBamNutChonProgram10TrangCaiDatCheDoChuongTrinh))
+    {
+      codeHMI = -1;
+      return;
+    }
+    Code = codeHMI;
+  }
+  else
+  {
+    if (!(lastcodeHMI >= _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh && lastcodeHMI <= _HMIBamNutChonChuongTrinh10TrangChonChuongTrinh))
+    {
+      codeHMI = -1;
+      return;
+    }
+    Code = lastcodeHMI;
+  }
+
+  VpAddressIcon = _VPChonProgram1TrangCaiDatCheDoChuongTrinh + (Code % VpAddressNutNhanDauTien);
+  IndexChuongTrinhDangXuLy = Code % VpAddressNutNhanDauTien;
+
   for (uint8_t icon = 0; icon < SoLuongChuongTrinhToiDa; icon++)
   {
-    if (icon == (codeHMI % _HMIBamNutChonProgram1TrangCaiDatCheDoChuongTrinh))
+    if (icon == IndexChuongTrinhDangXuLy)
     {
       GuiIconLenHMI(VpAddressIcon, 1);
       HienThiNoiDungChuongTrinh(icon, _VPTextHienThiChucNangProgramTrangCaiDatCheDoChuongTrinh);
@@ -3111,13 +3142,9 @@ void DWINHMI::HienThiThongTinABCH(void)
   String CX2 = String(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriC[1].X);
   String CY2 = String(-_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].ViTriC[1].Y);
 
-  String temp = "H1: Z=" + HZ1 + "\r\n" 
-  + "A1: X=" + AX1 + "; Y=" + AY1 + "\r\n" 
-  + "B1: X=" + BX1 + "; Y=" + BY1 + "\r\n" 
-  + "C1: X=" + CX1 + "; Y=" + CY1 + "\r\n" 
-  + "H2: Z=" + HZ2 + "\r\n"
-  + "A2: X=" + AX2 + "; Y=" + AY2 + "\r\n"
-  + "B2: X=" + BX2 + "; Y=" + BY2 + "\r\n"
-  + "C2: X=" + CX2 + "; Y=" + CY2 + "\r\n";
+  String temp = "H1:" + HZ1 + " H2:" + HZ2 + "\r\n" 
+  + "A1:(" + AX1 + "," + AY1 + ") A2:()" + AX2 + "," + AY2 + ")\r\n"
+  + "B1:(" + BX1 + "," + BY1 + ") B2:()" + BX2 + "," + BY2 + ")\r\n"
+  + "C1:(" + CX1 + "," + CY1 + ") C2:()" + CX2 + "," + CY2 + ")";
   GuiTextLenHMI(_VPTextInformationLocation,temp);
 }
