@@ -1012,8 +1012,8 @@ void DWINHMI::XuLyChonViTriPhanPhoi(void)
         //   (long) (vitriY- vitrivatoado[i].vitriY) < (BuachieuDaiYChonToaDo / _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].rackY - 10))
         // if value of vitriX is between (vitrivatoado[i].vitriX - KichThuocHcnDaVeTheoX) and (vitrivatoado[i].vitriX + KichThuocHcnDaVeTheoX)
         // and value of vitriY is between (vitrivatoado[i].vitriY - KichThuocHcnDaVeTheoY) and (vitrivatoado[i].vitriY + KichThuocHcnDaVeTheoY)
-        if (vitriX >= vitrivatoado[i].vitriX - KichThuocHcnDaVeTheoX && vitriX <= vitrivatoado[i].vitriX + KichThuocHcnDaVeTheoX &&
-            vitriY >= vitrivatoado[i].vitriY - KichThuocHcnDaVeTheoY && vitriY <= vitrivatoado[i].vitriY + KichThuocHcnDaVeTheoY)
+        if((long) (vitriX - vitrivatoado[i].vitriX) < (BuachieuDaiXChonToaDo / _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].rackX - 10) && 
+          (long) (vitriY- vitrivatoado[i].vitriY) < (BuachieuDaiYChonToaDo / _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].rackY - 10))
         {
           for (uint8_t m = 0; m < _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].DsToaDo[IdxKhuVucDangXuLy].size(); m++) 
           {
@@ -2482,9 +2482,9 @@ void DWINHMI ::HienThiMau(uint32_t VpAddress, uint16_t X, uint16_t Y, uint16_t M
 
   memset(data, 0, sizeof(data));
 
-  uint16_t KhoangCachGiua2DiemTheoX = chieudaiX / (ChuongTrinh.rackX - 1);
+  uint16_t KhoangCachGiua2DiemTheoX = chieudaiX / (ChuongTrinh.rackX);
 
-  uint16_t KhoangCachGiua2DiemTheoY = chieudaiY / (ChuongTrinh.rackY - 1);
+  uint16_t KhoangCachGiua2DiemTheoY = chieudaiY / (ChuongTrinh.rackY);
 
   #pragma endregion KhayDuocChon
   for (uint8_t i = 0; i < 240; i+=10)
@@ -2496,33 +2496,23 @@ void DWINHMI ::HienThiMau(uint32_t VpAddress, uint16_t X, uint16_t Y, uint16_t M
     uint16_t ToaDoXHMI = 0;
     uint16_t ToaDoYHMI = 0;
 
-    if (ChuongTrinh.rackX == 1U)
+   if (ChuongTrinh.rackX == 1)
     {
-      ToaDoXHMI = toadoXIcondautien + chieudaiX / 2;
-      KhoangCachGiua2DiemTheoX = chieudaiX / 2;
+      ToaDoXHMI = toadoXIcondautien + chieudaiX / 2.5;
+      KhoangCachGiua2DiemTheoX = (chieudaiX / (12 - ChuongTrinh.rackX)) * 2;
     }
     else
     {
-      int16_t OffsetUpperLeftCornerX = (toadoXIcondautien - KhoangCachGiua2DiemTheoX / 4) - GioiHanX0Khay;
-      if (OffsetUpperLeftCornerX <=0 )
-      {
-        toadoXIcondautien -= OffsetUpperLeftCornerX - 10;
-        KhoangCachGiua2DiemTheoX += OffsetUpperLeftCornerX - KhoangCachGiua2DiemTheoX / 6;
-      }
       ToaDoXHMI = toadoXIcondautien + KhoangCachGiua2DiemTheoX * ToaDoXMaTran;
     }
-    
-    if (ChuongTrinh.rackY == 1){
-      ToaDoYHMI = toadoYIcondautien + chieudaiY / 2 - 30;
-      KhoangCachGiua2DiemTheoY = chieudaiY / 2;
+
+    if (ChuongTrinh.rackY == 1)
+    {
+      ToaDoYHMI = toadoYIcondautien + chieudaiY / 2.5;
+      KhoangCachGiua2DiemTheoY = (chieudaiY / (12 - ChuongTrinh.rackY)) * 2;
     }
-    else{
-      int16_t OffsetUpperLeftCornerY = (toadoYIcondautien - KhoangCachGiua2DiemTheoY / 4) - GioiHanY0Khay;
-      if (OffsetUpperLeftCornerY <=0 )
-      {
-        toadoYIcondautien -= OffsetUpperLeftCornerY - 10;
-        KhoangCachGiua2DiemTheoY += OffsetUpperLeftCornerY - KhoangCachGiua2DiemTheoY / 6;
-      }
+    else
+    {
       ToaDoYHMI = toadoYIcondautien + KhoangCachGiua2DiemTheoY * ToaDoYMaTran;
     }
     
@@ -2544,17 +2534,15 @@ void DWINHMI ::HienThiMau(uint32_t VpAddress, uint16_t X, uint16_t Y, uint16_t M
 
     if (include){
 
-      uint16_t ToaDoXHMITrenTrai = ToaDoXHMI - (KhoangCachGiua2DiemTheoX / 4);
-      uint16_t ToaDoXHMIDuoiPhai = ToaDoXHMI + (KhoangCachGiua2DiemTheoX / 4);
+      uint16_t ToaDoXHMIDuoiPhai = ToaDoXHMI + KhoangCachGiua2DiemTheoX - 10;
 
-      uint16_t ToaDoYHMITrenTrai = ToaDoYHMI - (KhoangCachGiua2DiemTheoY / 4);
-      uint16_t ToaDoYHMIDuoiPhai = ToaDoYHMI + (KhoangCachGiua2DiemTheoY / 4);
+      uint16_t ToaDoYHMIDuoiPhai = ToaDoYHMI + KhoangCachGiua2DiemTheoY - 10;
 
-      data[i    ] = ToaDoXHMITrenTrai >> 8;
-      data[i + 1] = ToaDoXHMITrenTrai & 0xFF;
+      data[i    ] = ToaDoXHMI >> 8;
+      data[i + 1] = ToaDoXHMI & 0xFF;
 
-      data[i + 2] = ToaDoYHMITrenTrai >> 8;
-      data[i + 3] = ToaDoYHMITrenTrai & 0xFF;
+      data[i + 2] = ToaDoYHMI >> 8;
+      data[i + 3] = ToaDoYHMI & 0xFF;
 
       data[i + 4] = ToaDoXHMIDuoiPhai >> 8;
       data[i + 5] = ToaDoXHMIDuoiPhai & 0xFF;
@@ -2685,9 +2673,9 @@ void DWINHMI::VeToanBoHinhTron(uint32_t VpAddress, ChuongTrinh_t ChuongTrinh)
       break;
   }
 
-  uint16_t KhoangCachGiua2DiemTheoX = chieudaiX / (ChuongTrinh.rackX - 1);
+  uint16_t KhoangCachGiua2DiemTheoX = chieudaiX / (ChuongTrinh.rackX);
 
-  uint16_t KhoangCachGiua2DiemTheoY = chieudaiY / (ChuongTrinh.rackY - 1);
+  uint16_t KhoangCachGiua2DiemTheoY = chieudaiY / (ChuongTrinh.rackY);
 
   uint8_t data[240]; /* 24 * 10 */
   memset(data, 0, 240);
@@ -2704,33 +2692,21 @@ void DWINHMI::VeToanBoHinhTron(uint32_t VpAddress, ChuongTrinh_t ChuongTrinh)
 
     if (ChuongTrinh.rackX == 1)
     {
-      ToaDoXHMI = toadoXIcondautien + chieudaiX / 2;
-      KhoangCachGiua2DiemTheoX = chieudaiX / 2;
+      ToaDoXHMI = toadoXIcondautien + chieudaiX / 2.5;
+      KhoangCachGiua2DiemTheoX = (chieudaiX / (12 - ChuongTrinh.rackX)) * 2;
     }
     else
     {
-      int16_t OffsetUpperLeftCornerX = (toadoXIcondautien - KhoangCachGiua2DiemTheoX / 4) - GioiHanX0Khay;
-      if (OffsetUpperLeftCornerX <= 0)
-      {
-        toadoXIcondautien -= OffsetUpperLeftCornerX - 10; 
-        KhoangCachGiua2DiemTheoX += OffsetUpperLeftCornerX - KhoangCachGiua2DiemTheoX / 6;
-      }
       ToaDoXHMI = toadoXIcondautien + KhoangCachGiua2DiemTheoX * ToaDoXMaTran;
     }
 
     if (ChuongTrinh.rackY == 1)
     {
-      ToaDoYHMI = toadoYIcondautien + chieudaiY / 2 - 30;
-      KhoangCachGiua2DiemTheoY = chieudaiY / 2;
+      ToaDoYHMI = toadoYIcondautien + chieudaiY / 2.5;
+      KhoangCachGiua2DiemTheoY = (chieudaiY / (12 - ChuongTrinh.rackY)) * 2;
     }
     else
     {
-      int16_t OffsetUpperLeftCornerY = (toadoYIcondautien - KhoangCachGiua2DiemTheoY / 4) - GioiHanY0Khay;
-      if (OffsetUpperLeftCornerY <= 0)
-      {
-        toadoYIcondautien -= OffsetUpperLeftCornerY - 10; 
-        KhoangCachGiua2DiemTheoY += OffsetUpperLeftCornerY - KhoangCachGiua2DiemTheoY / 6;
-      }
       ToaDoYHMI = toadoYIcondautien + KhoangCachGiua2DiemTheoY * ToaDoYMaTran;
     }
 
@@ -2747,17 +2723,15 @@ void DWINHMI::VeToanBoHinhTron(uint32_t VpAddress, ChuongTrinh_t ChuongTrinh)
       // Serial.println("^^^^^^^^^^^^^^^^^^");
       #endif
 
-      uint16_t ToaDoXHMITrenTrai = ToaDoXHMI - (KhoangCachGiua2DiemTheoX / 4);
-      uint16_t ToaDoXHMIDuoiPhai = ToaDoXHMI + (KhoangCachGiua2DiemTheoX / 4);
+      uint16_t ToaDoXHMIDuoiPhai = ToaDoXHMI + KhoangCachGiua2DiemTheoX - 10;
 
-      uint16_t ToaDoYHMITrenTrai = ToaDoYHMI - (KhoangCachGiua2DiemTheoY / 4);
-      uint16_t ToaDoYHMIDuoiPhai = ToaDoYHMI + (KhoangCachGiua2DiemTheoY / 4);
+      uint16_t ToaDoYHMIDuoiPhai = ToaDoYHMI + KhoangCachGiua2DiemTheoY - 10;
 
-      data[i    ] = ToaDoXHMITrenTrai >> 8;
-      data[i + 1] = ToaDoXHMITrenTrai & 0xFF;
+      data[i    ] = ToaDoXHMI >> 8;
+      data[i + 1] = ToaDoXHMI & 0xFF;
 
-      data[i + 2] = ToaDoYHMITrenTrai >> 8;
-      data[i + 3] = ToaDoYHMITrenTrai & 0xFF;
+      data[i + 2] = ToaDoYHMI >> 8;
+      data[i + 3] = ToaDoYHMI & 0xFF;
 
       data[i + 4] = ToaDoXHMIDuoiPhai >> 8;
       data[i + 5] = ToaDoXHMIDuoiPhai & 0xFF;
@@ -3051,7 +3025,7 @@ void DWINHMI::HienThiNoiDungChuongTrinh(uint8_t IdxChuongTrinh, uint32_t VpAddre
   String DKOng = String(_ChuongTrinhEEPROM[IdxChuongTrinh].duongkinhong);
   String SpeedXY = String(_ChuongTrinhEEPROM[IdxChuongTrinh].tocdoXY);
   String data = "Quantity: " + rackX + "x" + rackY + "\r\n" + "Volume: " + Volume + " ml\r\n" +
-    "PumpSpeed: " + PumpSpeed + "rpm\r\n" + "Tube ID: " + DKOng + " mm\r\n" + "SpeedXY:" + SpeedXY + "rpm";
+    "PumpSpeed:" + PumpSpeed + "rpm\r\n" + "Tube ID: " + DKOng + " mm\r\n" + "SpeedXY:" + SpeedXY + "rpm";
   // GuiTextLenHMI(_VPTextHienThiTenProgramTrangCaiDatCheDoChuongTrinh, name);
   GuiTextLenHMI(VpAddress, data);
 }
