@@ -110,7 +110,6 @@ void _GRBL::BatDauPhanPhoi()
   {
     Serial.printf("Thu tu chay: %d\n", i);
   }
-  OngDaPhanPhoi = -1;
   // Chạy các chương trình theo thứ tự đã sắp xếp
   for (uint8_t i = 0; i < sizeof(KhuVucChay); i++)
   {
@@ -119,7 +118,6 @@ void _GRBL::BatDauPhanPhoi()
     //* Nếu chương trình không được chọn hoặc không có ống cần phân phối thì bỏ qua
 
 
-    OngDaPhanPhoi = -1;
 
     TinhKhoangCachGiuaHaiOng(_DSChuongTrinh[IdxChuongTrinh], i);
     //* Sắp xếp lại thứ tự di chuyển của các ống cần phân phối
@@ -134,20 +132,24 @@ void _GRBL::BatDauPhanPhoi()
 
     vector<toadoINT_t> DSToaDoCanChay = _DSChuongTrinh[IdxChuongTrinh].DsToaDo[i];
 
+#ifdef DEBUG_GRBL
     for (auto ToaDo: _DSChuongTrinh[IdxChuongTrinh].DsToaDo[i])
     {
       Serial.printf("Toa do: %d %d\n", ToaDo.X, ToaDo.Y);
     }
+#endif
 
     toado_t ViTriACanChay = _DSChuongTrinh[IdxChuongTrinh].ViTriA[i];
     toado_t ViTriBCanChay = _DSChuongTrinh[IdxChuongTrinh].ViTriB[i];
     toado_t ViTriCCanChay = _DSChuongTrinh[IdxChuongTrinh].ViTriC[i];
     float ViTriHCanChay = _DSChuongTrinh[IdxChuongTrinh].ViTriH[i];
 
+    delay(10);
+    OngDaPhanPhoi = -1;
+
     for (uint8_t ToaDoHienTai = 0; ToaDoHienTai < DSToaDoCanChay.size(); ToaDoHienTai++)
     {
 
-      Serial.printf("ToaDoXDaChay: %d, ToaDoYDaChay: %d\n", ToaDoXDaChay, ToaDoYDaChay);
       //* Di chuyển đến vị trí X Y Z
       asprintf(&ViTri, "G1G90X%gY%gZ%gF%d\r", ViTriACanChay.X + DSToaDoCanChay[ToaDoHienTai].X * _KhoangCachGiuaHaiOng.X,
                                               ViTriACanChay.Y + DSToaDoCanChay[ToaDoHienTai].Y * _KhoangCachGiuaHaiOng.Y, ViTriHCanChay, 
@@ -197,6 +199,7 @@ void _GRBL::BatDauPhanPhoi()
       OngDaPhanPhoi = ToaDoHienTai;
       ToaDoXDaChay = _DSChuongTrinh[IdxChuongTrinh].DsToaDo[i][ToaDoHienTai].X;
       ToaDoYDaChay = _DSChuongTrinh[IdxChuongTrinh].DsToaDo[i][ToaDoHienTai].Y;
+      Serial.printf("ToaDoXDaChay: %d, ToaDoYDaChay: %d\n", ToaDoXDaChay, ToaDoYDaChay);
       KhuVucDangChay = i;
       Serial.printf("OngDaPhanPhoi: %d\n", OngDaPhanPhoi);
     }
@@ -426,6 +429,14 @@ void _GRBL::VeToaDoGoc(void)
     delay(100);
     WebUI::inputBuffer.push("$H\n");
     delay(100);
+    return;
+  }
+
+  if (_grbl.ViTriHienTaiCuaSTEP(TrucX) == DEFAULT_HOMING_PULLOFF &&
+      _grbl.ViTriHienTaiCuaSTEP(TrucY) == DEFAULT_HOMING_PULLOFF &&
+      _grbl.ViTriHienTaiCuaSTEP(TrucZ) == DEFAULT_HOMING_PULLOFF)
+  {
+    VeViTriHome();
     return;
   }
   DiChuyenToiViTri(ToaDoGoc, TocDoTrungBinh);

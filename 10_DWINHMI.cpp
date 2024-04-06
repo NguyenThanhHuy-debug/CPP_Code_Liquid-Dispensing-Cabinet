@@ -190,6 +190,10 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
 #pragma region ChuyenTrangTheoBamChonCuaUserTrenHMI
     switch (codeHMI)
     {
+    case _HMIBamNutWiFiTrangCaiDat:
+      setPage(_TrangWiFi);
+      codeHMI = -1;
+      break;
     case _HMIBamNutINFORTrangCaiDat:
     {
       DWIN::setPage(_TrangThongTin);
@@ -621,10 +625,7 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
     }
     case (_HMIBamNutExitTrangXemConfig):
     {
-      if(Mode == _CheDoHoatDongMulti)
-        DWIN::setPage(_TrangCaiDatCheDoChuongTrinh_notHOME);
-      else 
-        DWIN::setPage(_TrangCaiDatCheDoChuongTrinh_HOME);
+      setPage(_TrangCaiDat);
       break;
     }
     case (_HMIBamNutModifyProgramTrangXemConfig):
@@ -681,6 +682,7 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
       goto hienthi;
       hienthi:
       CheDoVaoTrangBanPhim = _VaoTrangBanPhimCaiDatThoiGian;
+      GuiTextLenHMI(_VpTextCanhBaoChuoiDangNhap, "");
       DWIN::setPage(_TrangBanPhimCaiDatThoiGian);
       codeHMI = -1;
       break;
@@ -688,7 +690,7 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
     {
       Serial.println("_HMIBamNutEnterTrangDatenTime");
       DuLieuHMIGuiXuongBoard.CapNhatThoiGianRTC = true;
-      String Ngay_str = DuLieuHMIGuiXuongBoard.RTC_Ngay +  "/" + DuLieuHMIGuiXuongBoard.RTC_Thang + "/" + DuLieuHMIGuiXuongBoard.RTC_Nam;
+      String Ngay_str = DuLieuHMIGuiXuongBoard.RTC_Ngay +  "/" + DuLieuHMIGuiXuongBoard.RTC_Thang + "/" + DuLieuHMIGuiXuongBoard.RTC_Nam.substring(2);
       String Gio_str = DuLieuHMIGuiXuongBoard.RTC_Gio + ":" + DuLieuHMIGuiXuongBoard.RTC_Phut;
       Serial.println(Ngay_str);
       Serial.println(Gio_str);
@@ -1308,6 +1310,12 @@ void DWINHMI::XuLyBanPhim(void)
   }
   if(codeHMI == _HMIBamNutEnterTrangBanPhim)
   {
+    if (ChuoiDangNhap.length() == 0)
+    {
+      codeHMI = -1;
+      GuiTextLenHMI(_VpTextCanhBaoChuoiDangNhap, "Please enter the value");
+      return;
+    }
     //byte IDPage = DWIN::getPage();
     switch (CheDoVaoTrangBanPhim)
     {
@@ -1393,22 +1401,52 @@ void DWINHMI::XuLyBanPhim(void)
         switch (CheDoCaiDatThoiGian)
         {
         case _CaiDatGio:
+          if (ChuoiDangNhap.toInt() > 23)
+          {
+            GuiTextLenHMI(_VpTextCanhBaoChuoiDangNhap, "ERROR: Hours must be less than 24");
+            codeHMI = -1;
+            return;
+          }
           DuLieuHMIGuiXuongBoard.RTC_Gio = ChuoiDangNhap;
           GuiTextLenHMI(_VPTextHourTrangDaynTime,ChuoiDangNhap); 
           break;
         case _CaiDatPhut:
+          if (ChuoiDangNhap.toInt() > 59)
+          {
+            GuiTextLenHMI(_VpTextCanhBaoChuoiDangNhap, "ERROR: Minutes must be less than 60");
+            codeHMI = -1;
+            return;
+          }
           DuLieuHMIGuiXuongBoard.RTC_Phut = ChuoiDangNhap;
           GuiTextLenHMI(_VPTextMinuteTrangDaynTime,ChuoiDangNhap);
           break;
         case _CaiDatNgay:
+          if ((ChuoiDangNhap.toInt() > 31))
+          {
+            GuiTextLenHMI(_VpTextCanhBaoChuoiDangNhap, "ERROR: Days must be less than 32");
+            codeHMI = -1;
+            return;
+          }
           DuLieuHMIGuiXuongBoard.RTC_Ngay = ChuoiDangNhap;
           GuiTextLenHMI(_VPTextDayTrangDaynTime,ChuoiDangNhap);
           break;
         case _CaiDatThang:
+          if (ChuoiDangNhap.toInt() > 12)
+          {
+            GuiTextLenHMI(_VpTextCanhBaoChuoiDangNhap, "ERROR: Months must be less than 13");
+            codeHMI = -1;
+            return;
+          }
           DuLieuHMIGuiXuongBoard.RTC_Thang = ChuoiDangNhap;
           GuiTextLenHMI(_VPTextMonthTrangDaynTime,ChuoiDangNhap);
           break;
         case _CaiDatNam:
+          if ((ChuoiDangNhap.toInt() < 2000) && (ChuoiDangNhap.toInt() > 2099))
+          {
+            GuiTextLenHMI(_VpTextCanhBaoChuoiDangNhap, "ERROR: Years must be from 2000 to 2099");
+            codeHMI = -1;
+            return;
+          }
           DuLieuHMIGuiXuongBoard.RTC_Nam = ChuoiDangNhap;
           GuiTextLenHMI(_VPTextYearTrangDaynTime,ChuoiDangNhap);
           break;
@@ -2123,7 +2161,8 @@ void DWINHMI::XuLyXemConfig()
     } 
   }
   if(codeHMI == _HMIBamNutExitTrangXemConfig ||
-    codeHMI == _HMIBamNutBackTrangLayViTriXacNhan)
+    codeHMI == _HMIBamNutBackTrangLayViTriXacNhan ||
+    codeHMI == _HMIBamNutEXITTrangManualControl)
   {
     controlABC = false;
   }
@@ -2762,7 +2801,18 @@ void DWINHMI::XuLyThoiGianThuc()
 {
 
   if(codeHMI == _HMIBamNutTimeTrangCaiDat)
-  {
+  { // 01/02/2002
+    // 0123456789
+
+    //12:30
+    //01234
+    DuLieuHMIGuiXuongBoard.RTC_Ngay = DuLieuBoardGuiLenHMI.RTC_ChuoiNgay.substring(0,2);
+    DuLieuHMIGuiXuongBoard.RTC_Thang = DuLieuBoardGuiLenHMI.RTC_ChuoiNgay.substring(3,5);
+    DuLieuHMIGuiXuongBoard.RTC_Nam = DuLieuBoardGuiLenHMI.RTC_ChuoiNgay.substring(6);
+
+    DuLieuHMIGuiXuongBoard.RTC_Gio = DuLieuBoardGuiLenHMI.RTC_ChuoiGio.substring(0,2);
+    DuLieuHMIGuiXuongBoard.RTC_Phut = DuLieuBoardGuiLenHMI.RTC_ChuoiGio.substring(3);
+
   }
   
   static uint32_t time50s = millis();

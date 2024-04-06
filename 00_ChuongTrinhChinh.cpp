@@ -143,9 +143,6 @@ void CapNhatDuLieuLenHMI(void)
   _DWIN.DuLieuBoardGuiLenHMI.ToaDoYDaChay = _grbl.ToaDoYDaChay;
   _DWIN.DuLieuBoardGuiLenHMI.DaChayXongCacKhuVuc = _grbl.DaChayXongCacKhuVuc;
 
-  // if (_DWIN.Mode == _CheDoHoatDongMulti){
-
-  // }
 }
 
 void XuLyDuLieuNhanTuHMI(void) 
@@ -600,7 +597,7 @@ void Shutdown(void)
 {
   _grbl.VeToaDoGoc();
   delay(100);
-  while (sys.state == State::Homing)
+  while (sys.state != State::Idle)
   {
     delay(1);
   }

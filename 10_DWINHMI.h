@@ -523,10 +523,6 @@ typedef enum {
 }CheDoVaoTrangBanPhimMoRong_t;
 
 typedef enum {
-  _CheDoHoatDongMulti
-}CheDoHoatDong_t;
-
-typedef enum {
   _CaiDatGio,
   _CaiDatPhut,
   _CaiDatNgay,
@@ -584,7 +580,6 @@ public:
   void ThayDoiTenChuongTrinh();
 
   DanhSachMaLenh_t ReturnMaLenhGRBL();
-  CheDoHoatDong_t Mode = _CheDoHoatDongMulti;
   bool BamNutRunON = false;
   bool delay_flag = false;
   int32_t timeLoopDelay = 0;
