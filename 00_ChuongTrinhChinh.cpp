@@ -125,8 +125,9 @@ void KhoiTao(void){
   CapNhatDuLieuLenHMI();
 
 /////////////////////////////////////////////////////////////////////////
-
-    // _ThongSoBoard.XoaEEPROM(0,_ChieuDaiI2CEEPROM);
+#ifdef RESET_EEPROM
+    _ThongSoBoard.XoaEEPROM(0,_ChieuDaiI2CEEPROM);
+#endif
 }
 
 void CapNhatDuLieuLenHMI(void) 
@@ -180,16 +181,22 @@ void XuLyDuLieuNhanTuHMI(void)
       _grbl.VeToaDoGoc();
       break;
     case GOHOME:
-      #ifdef debug
+      #ifdef DEBUG_CHUONGTRINHCHINH
       Serial.println("GoHome");
       #endif
       _DWIN.DuLieuBoardGuiLenHMI.TrangThaiXacNhanSetHome = _grbl.VeViTriHome();
       // _DWIN.DuLieuBoardGuiLenHMI.TrangThaiXacNhanSetHome = true;
       break;
     case RUN:
+      _grbl._DSChuongTrinh =_DWIN._ChuongTrinhEEPROM;
+      if (_grbl.DaChayXongCacKhuVuc == true)
+      {
+        _grbl.OngDaPhanPhoi = -1;
+        _DWIN.DuLieuBoardGuiLenHMI.OngDaPhanPhoi = -1;
+      }
       if (DangTamDungPhanPhoi == true) 
       {
-        #ifdef debug
+        #ifdef DEBUG_CHUONGTRINHCHINH
         Serial.println("RUN TiepTucPhanPhoi");
         #endif
         _grbl.TiepTucPhanPhoi();
@@ -197,7 +204,7 @@ void XuLyDuLieuNhanTuHMI(void)
       }
       else 
       {
-        #ifdef debug
+        #ifdef DEBUG_CHUONGTRINHCHINH
         Serial.println("RUN PhanPhoi");
         #endif
         memcpy(_grbl.KhuVucChay, _DWIN.DSIndexChuongTrinhDuocChon, SoLuongKhuVucToiDa);
@@ -205,7 +212,7 @@ void XuLyDuLieuNhanTuHMI(void)
       }
       break;
     case RESUME:
-      #ifdef debug
+      #ifdef DEBUG_CHUONGTRINHCHINH
       Serial.println("Tạm dừng");
       #endif
       _grbl.TamDungPhanPhoi();
@@ -214,7 +221,7 @@ void XuLyDuLieuNhanTuHMI(void)
     case RESETPROGRAM:
       if (DangTamDungPhanPhoi == true)
       {
-        #ifdef debug
+        #ifdef DEBUG_CHUONGTRINHCHINH
         Serial.println("RESET DungPhanPhoi");
         #endif
         DangTamDungPhanPhoi = false;
@@ -241,7 +248,6 @@ void XuLyDuLieuNhanTuHMI(void)
         DangTamDungPhanPhoi = false;
         _grbl.DungPhanPhoi();
       }
-      //TODO reset thứ tự chạy và tọa độ hiện tại
       // _grbl.VeViTriHome();
       _grbl.VeToaDoGoc();
       break;
@@ -255,7 +261,7 @@ void XuLyDuLieuNhanTuHMI(void)
       // if (_DWIN.DuLieuBoardGuiLenHMI.V iTriHienTaiX - SoBuocTamThoi < DEFAULT_HOMING_PULLOFF)
       //   break;
       _grbl.DiChuyenX(Am,SoBuocTamThoi,TocDoTamThoi);
-      #ifdef debug
+      #ifdef DEBUG_CHUONGTRINHCHINH
       Serial.printf("X-, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoFAST);
       #endif
       break;
@@ -263,7 +269,7 @@ void XuLyDuLieuNhanTuHMI(void)
       // if (_DWIN.DuLieuBoardGuiLenHMI.ViTriHienTaiY + SoBuocTamThoi > -DEFAULT_HOMING_PULLOFF)
       //   break;
       _grbl.DiChuyenY(Duong,SoBuocTamThoi,TocDoTamThoi);
-      #ifdef debug
+      #ifdef DEBUG_CHUONGTRINHCHINH
       Serial.printf("Y+, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoFAST);
       #endif
       break;
@@ -271,7 +277,7 @@ void XuLyDuLieuNhanTuHMI(void)
       // if (_DWIN.DuLieuBoardGuiLenHMI.ViTriHienTaiX + SoBuocTamThoi > GioiHanTrucX)
       //   break;
       _grbl.DiChuyenX(Duong, SoBuocTamThoi, TocDoTamThoi);
-      #ifdef debug
+      #ifdef DEBUG_CHUONGTRINHCHINH
       Serial.printf("X+, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoFAST);
       #endif
 
@@ -280,7 +286,7 @@ void XuLyDuLieuNhanTuHMI(void)
       // if (_DWIN.DuLieuBoardGuiLenHMI.ViTriHienTaiY - SoBuocTamThoi < -GioiHanTrucY)
       //   break;
       _grbl.DiChuyenY(Am, SoBuocTamThoi, TocDoTamThoi);
-      #ifdef debug
+      #ifdef DEBUG_CHUONGTRINHCHINH
       Serial.printf("Y-, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoFAST);
       #endif
       break;
@@ -288,7 +294,7 @@ void XuLyDuLieuNhanTuHMI(void)
       // if (_DWIN.DuLieuBoardGuiLenHMI.ViTriHienTaiZ + SoBuocTamThoi > DEFAULT_HOMING_PULLOFF)
       //   break;
       _grbl.DiChuyenZ(Duong, SoBuocTamThoi, TocDoTamThoi);
-      #ifdef debug
+      #ifdef DEBUG_CHUONGTRINHCHINH
       Serial.printf("Y-, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoFAST);
       #endif
       break;
@@ -296,56 +302,56 @@ void XuLyDuLieuNhanTuHMI(void)
       // if (_DWIN.DuLieuBoardGuiLenHMI.ViTriHienTaiZ - SoBuocTamThoi < -GioiHanTrucZ)
       //   break;
       _grbl.DiChuyenZ(Am,SoBuocTamThoi,TocDoTamThoi);
-      #ifdef debug
+      #ifdef DEBUG_CHUONGTRINHCHINH
       Serial.printf("Z-, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoFAST);
       #endif
       break;
 
     case HOLDXCONG:
       _grbl.DiChuyenX(Duong, 1000.0f, TocDoTamThoi);
-      #ifdef debug
+      #ifdef DEBUG_CHUONGTRINHCHINH
       Serial.printf("Hold X+, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoTamThoi);
       #endif
       break;
 
     case HOLDXTRU:
       _grbl.DiChuyenX(Am, 1000.0f, TocDoTamThoi);
-      #ifdef debug
+      #ifdef DEBUG_CHUONGTRINHCHINH
       Serial.printf("Hold X-, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoTamThoi);
       #endif
       break;
 
     case HOLDYCONG:
       _grbl.DiChuyenY(Duong, 1000.0f, TocDoTamThoi);
-      #ifdef debug
+      #ifdef DEBUG_CHUONGTRINHCHINH
       Serial.printf("Hold Y+, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoTamThoi);
       #endif
       break;
 
     case HOLDYTRU:
       _grbl.DiChuyenY(Am, 1000.0f, TocDoTamThoi);
-      #ifdef debug
+      #ifdef DEBUG_CHUONGTRINHCHINH
       Serial.printf("Hold Y-, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoTamThoi);
       #endif
       break;
 
     case HOLDZCONG:
       _grbl.DiChuyenZ(Duong, 1000.0f, TocDoTamThoi);
-      #ifdef debug
+      #ifdef DEBUG_CHUONGTRINHCHINH
       Serial.printf("Hold Z+, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoTamThoi);
       #endif
       break;
     
     case HOLDZTRU:
       _grbl.DiChuyenZ(Am, 1000.0f, TocDoTamThoi);
-      #ifdef debug
+      #ifdef DEBUG_CHUONGTRINHCHINH
       Serial.printf("Hold Z-, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoTamThoi);
       #endif
       break;
 
     case DUNGDICHUYEN:
       _grbl.TamDungChay();
-      #ifdef debug
+      #ifdef DEBUG_CHUONGTRINHCHINH
       Serial.println("Dừng di chuyển");
       #endif
       break;
@@ -359,16 +365,14 @@ void XuLyDuLieuNhanTuHMI(void)
       break;
     case CALIB:                                         // khi nhấn CALIB để thay đổi số vòng bơm
     {
-      Serial.printf("actualweight: %g, density: %g, duongkinhong: %g, vitriA: %g\n", _DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy].actualweight, _DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy].density, _DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy].duongkinhong, _grbl.ViTriHienTaiCuaSTEP(MayBom));
       _grbl.Calib(&_DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy]);
       _grbl._DSChuongTrinh = _DWIN._ChuongTrinhEEPROM;
       _ThongSoBoard.CaiDatThongSoBoardVaoROM(_ThongSoBoard.ChuyenDoiChuongTrinhSangJsonVar(_grbl._DSChuongTrinh));
       _DWIN.DuLieuBoardGuiLenHMI.TrangThaiXacNhanSaveCalib = true;
-      #ifdef debug
-      // Serial.print("SoVongQuay1ml: ");
-      // Serial.println(_DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy].SoVongDeBom1ml);
+#ifdef DEBUG_CHUONGTRINHCHINH
+      Serial.printf("actualweight: %g, density: %g, duongkinhong: %g, vitriA: %g\n", _DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy].actualweight, _DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy].density, _DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy].duongkinhong, _grbl.ViTriHienTaiCuaSTEP(MayBom));      
       Serial.printf("TheTichBomDuocKhiQuay1Vong: %g\n", _DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy].TheTichBomDuocKhiQuay1Vong);
-      #endif
+#endif
       break;
     }
     case TESTCALIB:
@@ -376,9 +380,9 @@ void XuLyDuLieuNhanTuHMI(void)
     {
       if (_DWIN.countTest == 2){
         sys_position[A_AXIS] = 0;
-        #ifdef debug
+#ifdef DEBUG_CHUONGTRINHCHINH
         Serial.println("Zero");
-        #endif
+#endif
       }
       _grbl.TestFill(_DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy]);
 
@@ -391,11 +395,11 @@ void XuLyDuLieuNhanTuHMI(void)
       ChuongTrinhDangXuLy->TheTichBomDuocKhiQuay1Vong *= -1.0f;
       _grbl._DSChuongTrinh = _DWIN._ChuongTrinhEEPROM;
       // _ThongSoBoard.CaiDatThongSoBoardVaoROM(_ThongSoBoard.ChuyenDoiChuongTrinhSangJsonVar(_grbl._DSChuongTrinh));
-      #ifdef debug
+#ifdef DEBUG_CHUONGTRINHCHINH
       Serial.println("DIRECTION");
       // Serial.printf("SoVongDeBom1ml: %g\n", ChuongTrinhDangXuLy->SoVongDeBom1ml);
       Serial.printf("TheTichBomDuocKhiQuay1Vong: %g\n", ChuongTrinhDangXuLy->TheTichBomDuocKhiQuay1Vong);
-      #endif
+#endif
     }
       break;
     case FASTPUMP:
@@ -442,7 +446,7 @@ void XuLyDuLieuNhanTuHMI(void)
 
     case LOWSPEED:
     {
-      #ifdef debug
+      #ifdef DEBUG_CHUONGTRINHCHINH
       Serial.println("LOW SPEED");
       #endif
       TocDoTamThoi = TocDoLOW;
@@ -451,7 +455,7 @@ void XuLyDuLieuNhanTuHMI(void)
     }
     case MEDIUMSPEED:
     {
-      #ifdef debug
+      #ifdef DEBUG_CHUONGTRINHCHINH
       Serial.println("MEDIUM SPEED");
       #endif
       TocDoTamThoi = TocDoMEDIUM;
@@ -460,7 +464,7 @@ void XuLyDuLieuNhanTuHMI(void)
     }
     case FASTSPEED:
     {
-      #ifdef debug
+      #ifdef DEBUG_CHUONGTRINHCHINH
       Serial.println("FAST SPEED");
       #endif
       TocDoTamThoi = TocDoFAST;
@@ -525,7 +529,7 @@ void CapNhatDanhSachChuongTrinhLuuTrongEEPROM()
   {
     if ((DSChuongTrinhLuuTrongEeprom[i].TheTichBomDuocKhiQuay1Vong == 0) || (DSChuongTrinhLuuTrongEeprom[i].TheTichBomDuocKhiQuay1Vong == NAN))
     {
-      DSChuongTrinhLuuTrongEeprom[i].TheTichBomDuocKhiQuay1Vong = TheTichBomDuocKhiQuay1VongMacDinh;
+      DSChuongTrinhLuuTrongEeprom[i].TheTichBomDuocKhiQuay1Vong = HeSoCalibMacDinh;
     }
   }
 

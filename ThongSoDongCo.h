@@ -55,9 +55,9 @@
 #define A_DIRECTION_PIN         GPIO_NUM_19
 
 #define X_LIMIT_PIN             36 //* limit 1        //cảm biến hành trình đầu trục X
-// #define X2_LIMIT_PIN            39 //limit 2        //cảm biến hành trình cuối trục X
+#define X2_LIMIT_PIN            39 //limit 2        //cảm biến hành trình cuối trục X
 #define Y_LIMIT_PIN             34 //* limit 3        //cảm biến hành trình đầu trục Y
-// #define Y2_LIMIT_PIN            35 //limit 4     //cảm biến Y2 hiên tại đang bị hư nên không dùng
+#define Y2_LIMIT_PIN            35 //limit 4     //cảm biến Y2 hiên tại đang bị hư nên không dùng
 #define Z_LIMIT_PIN             32 //* limit 5        //cảm biến hành trình đầu trục Z    
 // #define Z2_LIMIT_PIN            34               //khi mở máy thì cảm biến Z2 sẽ bị kích hoạt, nên không dùng
 
@@ -87,10 +87,10 @@
 //* Phụ thuộc vào kích thước máy
 //* Chính là cảm biến hành trình mềm
 //!Phải là giá trị dương
-#define DEFAULT_X_MAX_TRAVEL    800 //* mm $130 
-#define DEFAULT_Y_MAX_TRAVEL    800 //* mm $131
-#define DEFAULT_Z_MAX_TRAVEL    450 //* mm $132
-//* #define DEFAULT_A_MAX_TRAVEL    1000 //* mm $133
+#define DEFAULT_X_MAX_TRAVEL    600 //* mm $130 
+#define DEFAULT_Y_MAX_TRAVEL    200 //* mm $131
+#define DEFAULT_Z_MAX_TRAVEL    1000 //* mm $132
+// #define DEFAULT_A_MAX_TRAVEL    1000 //* mm $133
 
 //* Cho phép dùng cảm biến hành trình
 #define DEFAULT_HARD_LIMIT_ENABLE 1  // $21 false

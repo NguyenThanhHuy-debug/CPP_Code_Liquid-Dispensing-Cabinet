@@ -1,5 +1,4 @@
 #include "_GRBL.h"
-#define debug_grbl
 bool _GRBL::VeViTriHome()
 {
   if (sys.state == State::Homing)
@@ -12,11 +11,17 @@ bool _GRBL::VeViTriHome()
   WebUI::inputBuffer.push("$H\r"); //* set home
   sys_position[MayBom] = 0; //* reset vị trí máy bơm
   digitalWrite(2, HIGH);
-  delay(500);
+  delay(100);
   digitalWrite(2, LOW);
   while (sys.state == State::Homing){
       delay(100);
   }
+
+  if (sys.state == State::Alarm)
+  {
+    VeViTriHome();
+  }
+
   return true;
 }
 
@@ -364,7 +369,7 @@ void _GRBL::TinhKhoangCachGiuaHaiOng(ChuongTrinh_t ChuongTrinh, uint8_t KhuVuc) 
   _KhoangCachGiuaHaiOng.Y = (ChuongTrinh.ViTriC[KhuVuc].Y - ChuongTrinh.ViTriA[KhuVuc].Y) / (float)(ChuongTrinh.rackY - 1);
   }
 
-  #ifdef debug_grbl
+  #ifdef DEBUG_GRBL
   Serial.printf("Khoang cach giua hai ong: %g %g\n", _KhoangCachGiuaHaiOng.X, _KhoangCachGiuaHaiOng.Y);
   #endif
 }
@@ -402,7 +407,7 @@ void _GRBL::TestFill(ChuongTrinh_t ChuongTrinh)
     asprintf(&str, "G1G91A%3.3fF%d\r", SoVongQuay, ChuongTrinh.tocdobom); 
     WebUI::inputBuffer.push(str);
 
-    #ifdef debug_grbl
+    #ifdef DEBUG_GRBL
     Serial.println("TESTFILL/CALIB");
     Serial.println(str);
     #endif

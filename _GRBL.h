@@ -10,8 +10,6 @@
 #define DoUuTienGRBL      3
 #define DoUuTienPhanPhoi  2
 
-#define TheTichBomDuocKhiQuay1VongMacDinh 187.125748503 // ul/duongkinhong
-
 double KhoangCachGiua2Diem(const toadoINT_t& Diem1, const toadoINT_t& Diem2);
 vector<uint8_t> ThuatToanTimDuongDiNganNhat(const vector<toadoINT_t>& DanhSachToaDo);
 

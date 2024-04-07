@@ -5,9 +5,6 @@
 #include <Arduino.h>  
 #include <DWIN.h>  
 
-//TODO vẽ sai khi chọn kích thước 2x2 và 3x3
-
-
 #define RACK_X_UPPER_LIMIT 12
 #define RACK_X_LOWER_LIMIT 1
 
@@ -59,19 +56,10 @@
 #define MauTrang 0xFFFFU
 #define MauDen 0x0000U
 
-#define BuachieuDaiXChonToaDo 740U
-#define BuachieuDaiYChonToaDo 300U
+#define BuachieuDaiXChonToaDo 750U
+#define BuachieuDaiYChonToaDo 320U
 
-#define ToaDoX0KhayChon 710U
-#define ToaDoY0KhayChon 25U
-
-#define ToaDoX0Khay1 115U
-#define ToaDoY0Khay1 130U
-
-#define ToaDoX0Khay2 520U
-#define ToaDoY0Khay2 130U
-
-#define ToaDoXIconHinhTronDauTienKhayChon 765U
+#define ToaDoXIconHinhTronDauTienKhayChon 760U
 #define ToaDoYIconHinhTronDauTienKhayChon 45U
 
 #define ToaDoXIconHinhTronDauTienKhay1 150U
@@ -364,8 +352,8 @@
 /* Trang 131 */
 #define _VPTextTenProgramArea1 0x9100
 #define _VPTextTenProgramArea2 0x9200
-#define _VPTextHienThiTenProgramTrangCaiDatCheDoChuongTrinh 0x9500     // hiện tại không dùng
-#define _VPTextHienThiChucNangProgramTrangCaiDatCheDoChuongTrinh 0x5400 // có dùng
+#define _VPTextHienThiTenProgramTrangCaiDatCheDoChuongTrinh 0x9500   
+#define _VPTextHienThiChucNangProgramTrangCaiDatCheDoChuongTrinh 0x5400 
 
 /* Trang 132*/
 #define _VPTextProgram1TrangChonChuongTrinh 0x8000
@@ -544,7 +532,6 @@ typedef struct {
   String RTC_Phut = "";
   String RTC_ChuoiNgay = "";
   String RTC_ChuoiGio = "";
-  bool TrangThaiChayXongMulti = false;
   bool CapNhatThoiGianRTC;
   int8_t KhuVucDangChay = -1;
   int8_t OngDaPhanPhoi = -1;
@@ -583,10 +570,8 @@ public:
   bool BamNutRunON = false;
   bool delay_flag = false;
   int32_t timeLoopDelay = 0;
-  bool TamDungChayDelay = false;
   int8_t IndexChuongTrinhDangXuLy;                           // Đây là biến tạm để biết chương trình nào đang xử lý
   uint8_t countTest = 1;
-  // vector<toadoINT_t> DSToaDoKhuVuc[SoLuongKhuVucToiDa];
   int8_t DSIndexChuongTrinhDuocChon[SoLuongKhuVucToiDa];      
   int8_t OngDaPhanPhoi_prev = -1;             
 
@@ -601,8 +586,6 @@ private:
   String TimeRunStart_c = "00:00";
   String timeLoopDelay_c = "00:00"; 
   int TimeNow = 0;
-  uint32_t DentaT = 0;
-  // uint8_t NutModidyDaBam;                                         // Đây là biến dùng để biết nút modify nào được bấm để hiển thị full chương trình hợp lý           
   uint8_t IdxKhuVucDangXuLy;                             
   bool CanCapNhatThongSo = false;
   CheDoVaoTrangChonChuongTrinh_t CheDoVaoTrangChonChuongTrinh;
