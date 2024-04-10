@@ -17,10 +17,11 @@ int DWINHMI::lastcodeHMI = -1;  // Reset mã code cũ trả về của các nút
 static uint32_t _time500ms = millis();
 static uint32_t _time1s = millis();
 static uint32_t _time5s = millis(); 
+
+bool DWINHMI::ManualControl = false;
 // static String TimeRunStart_c = "00:00";
 // static int TimeNow = 0;
 uint8_t holdAdd = 0; // 0 1 2
-volatile bool ManualControl = false;
 DanhSachMaLenh_t MaLenhManualControl = RESETMALENH;
 uint32_t HoldingTime;
 String twoDigits(int number);

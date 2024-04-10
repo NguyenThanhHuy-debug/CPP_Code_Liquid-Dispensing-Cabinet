@@ -599,7 +599,9 @@ public:
   int8_t IndexChuongTrinhDangXuLy;                           // Đây là biến tạm để biết chương trình nào đang xử lý
   uint8_t countTest = 1;
   int8_t DSIndexChuongTrinhDuocChon[SoLuongKhuVucToiDa];      
-  int8_t OngDaPhanPhoi_prev = -1;             
+  int8_t OngDaPhanPhoi_prev = -1;       
+  static bool ManualControl;
+      
 
 private:
 
