@@ -20,9 +20,6 @@ float TocDoTamThoi = TocDoLOW;
 float SoBuocTamThoi = SoBuocLOW;
 
 Flags _Flags;
-#ifndef build_test_chay_khong_Wifi
-WIFI _WiFi;                  // Kết nối WiFi cho board.
-#endif                       //build_test_chay_khong_Wifi
 Firmware _Firmware;          // Phiên bản firmware hiện tại của board.
 ThongSoBoard _ThongSoBoard;  // Thông số cài đặt cho board lưu trong EEPROM.
 RTC _RTC;                    // Mô-đun thời gian thực DS3231.
@@ -34,6 +31,24 @@ int _MODE;                   // Chế độ làm việc của máy.
 //--------------------------------------------------------------------------------------------------------//
 
 //--------------------------------------------------------------------------------------------------------//
+
+volatile bool SENSOR_2_TRIGGERED = false;
+
+void IRAM_ATTR ISR_2_SENSOR(void)
+{
+  Serial.printf("X2:%d, Y2:%d\n", digitalRead(X2_SENSOR_PIN), digitalRead(Y2_SENSOR_PIN));
+  if (SENSOR_2_TRIGGERED == false && sys.state == State::Cycle)
+  {
+    Serial.printf("X2: %d, Y2: %d\n", digitalRead(X2_SENSOR_PIN), digitalRead(Y2_SENSOR_PIN));
+    if (digitalRead(X2_SENSOR_PIN) == LOW || digitalRead(Y2_SENSOR_PIN) == LOW)
+    {
+      mc_reset();
+      sys_rt_exec_alarm = ExecAlarm::HardLimit;  // Indicate hard limit critical event
+      SENSOR_2_TRIGGERED = true;
+      Serial.println("Reset");
+    }
+  }
+}
 
 void vTaskDWINCode(void* pvParameters)
 {
@@ -73,12 +88,6 @@ void KhoiTao(void){
   //---------------------------------------------------------------
 
   #pragma region Các khởi tạo cơ bản của máy
-    #ifndef build_test_chay_khong_Wifi
-    _ID = _WiFi.LaySoMAC();
-    Serial.print("ID: ");
-    Serial.println(_ID);
-    #endif
-
     _Firmware.SETPhienBanFirmware("KingTubeAuto_2024.01.10_v01");
     Serial.print("Phiên bản firmware: ");
     Serial.println(_Firmware.PhienBan);
@@ -86,35 +95,6 @@ void KhoiTao(void){
     _ThongSoBoard.ID = _ID;
     _ThongSoBoard.KhoiTao();
     CapNhatDanhSachChuongTrinhLuuTrongEEPROM();
-
-    #ifdef CoKetNoiServer
-#pragma region Khởi tạo WIFI
-#ifndef BAT_TAT_WIFI
-  //======================================================================
-  //------ Begin: Khởi tạo để có thể cấu hình kết nối WiFi tự động -----//
-  //======================================================================
-  // Nếu muốn xóa thông tin WIFI đã lưu trong EEPROM thì mở dòng code này.
-  // _WiFi.XoaWIFIDaLuuTrongEEPROM();
-  _WiFi.CapNhatWiFiVaoEEPROM("IoTVision_2.4GHz", "iotvision@2022");
-  // _WiFi.CapNhatWiFiVaoEEPROM("", "");
-  // delay(500);
-  // Đoạn code này phải được gọi ở cuối cùng ở hàm setup().
-  _WiFi.DocWiFiDaLuuTrongEEPROM();
-
-  // Dành 10s để kết nối WiFI
-  // Lưu ý: Phải có thời gian chờ cho việc kết nối WIFI nếu không sẽ
-  // gây ra tình trạng board bị reset và không thể phát access point (AP).
-  _WiFi.KetNoiWiFi(10);
-
-  // delay(1000);
-
-  //xTaskCreate(TaskWIFI, "Task WIFI", 2048, NULL, 1, NULL);
-  //======================================================================
-  //------ End: Khởi tạo để có thể cấu hình kết nối WiFi tự động -------//
-  //======================================================================
-#endif
-#pragma endregion Khởi tạo WIFI
-#endif
 #pragma endregion Các khởi tạo cơ bản của máy
 
   // Khởi tạo HMI và chạy giao diện khởi động.
@@ -128,6 +108,15 @@ void KhoiTao(void){
 #ifdef RESET_EEPROM
     _ThongSoBoard.XoaEEPROM(0,_ChieuDaiI2CEEPROM);
 #endif
+
+  pinMode(X2_SENSOR_PIN, INPUT);
+  pinMode(Y2_SENSOR_PIN, INPUT);
+  pinMode(Z2_SENSOR_PIN, INPUT);
+
+  attachInterrupt(X2_SENSOR_PIN, ISR_2_SENSOR, FALLING);
+  attachInterrupt(Y2_SENSOR_PIN, ISR_2_SENSOR, FALLING);
+  // attachInterrupt(Z2_SENSOR_PIN, ISR_2_SENSOR, FALLING);
+  
 }
 
 void CapNhatDuLieuLenHMI(void) 
@@ -167,6 +156,13 @@ void XuLyDuLieuNhanTuHMI(void)
   switch (_MaLenhGRBL)
   {
     case GOHOMEKHONGCHUYENTRANG:
+      if (SENSOR_2_TRIGGERED == true)
+      {
+        SENSOR_2_TRIGGERED = false;
+        WebUI::inputBuffer.write(0x18);
+        delay(100);
+        WebUI::inputBuffer.push("$H\n");
+      }
       if (DangTamDungPhanPhoi == true)
       {
         Serial.println("Set Home khi dang phan phoi");
@@ -193,6 +189,7 @@ void XuLyDuLieuNhanTuHMI(void)
       {
         _grbl.OngDaPhanPhoi = -1;
         _DWIN.DuLieuBoardGuiLenHMI.OngDaPhanPhoi = -1;
+        delay(10);
       }
       if (DangTamDungPhanPhoi == true) 
       {
@@ -575,36 +572,80 @@ void KiemTraNguon(void)
         delay(100);
         digitalWrite(2, LOW);
         DaTatNguon = true;     
-        digitalWrite(_ChanKichNguon, LOW);
+        Shutdown();
       }
     }
 }
 
 void ChayChuongTrinhChinh()
 {
+  // if (SENSOR_2_TRIGGERED == false)
+  // {
+  //   if (sys.state == State::Cycle)
+  //   {
+  //     if (digitalRead(Z2_SENSOR_PIN) == LOW)
+  //     {
+  //       delay(100);
+  //       if (digitalRead(Z2_SENSOR_PIN) == LOW)
+  //       {
+  //         Serial.println("Z2");
+  //         mc_reset();
+  //         sys_rt_exec_alarm = ExecAlarm::HardLimit;  // Indicate hard limit critical event
+  //         SENSOR_2_TRIGGERED = true;
+  //       }
+  //     }
+  //   }
+
+  // }
+  KiemTraNguon();
+
   _Flags.TurnONFlags();
 
   ThucThiCacTacVuTheoFlag();
 
   _Flags.TurnOFFFlags();
+
+  // if (SENSOR_2_TRIGGERED == true)
+  //   {
+  //     SENSOR_2_TRIGGERED = false;
+  //     if (sys.state == State::Homing)
+  //     {
+  //       return;
+  //     }
+  //     Serial.println("LIMIT2");
+  //     sys.state = State::Alarm;
+  //   }
 }
 void ThucThiCacTacVuTheoFlag()
 {
+  // Serial.printf("Z1: %d, Z2:%d\n", digitalRead(Z_LIMIT_PIN), digitalRead(Z2_SENSOR_PIN));
   if(_Flags.Flag.t1s)
   {
     _RTC.LayRTCTuDS3231();
-    KiemTraNguon();
+
   }
 }
 
 void Shutdown(void)
 {
-  _grbl.VeToaDoGoc();
+  // _grbl.VeToaDoGoc();
+  if (sys.state == State::Alarm)
+  {
+    WebUI::inputBuffer.write(0x18);
+    delay(100);
+    WebUI::inputBuffer.push("$H\n");
+    delay(100);
+    while (sys.state == State::Homing)
+    {
+      delay(1);
+    }
+  }
+  _grbl.DiChuyenToiViTri(DEFAULT_HOMING_PULLOFF, -DEFAULT_HOMING_PULLOFF, -800.0, TocDoCao);
   delay(100);
   while (sys.state != State::Idle)
   {
     delay(1);
   }
-  
+
   digitalWrite(_ChanKichNguon, LOW);
 }

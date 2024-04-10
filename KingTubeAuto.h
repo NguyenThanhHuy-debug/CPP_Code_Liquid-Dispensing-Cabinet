@@ -9,13 +9,13 @@ using namespace std;
 // #define DEBUG_GRBL
 // #define DEBUG_CHUONGTRINHCHINH
 
-#define RESET_EEPROM
+// #define RESET_EEPROM
 
 // #define ABCH_LAB
-
-//#define TEST_SENSORS
-
 #define ABCH_NHAMAY
+
+#define TEST_SENSORS
+
 
 #define Serial                              Uart0
 
@@ -38,7 +38,7 @@ using namespace std;
 
 #define ToaDoGoc                            DEFAULT_HOMING_PULLOFF, -DEFAULT_HOMING_PULLOFF, -DEFAULT_HOMING_PULLOFF
 
-#define MatKhau                             "000000"
+#define MatKhau                             "123456"
 
 #define HeSoCalibMacDinh 403.041 // ul/duongkinhong
 
@@ -72,10 +72,10 @@ typedef struct {
 #endif
 
 #ifdef ABCH_NHAMAY
-    toado_t ViTriA[SoLuongKhuVucToiDa] = { { 17.0, -13.0 },     { 255.0, -13.0 } };
-    toado_t ViTriB[SoLuongKhuVucToiDa] = { { 225.5, -13.0 },    {463.0, -13.0 } };
-    toado_t ViTriC[SoLuongKhuVucToiDa] = { { 225.5, -175.0 },   {463.0, -175.0 } };
-    float ViTriH[SoLuongKhuVucToiDa] = {-890.0,                -890.0};
+    toado_t ViTriA[SoLuongKhuVucToiDa] = { { 32.0, -17.0 },     { 297.0, -17.0 } };
+    toado_t ViTriB[SoLuongKhuVucToiDa] = { { 263.0, -17.0 },    {527.0, -17.0 } };
+    toado_t ViTriC[SoLuongKhuVucToiDa] = { { 263.0, -180.0 },   {527.0, -180.0 } };
+    float ViTriH[SoLuongKhuVucToiDa] = {-850.0,                -850.0};
 #endif
 
     vector<toadoINT_t> DsToaDo[SoLuongKhuVucToiDa];

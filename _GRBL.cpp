@@ -17,11 +17,6 @@ bool _GRBL::VeViTriHome()
       delay(100);
   }
 
-  if (sys.state == State::Alarm)
-  {
-    VeViTriHome();
-  }
-
   return true;
 }
 
@@ -111,9 +106,14 @@ void _GRBL::BatDauPhanPhoi()
 
   DaChayXongCacKhuVuc = false;
 
-  for (auto i : KhuVucChay)
+  int8_t KhuVucCuoi = -1;
+
+  for (uint8_t i = 0; i < sizeof(KhuVucChay); i++)
   {
-    Serial.printf("Thu tu chay: %d\n", i);
+    if (KhuVucChay[i] != -1)
+    {
+      KhuVucCuoi = i;
+    }
   }
   // Chạy các chương trình theo thứ tự đã sắp xếp
   for (uint8_t i = 0; i < sizeof(KhuVucChay); i++)
@@ -207,10 +207,20 @@ void _GRBL::BatDauPhanPhoi()
       Serial.printf("ToaDoXDaChay: %d, ToaDoYDaChay: %d\n", ToaDoXDaChay, ToaDoYDaChay);
       KhuVucDangChay = i;
       Serial.printf("OngDaPhanPhoi: %d\n", OngDaPhanPhoi);
+
+      if (KhuVucDangChay == KhuVucCuoi && ToaDoHienTai == DSToaDoCanChay.size() - 1)
+      {
+        VeToaDoGoc();
+        delay(100);
+        while(sys.state != State::Idle)
+        {
+          delay(1);
+        }
+      }
     }
   }
+  // VeToaDoGoc();
   DaChayXongCacKhuVuc = true;
-  VeToaDoGoc();
 }
 //* Trả về vị trí hiện tại của STEP
 float _GRBL::ViTriHienTaiCuaSTEP(uint8_t STEP) {
@@ -437,14 +447,14 @@ void _GRBL::VeToaDoGoc(void)
     return;
   }
 
-  if (_grbl.ViTriHienTaiCuaSTEP(TrucX) == DEFAULT_HOMING_PULLOFF &&
-      _grbl.ViTriHienTaiCuaSTEP(TrucY) == DEFAULT_HOMING_PULLOFF &&
-      _grbl.ViTriHienTaiCuaSTEP(TrucZ) == DEFAULT_HOMING_PULLOFF)
-  {
-    VeViTriHome();
-    return;
-  }
-  DiChuyenToiViTri(ToaDoGoc, TocDoTrungBinh);
+  // if (_grbl.ViTriHienTaiCuaSTEP(TrucX) == DEFAULT_HOMING_PULLOFF &&
+  //     _grbl.ViTriHienTaiCuaSTEP(TrucY) == DEFAULT_HOMING_PULLOFF &&
+  //     _grbl.ViTriHienTaiCuaSTEP(TrucZ) == DEFAULT_HOMING_PULLOFF)
+  // {
+  //   VeViTriHome();
+  //   return;
+  // }
+  DiChuyenToiViTri(ToaDoGoc, TocDoCao);
 }
 
 _GRBL _grbl;

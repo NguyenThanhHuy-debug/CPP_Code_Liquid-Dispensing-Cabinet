@@ -68,6 +68,28 @@
 #define ToaDoXIconHinhTronDauTienKhay2 550U
 #define ToaDoYIconHinhTronDauTienKhay2 ToaDoYIconHinhTronDauTienKhay1
 
+#define _VpTextA 0x3C00UL
+#define _VpTextB 0x3C10UL
+#define _VpTextC 0x3C20UL
+#define _VpTextD 0x3C30UL
+#define _VpTextE 0x3C40UL
+#define _VpTextF 0x3C50UL
+#define _VpTextG 0x3C60UL
+#define _VpTextH 0x3C70UL
+#define _VpTextI 0x3C80UL
+#define _VpTextJ 0x3C90UL
+#define _VpTextK 0x3CA0UL
+#define _VpTextL 0x3CB0UL
+
+#define _VpText1 0x3CC0UL
+#define _VpText2 0x3CD0UL
+#define _VpText3 0x3CE0UL
+#define _VpText4 0x3CF0UL
+#define _VpText5 0x3D00UL
+#define _VpText6 0x3D10UL
+#define _VpText7 0x3D20UL
+#define _VpText8 0x3D30UL
+
 #define _VpAddressVung1KhayChon  0x3800UL
 #define _VpAddressVung2KhayChon  0x3900UL
 #define _VpAddressVung3KhayChon  0x3A00UL
@@ -154,6 +176,9 @@
 #define _HMIBamNutADDTrangPhanPhoiViTri 0x9A
 #define _HMIBamNutOKTrangPhanPhoiViTri 0x9B
 #define _HMIBamNutEXITTrangPhanPhoiViTri 0x9C
+
+#define _HMIBamNutIncreaseTrangPhanPhoiViTri 0xDEADBEEF
+#define _HMIBamNutDecreaseTrangPhanPhoiViTri 0xDEADBEFF
 
 /* Define các nút bấm trang 134*/
 #define _HMIBamNutRUNTrangHienThiPhanPhoiThoiGianThuc 0x9D
