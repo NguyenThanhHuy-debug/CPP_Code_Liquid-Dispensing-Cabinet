@@ -37,7 +37,7 @@ volatile bool SENSOR_2_TRIGGERED = false;
 void IRAM_ATTR ISR_2_SENSOR(void)
 {
   Serial.printf("X2:%d, Y2:%d\n", digitalRead(X2_SENSOR_PIN), digitalRead(Y2_SENSOR_PIN));
-  if (SENSOR_2_TRIGGERED == false && sys.state == State::Cycle)
+  if (SENSOR_2_TRIGGERED == false && sys.state == State::Cycle && DWINHMI::ManualControl == true)
   {
     Serial.printf("X2: %d, Y2: %d\n", digitalRead(X2_SENSOR_PIN), digitalRead(Y2_SENSOR_PIN));
     if (digitalRead(X2_SENSOR_PIN) == LOW || digitalRead(Y2_SENSOR_PIN) == LOW)

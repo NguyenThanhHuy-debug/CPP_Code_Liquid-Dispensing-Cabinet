@@ -176,7 +176,8 @@ void _GRBL::BatDauPhanPhoi()
 
       while ((sys.state == State::Cycle) || (sys.state == State::Hold) ) 
       {
-        if (CoBaoDungPhanPhoi == true) {
+        if (CoBaoDungPhanPhoi == true) 
+        {
           CoBaoDungPhanPhoi = false;
           if (CoBaoPhanPhoiLaiOng == true)
           {
