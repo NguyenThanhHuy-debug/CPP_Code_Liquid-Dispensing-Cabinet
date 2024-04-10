@@ -2994,10 +2994,10 @@ void DWINHMI::TaskFunction_RunTime(void)
   uint32_t seconds,minutes,hours;
   while (1)
   {
-    if (sys.state == State::Alarm)
-    {
-      vTaskSuspend(xTaskHandle_RunTime);
-    }
+    // if (sys.state == State::Alarm)
+    // {
+    //   vTaskSuspend(xTaskHandle_RunTime);
+    // }
     if (millis() - time1s >= 1000)
     {
       if(delay_flag == true)
@@ -3030,48 +3030,30 @@ void DWINHMI::TaskFunction_RunTime(void)
       time1s = millis();
     }
 
-    if (DuLieuBoardGuiLenHMI.OngDaPhanPhoi != OngDaPhanPhoi_prev && delay_flag == false)
+    if (DuLieuBoardGuiLenHMI.DaChayXongMotOng == true && delay_flag == false)
     {
-      Serial.printf("OngDaPhanPhoi: %d, OngDaPhanPhoi_prev: %d\n",DuLieuBoardGuiLenHMI.OngDaPhanPhoi,OngDaPhanPhoi_prev);
+      DuLieuBoardGuiLenHMI.DaChayXongMotOng = false;
       Serial.printf("KhuVuc: %d, X: %d, Y: %d\n",DuLieuBoardGuiLenHMI.KhuVucDangChay,DuLieuBoardGuiLenHMI.ToaDoXDaChay,DuLieuBoardGuiLenHMI.ToaDoYDaChay);
-      OngDaPhanPhoi_prev = DuLieuBoardGuiLenHMI.OngDaPhanPhoi;
       IdxKhuVucDangXuLy = DuLieuBoardGuiLenHMI.KhuVucDangChay;
       GuiTextLenHMI(_VPTextFillNumberTrangHienThiPhanPhoiThoiGianThuc, String(OngDaPhanPhoi_prev + 1));
       HienThiMau(DuLieuBoardGuiLenHMI.KhuVucDangChay, DuLieuBoardGuiLenHMI.ToaDoXDaChay, DuLieuBoardGuiLenHMI.ToaDoYDaChay, _ChuongTrinhEEPROM[DSIndexChuongTrinhDuocChon[DuLieuBoardGuiLenHMI.KhuVucDangChay]], MauXanhLa);
-      if (DuLieuBoardGuiLenHMI.DaChayXongCacKhuVuc == true)
+    }
+
+      if (DuLieuBoardGuiLenHMI.DaChayXongCacKhuVuc == true && delay_flag == false)
       {
+        DuLieuBoardGuiLenHMI.DaChayXongCacKhuVuc = false;
         if (oneTimeMulti == false)
         {
-          // char * str;
-          // asprintf(&str, "G0G90X%gY%gZ%g\n", DEFAULT_HOMING_PULLOFF, -DEFAULT_HOMING_PULLOFF, -DEFAULT_HOMING_PULLOFF);
-          // WebUI::inputBuffer.push(str);
-          // free(str);
-          // delay(100);
-          // while (sys.state != State::Idle)
-          // {
-          //   delay(1);
-          // }
-          OngDaPhanPhoi_prev = -1;
           delay_flag = true;
           timeloopdelay = timeLoopDelay;
-          OngDaPhanPhoi_prev = -1;
-          Serial.println("Chay xong cac khu vuc");
-
-          // while (sys.state != State::Idle && sys.state != State::Alarm)
-          // {
-          //   delay(1);
-          // }
         }
         else
         {
           setPage(_TrangHienThiPhanPhoiThoiGianThuc_OFF_HOME);
           BamNutRunON = false;
-          OngDaPhanPhoi_prev = -1;
           vTaskSuspend(xTaskHandle_RunTime);
         }
       }
-    }
-
 
     if (delay_flag)
     {

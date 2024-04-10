@@ -49,6 +49,7 @@ public:
     uint8_t ToaDoXDaChay;
     uint8_t ToaDoYDaChay;
     bool DaChayXongCacKhuVuc = false;
+    bool DaChayXongMotOng = false;
     int8_t KhuVucChay[SoLuongKhuVucToiDa];
     bool CoBaoPhanPhoiLaiOng = false;
 

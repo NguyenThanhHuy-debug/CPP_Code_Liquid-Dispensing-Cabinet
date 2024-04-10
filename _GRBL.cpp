@@ -104,17 +104,8 @@ void _GRBL::BatDauPhanPhoi()
   char* SoVongDeBomDungTheTich;
   char* ChongNhoGiot;
 
-  DaChayXongCacKhuVuc = false;
-
   int8_t KhuVucCuoi = -1;
 
-  for (uint8_t i = 0; i < sizeof(KhuVucChay); i++)
-  {
-    if (KhuVucChay[i] != -1)
-    {
-      KhuVucCuoi = i;
-    }
-  }
   // Chạy các chương trình theo thứ tự đã sắp xếp
   for (uint8_t i = 0; i < sizeof(KhuVucChay); i++)
   {
@@ -201,26 +192,24 @@ void _GRBL::BatDauPhanPhoi()
         continue;
       }
 
+      DaChayXongMotOng = true;
+
       OngDaPhanPhoi = ToaDoHienTai;
       ToaDoXDaChay = _DSChuongTrinh[IdxChuongTrinh].DsToaDo[i][ToaDoHienTai].X;
       ToaDoYDaChay = _DSChuongTrinh[IdxChuongTrinh].DsToaDo[i][ToaDoHienTai].Y;
       Serial.printf("ToaDoXDaChay: %d, ToaDoYDaChay: %d\n", ToaDoXDaChay, ToaDoYDaChay);
       KhuVucDangChay = i;
       Serial.printf("OngDaPhanPhoi: %d\n", OngDaPhanPhoi);
-
-      if (KhuVucDangChay == KhuVucCuoi && ToaDoHienTai == DSToaDoCanChay.size() - 1)
-      {
-        VeToaDoGoc();
-        delay(100);
-        while(sys.state != State::Idle)
-        {
-          delay(1);
-        }
-      }
     }
   }
-  // VeToaDoGoc();
+  VeToaDoGoc();
+  delay(100);
+  while(sys.state != State::Idle)
+  {
+    delay(10);
+  }
   DaChayXongCacKhuVuc = true;
+  delay(10);
 }
 //* Trả về vị trí hiện tại của STEP
 float _GRBL::ViTriHienTaiCuaSTEP(uint8_t STEP) {

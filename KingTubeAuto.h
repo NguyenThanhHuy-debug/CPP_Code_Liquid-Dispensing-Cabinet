@@ -14,7 +14,7 @@ using namespace std;
 // #define ABCH_LAB
 #define ABCH_NHAMAY
 
-#define TEST_SENSORS
+// #define TEST_SENSORS
 
 
 #define Serial                              Uart0

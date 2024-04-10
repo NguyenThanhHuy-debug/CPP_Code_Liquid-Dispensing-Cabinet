@@ -36,11 +36,10 @@ volatile bool SENSOR_2_TRIGGERED = false;
 
 void IRAM_ATTR ISR_2_SENSOR(void)
 {
-  Serial.printf("X2:%d, Y2:%d\n", digitalRead(X2_SENSOR_PIN), digitalRead(Y2_SENSOR_PIN));
   if (SENSOR_2_TRIGGERED == false && sys.state == State::Cycle)
   {
     Serial.printf("X2: %d, Y2: %d\n", digitalRead(X2_SENSOR_PIN), digitalRead(Y2_SENSOR_PIN));
-    if (digitalRead(X2_SENSOR_PIN) == LOW || digitalRead(Y2_SENSOR_PIN) == LOW)
+    if (digitalRead(X2_SENSOR_PIN) == LOW || digitalRead(Y2_SENSOR_PIN) == LOW || digitalRead(Z2_SENSOR_PIN) == LOW)
     {
       mc_reset();
       sys_rt_exec_alarm = ExecAlarm::HardLimit;  // Indicate hard limit critical event
@@ -115,7 +114,7 @@ void KhoiTao(void){
 
   attachInterrupt(X2_SENSOR_PIN, ISR_2_SENSOR, FALLING);
   attachInterrupt(Y2_SENSOR_PIN, ISR_2_SENSOR, FALLING);
-  // attachInterrupt(Z2_SENSOR_PIN, ISR_2_SENSOR, FALLING);
+  attachInterrupt(Z2_SENSOR_PIN, ISR_2_SENSOR, FALLING);
   
 }
 
@@ -127,11 +126,20 @@ void CapNhatDuLieuLenHMI(void)
   _DWIN.DuLieuBoardGuiLenHMI.DSChuongTrinh = _grbl._DSChuongTrinh;
   _DWIN.DuLieuBoardGuiLenHMI.RTC_ChuoiNgay = _RTC.ChuanHoaChuoiRTC_Ngay();
   _DWIN.DuLieuBoardGuiLenHMI.RTC_ChuoiGio  = _RTC.ChuanHoaChuoiRTC_Gio();
-  _DWIN.DuLieuBoardGuiLenHMI.OngDaPhanPhoi = _grbl.OngDaPhanPhoi;
-  _DWIN.DuLieuBoardGuiLenHMI.KhuVucDangChay = _grbl.KhuVucDangChay;
-  _DWIN.DuLieuBoardGuiLenHMI.ToaDoXDaChay = _grbl.ToaDoXDaChay;
-  _DWIN.DuLieuBoardGuiLenHMI.ToaDoYDaChay = _grbl.ToaDoYDaChay;
-  _DWIN.DuLieuBoardGuiLenHMI.DaChayXongCacKhuVuc = _grbl.DaChayXongCacKhuVuc;
+  if (_grbl.DaChayXongMotOng == true)
+  {
+    _grbl.DaChayXongMotOng = false;
+    _DWIN.DuLieuBoardGuiLenHMI.OngDaPhanPhoi = _grbl.OngDaPhanPhoi;
+    _DWIN.DuLieuBoardGuiLenHMI.KhuVucDangChay = _grbl.KhuVucDangChay;
+    _DWIN.DuLieuBoardGuiLenHMI.ToaDoXDaChay = _grbl.ToaDoXDaChay;
+    _DWIN.DuLieuBoardGuiLenHMI.ToaDoYDaChay = _grbl.ToaDoYDaChay;
+  }
+
+  if (_grbl.DaChayXongCacKhuVuc == true)
+  {
+    _grbl.DaChayXongCacKhuVuc = false;
+    _DWIN.DuLieuBoardGuiLenHMI.DaChayXongCacKhuVuc = _grbl.DaChayXongCacKhuVuc;
+  }
 
 }
 
@@ -184,13 +192,8 @@ void XuLyDuLieuNhanTuHMI(void)
       // _DWIN.DuLieuBoardGuiLenHMI.TrangThaiXacNhanSetHome = true;
       break;
     case RUN:
+
       _grbl._DSChuongTrinh =_DWIN._ChuongTrinhEEPROM;
-      if (_grbl.DaChayXongCacKhuVuc == true)
-      {
-        _grbl.OngDaPhanPhoi = -1;
-        _DWIN.DuLieuBoardGuiLenHMI.OngDaPhanPhoi = -1;
-        delay(10);
-      }
       if (DangTamDungPhanPhoi == true) 
       {
         #ifdef DEBUG_CHUONGTRINHCHINH
@@ -201,6 +204,8 @@ void XuLyDuLieuNhanTuHMI(void)
       }
       else 
       {
+        _grbl.DaChayXongCacKhuVuc = false;
+        _grbl.DaChayXongMotOng = false;
         #ifdef DEBUG_CHUONGTRINHCHINH
         Serial.println("RUN PhanPhoi");
         #endif
@@ -224,14 +229,14 @@ void XuLyDuLieuNhanTuHMI(void)
         DangTamDungPhanPhoi = false;
         _grbl.DungPhanPhoi();
       }
-      _grbl.OngDaPhanPhoi = -1;
-      _DWIN.DuLieuBoardGuiLenHMI.OngDaPhanPhoi = -1;
+      _grbl.DaChayXongCacKhuVuc = false;
+      _grbl.DaChayXongMotOng = false;
       _grbl.VeToaDoGoc();
       break;
     case EXITVETRANGCAIDATCHEDOCHUONGTRINH:
       Serial.println("EXITVETRANGCAIDATCHEDOCHUONGTRINH");
-      _grbl.OngDaPhanPhoi = -1;
-      _DWIN.DuLieuBoardGuiLenHMI.OngDaPhanPhoi = -1;
+     _grbl.DaChayXongCacKhuVuc = false;
+     _grbl.DaChayXongMotOng = false;
       if (_grbl.CoBaoPhanPhoiLaiOng == true)
       {
         Serial.println("EXITVETRANGCAIDATCHEDOCHUONGTRINH CoBaoPhanPhoiLaiOng");

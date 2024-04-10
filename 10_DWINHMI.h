@@ -563,6 +563,7 @@ typedef struct {
   uint8_t ToaDoXDaChay;
   uint8_t ToaDoYDaChay;
   bool DaChayXongCacKhuVuc = false;
+  bool DaChayXongMotOng = false;
 } DuLieuHMI;// Struct cấu trúc dữ liệu dùng để giao tiếp giữa board và HMI.
 
 
