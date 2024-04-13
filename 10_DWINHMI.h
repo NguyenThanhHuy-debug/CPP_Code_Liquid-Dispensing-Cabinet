@@ -599,12 +599,11 @@ public:
   int8_t IndexChuongTrinhDangXuLy;                           // Đây là biến tạm để biết chương trình nào đang xử lý
   uint8_t countTest = 1;
   int8_t DSIndexChuongTrinhDuocChon[SoLuongKhuVucToiDa];      
-  int8_t OngDaPhanPhoi_prev = -1;       
   static bool ManualControl;
       
 
 private:
-
+  bool DaChayXongCacKhuVuc_oneTimeMulti = false;
   vector<ViTrivaToaDo_t> vitrivatoado;
   uint16_t khaychon[12][8];
   uint16_t khay1[12][8];
