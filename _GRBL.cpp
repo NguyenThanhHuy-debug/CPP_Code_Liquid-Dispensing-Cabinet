@@ -169,13 +169,6 @@ void _GRBL::BatDauPhanPhoi()
         if (CoBaoDungPhanPhoi == true) 
         {
           CoBaoDungPhanPhoi = false;
-          if (CoBaoPhanPhoiLaiOng == true)
-          {
-            WebUI::inputBuffer.push("~\n");
-            CoBaoPhanPhoiLaiOng = false;
-            return;
-          }
-          Serial.println("TaskPhanPhoi DungPhanPhoi");
           return;
         }
         if (CoBaoPhanPhoiLaiOng == true)
@@ -187,7 +180,6 @@ void _GRBL::BatDauPhanPhoi()
 
       if (CoBaoPhanPhoiLaiOng == true)
       {
-        ToaDoHienTai--;
         CoBaoPhanPhoiLaiOng = false;
         continue;
       }
@@ -232,6 +224,7 @@ void _GRBL::TamDungPhanPhoi(void) {
   if (CoBaoPhanPhoiLaiOng == true)
   {
     vTaskSuspend(_PhanPhoiTaskHandle);
+    return;
   }
   WebUI::inputBuffer.push("!\r");
 }
@@ -250,18 +243,14 @@ void _GRBL::DungPhanPhoi(void) {
 
   if (CoBaoPhanPhoiLaiOng == true)
   {
-    WebUI::inputBuffer.push("!\n");
-    CoBaoDungPhanPhoi = true;
-    delay(100);
     vTaskResume(_PhanPhoiTaskHandle);
+    CoBaoDungPhanPhoi = true;
+    CoBaoPhanPhoiLaiOng = false;
+    delay(100);
     return;
   }
   CoBaoDungPhanPhoi = true;
   delay(100); /* NOTE delay(100)*/
-  WebUI::inputBuffer.write(0x18);
-  delay(100); /* NOTE delay(100)*/
-  WebUI::inputBuffer.push("$X\n");
-  delay(100);
 }
 
 

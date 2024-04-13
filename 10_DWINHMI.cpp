@@ -1956,7 +1956,7 @@ DanhSachMaLenh_t DWINHMI::ReturnMaLenhGRBL()
         else
         {
           BamNutRunON = false;
-          return RESUME;
+          return PAUSE;
         }     
       }
       case _HMIBamNutRESETPROGRAMTrangHienThiPhanPhoiThoiGianThuc:

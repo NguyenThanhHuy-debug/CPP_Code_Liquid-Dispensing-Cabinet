@@ -181,6 +181,11 @@ void XuLyDuLieuNhanTuHMI(void)
         delay(100);
         WebUI::inputBuffer.push("$H\n");
         delay(100);
+        while (sys.state != State::Idle)
+        {
+          delay(10);
+        }
+        WebUI::inputBuffer.push("!\n");
         break;
       }
       // _grbl.VeToaDoGoc();
@@ -215,7 +220,7 @@ void XuLyDuLieuNhanTuHMI(void)
         _grbl.PhanPhoi();
       }
       break;
-    case RESUME:
+    case PAUSE:
       #ifdef DEBUG_CHUONGTRINHCHINH
       Serial.println("Tạm dừng");
       #endif
@@ -233,8 +238,6 @@ void XuLyDuLieuNhanTuHMI(void)
       }
       _grbl.DaChayXongCacKhuVuc = false;
       _grbl.DaChayXongMotOng = false;
-      // _grbl.VeToaDoGoc();
-      _grbl.VeViTriHome();
       break;
     case EXITVETRANGCAIDATCHEDOCHUONGTRINH:
       Serial.println("EXITVETRANGCAIDATCHEDOCHUONGTRINH");
@@ -245,6 +248,7 @@ void XuLyDuLieuNhanTuHMI(void)
         Serial.println("EXITVETRANGCAIDATCHEDOCHUONGTRINH CoBaoPhanPhoiLaiOng");
         DangTamDungPhanPhoi = false;
         _grbl.DungPhanPhoi();
+        WebUI::inputBuffer.push("~\n");
         break;
       }
       if (DangTamDungPhanPhoi == true)

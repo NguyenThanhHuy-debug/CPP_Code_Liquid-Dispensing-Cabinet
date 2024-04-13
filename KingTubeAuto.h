@@ -89,7 +89,7 @@ typedef struct {
 typedef enum {
     RESETMALENH,
     RUN,
-    RESUME,
+    PAUSE,
     GOHOMEKHONGCHUYENTRANG,
     GOHOME,
     CAPNHATCHUONGTRINH,
