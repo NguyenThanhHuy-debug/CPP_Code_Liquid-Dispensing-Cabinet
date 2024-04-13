@@ -55,7 +55,7 @@ Some features should not be changed. See notes below.
 //* that the machine file might choose to undefine.
 
 // *Note: HOMING_CYCLES are now settings
-#define SUPPORT_TASK_CORE 0  // Reference: CONFIG_ARDUINO_RUNNING_CORE = 1
+#define SUPPORT_TASK_CORE 1  // Reference: CONFIG_ARDUINO_RUNNING_CORE = 1
 
 //* Inverts pin logic of the control command pins based on a mask. This essentially means you can use
 //* normally-closed switches on the specified pins, rather than the default normally-open switches.

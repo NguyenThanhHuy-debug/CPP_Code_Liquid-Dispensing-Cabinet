@@ -236,6 +236,7 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
     /* =============================== BEGIN: CODE TRANG 131 CÀI ĐẶT CHẾ ĐỘ CHƯƠNG TRÌNH ===============================*/
     case _HMIBamNutRunTrangCaiDatCheDoChuongTrinh:
     {
+      DaChayXongCacKhuVuc_oneTimeMulti = false;
       bool CoTonTaiChuongTrinhDuocChon = false;
       for (uint8_t i = 0; i < sizeof(DSIndexChuongTrinhDuocChon); i++)
       {
@@ -423,6 +424,12 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
     /* =============================== BEGIN: CODE TRANG 134 TRANG PHÂN PHỐI THỜI GIAN THỰC ===============================*/
     case _HMIBamNutEXITTrangHienThiPhanPhoiThoiGianThuc:
     {
+      if (sys.state == State::Homing)
+      {
+        codeHMI = -1;
+        return;
+      }
+      DaChayXongCacKhuVuc_oneTimeMulti = false;
       /* Chỉ thực hiện Exit khi đã máy đã tắt */
       if (BamNutRunON == false)
       {
@@ -1875,6 +1882,7 @@ void DWINHMI::ResetProgram(void)
 {
     if (codeHMI == _HMIBamNutRESETPROGRAMTrangHienThiPhanPhoiThoiGianThuc && BamNutRunON == false)
     {
+      DaChayXongCacKhuVuc_oneTimeMulti = false;
       for (uint8_t i = 0; i < sizeof(DSIndexChuongTrinhDuocChon); i++)
       {
         if (DSIndexChuongTrinhDuocChon[i] == -1)
@@ -1890,8 +1898,9 @@ void DWINHMI::ResetProgram(void)
       TimeNow = 0;
     }
 
-    else if (codeHMI == _HMIBamNutRUNTrangHienThiPhanPhoiThoiGianThuc && BamNutRunON == false && DuLieuBoardGuiLenHMI.DaChayXongCacKhuVuc == true)
+    else if (codeHMI == _HMIBamNutRUNTrangHienThiPhanPhoiThoiGianThuc && BamNutRunON == false && DaChayXongCacKhuVuc_oneTimeMulti == true)
     {
+      DaChayXongCacKhuVuc_oneTimeMulti = false;
       for (uint8_t i = 0; i < sizeof(DSIndexChuongTrinhDuocChon); i++)
       {
         if (DSIndexChuongTrinhDuocChon[i] == -1)
@@ -1954,7 +1963,6 @@ DanhSachMaLenh_t DWINHMI::ReturnMaLenhGRBL()
       {
         if (BamNutRunON == false) 
         {
-          OngDaPhanPhoi_prev = -1;
           GuiTextLenHMI(_VPTextFillNumberTrangHienThiPhanPhoiThoiGianThuc, "0");
           return RESETPROGRAM;
         }
@@ -1966,7 +1974,6 @@ DanhSachMaLenh_t DWINHMI::ReturnMaLenhGRBL()
          break;
         else
         {
-          OngDaPhanPhoi_prev = -1;
          return EXITVETRANGCAIDATCHEDOCHUONGTRINH;
         }
       }
@@ -2057,12 +2064,6 @@ DanhSachMaLenh_t DWINHMI::ReturnMaLenhGRBL()
       case _HMIBamNutFAST:
         codeHMI = -1;
         return FASTSPEED;
-      case _HMIBamNutUNLOCKTrangManualControl:
-        codeHMI = -1;
-        return UNLOCK;
-      case _HMIBamNutRESETTrangManualControl:
-        codeHMI = -1;
-        return RESET;
 
       case _HMIBamNutShutdownTrangCaiDat:
         codeHMI = -1;
@@ -2419,13 +2420,14 @@ void DWINHMI::CapNhatHienThiThongTinChiTietChuongTrinh()
 void DWINHMI::CapNhatHienThiThongTinChuongTrinhTrangChonChuongTrinh()
 {
     int8_t IdxChuongTrinhVuaChon = codeHMI % _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh;
+    String name = String(_ChuongTrinhEEPROM[IdxChuongTrinhVuaChon].tenchuongtrinh);
     String rackX = String(_ChuongTrinhEEPROM[IdxChuongTrinhVuaChon].rackX);
     String rackY = String(_ChuongTrinhEEPROM[IdxChuongTrinhVuaChon].rackY);
     String Volume = String(_ChuongTrinhEEPROM[IdxChuongTrinhVuaChon].thetich);
     String PumpSpeed = String(_ChuongTrinhEEPROM[IdxChuongTrinhVuaChon].tocdobom);
     String DKOng = String(_ChuongTrinhEEPROM[IdxChuongTrinhVuaChon].duongkinhong);
     String SpeedXY = String(_ChuongTrinhEEPROM[IdxChuongTrinhVuaChon].tocdoXY);
-    String data = "Quantity: " + rackX + "x" + rackY + "\r\n" + "Volume: " + Volume + " ml\r\n" +
+    String data = "Name: " + name + "\r\n" + "Quantity: " + rackX + "x" + rackY + "\r\n" + "Volume: " + Volume + " ml\r\n" +
       "Pump speed : " + PumpSpeed + " rpm\r\n" + "Tube ID: " + DKOng + " mm\r\n" + "SpeedXY: " + SpeedXY + " mm/min";
     GuiTextLenHMI(_VPTextHienThiChuongTrinhTrangChonChuongTrinh, data);
 
@@ -2995,10 +2997,10 @@ void DWINHMI::TaskFunction_RunTime(void)
   uint32_t seconds,minutes,hours;
   while (1)
   {
-    if (sys.state == State::Alarm)
-    {
-      vTaskSuspend(xTaskHandle_RunTime);
-    }
+    // if (sys.state == State::Alarm)
+    // {
+    //   vTaskSuspend(xTaskHandle_RunTime);
+    // }
     if (millis() - time1s >= 1000)
     {
       if(delay_flag == true)
@@ -3031,48 +3033,31 @@ void DWINHMI::TaskFunction_RunTime(void)
       time1s = millis();
     }
 
-    if (DuLieuBoardGuiLenHMI.OngDaPhanPhoi != OngDaPhanPhoi_prev && delay_flag == false)
+    if (DuLieuBoardGuiLenHMI.DaChayXongMotOng == true && delay_flag == false)
     {
-      Serial.printf("OngDaPhanPhoi: %d, OngDaPhanPhoi_prev: %d\n",DuLieuBoardGuiLenHMI.OngDaPhanPhoi,OngDaPhanPhoi_prev);
+      DuLieuBoardGuiLenHMI.DaChayXongMotOng = false;
       Serial.printf("KhuVuc: %d, X: %d, Y: %d\n",DuLieuBoardGuiLenHMI.KhuVucDangChay,DuLieuBoardGuiLenHMI.ToaDoXDaChay,DuLieuBoardGuiLenHMI.ToaDoYDaChay);
-      OngDaPhanPhoi_prev = DuLieuBoardGuiLenHMI.OngDaPhanPhoi;
       IdxKhuVucDangXuLy = DuLieuBoardGuiLenHMI.KhuVucDangChay;
-      GuiTextLenHMI(_VPTextFillNumberTrangHienThiPhanPhoiThoiGianThuc, String(OngDaPhanPhoi_prev + 1));
+      GuiTextLenHMI(_VPTextFillNumberTrangHienThiPhanPhoiThoiGianThuc, String(DuLieuBoardGuiLenHMI.OngDaPhanPhoi + 1));
       HienThiMau(DuLieuBoardGuiLenHMI.KhuVucDangChay, DuLieuBoardGuiLenHMI.ToaDoXDaChay, DuLieuBoardGuiLenHMI.ToaDoYDaChay, _ChuongTrinhEEPROM[DSIndexChuongTrinhDuocChon[DuLieuBoardGuiLenHMI.KhuVucDangChay]], MauXanhLa);
-      if (DuLieuBoardGuiLenHMI.DaChayXongCacKhuVuc == true)
+    }
+
+      if (DuLieuBoardGuiLenHMI.DaChayXongCacKhuVuc == true && delay_flag == false)
       {
+        DuLieuBoardGuiLenHMI.DaChayXongCacKhuVuc = false;
         if (oneTimeMulti == false)
         {
-          // char * str;
-          // asprintf(&str, "G0G90X%gY%gZ%g\n", DEFAULT_HOMING_PULLOFF, -DEFAULT_HOMING_PULLOFF, -DEFAULT_HOMING_PULLOFF);
-          // WebUI::inputBuffer.push(str);
-          // free(str);
-          // delay(100);
-          // while (sys.state != State::Idle)
-          // {
-          //   delay(1);
-          // }
-          OngDaPhanPhoi_prev = -1;
           delay_flag = true;
           timeloopdelay = timeLoopDelay;
-          OngDaPhanPhoi_prev = -1;
-          Serial.println("Chay xong cac khu vuc");
-
-          // while (sys.state != State::Idle && sys.state != State::Alarm)
-          // {
-          //   delay(1);
-          // }
         }
         else
         {
+          DaChayXongCacKhuVuc_oneTimeMulti = true;
           setPage(_TrangHienThiPhanPhoiThoiGianThuc_OFF_HOME);
           BamNutRunON = false;
-          OngDaPhanPhoi_prev = -1;
           vTaskSuspend(xTaskHandle_RunTime);
         }
       }
-    }
-
 
     if (delay_flag)
     {
@@ -3100,7 +3085,6 @@ void DWINHMI::TaskFunction_RunTime(void)
 
         codeHMI = _HMIBamNutRUNTrangHienThiPhanPhoiThoiGianThuc;
         BamNutRunON = false;
-        OngDaPhanPhoi_prev = -1;
       }
     }
     delay(1);

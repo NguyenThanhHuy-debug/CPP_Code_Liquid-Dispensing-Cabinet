@@ -6,7 +6,7 @@ using namespace std;
 
 // #define DEBUG_THONGSOBOARD
 // #define DEBUG_DWIN
-// #define DEBUG_GRBL
+#define DEBUG_GRBL
 // #define DEBUG_CHUONGTRINHCHINH
 
 // #define RESET_EEPROM
@@ -14,7 +14,7 @@ using namespace std;
 // #define ABCH_LAB
 #define ABCH_NHAMAY
 
-#define TEST_SENSORS
+// #define TEST_SENSORS
 
 
 #define Serial                              Uart0
@@ -75,7 +75,7 @@ typedef struct {
     toado_t ViTriA[SoLuongKhuVucToiDa] = { { 32.0, -17.0 },     { 297.0, -17.0 } };
     toado_t ViTriB[SoLuongKhuVucToiDa] = { { 263.0, -17.0 },    {527.0, -17.0 } };
     toado_t ViTriC[SoLuongKhuVucToiDa] = { { 263.0, -180.0 },   {527.0, -180.0 } };
-    float ViTriH[SoLuongKhuVucToiDa] = {-850.0,                -850.0};
+    float ViTriH[SoLuongKhuVucToiDa] = {-105.0,                -105.0};
 #endif
 
     vector<toadoINT_t> DsToaDo[SoLuongKhuVucToiDa];

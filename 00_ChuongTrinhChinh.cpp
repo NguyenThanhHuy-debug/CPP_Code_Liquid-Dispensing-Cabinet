@@ -26,8 +26,6 @@ RTC _RTC;                    // Mô-đun thời gian thực DS3231.
 DWINHMI _DWIN;               // Các thao tác trên màn hình HMI DWIN
 
 String _ID;                  // Số ID của ESP32, đây là số IMEI của board.
-int _CODE;                   // Mã CODE gửi từ app xuống board để thực thi các tác vụ.
-int _MODE;                   // Chế độ làm việc của máy.
 //--------------------------------------------------------------------------------------------------------//
 
 //--------------------------------------------------------------------------------------------------------//
@@ -36,11 +34,12 @@ volatile bool SENSOR_2_TRIGGERED = false;
 
 void IRAM_ATTR ISR_2_SENSOR(void)
 {
-  Serial.printf("X2:%d, Y2:%d\n", digitalRead(X2_SENSOR_PIN), digitalRead(Y2_SENSOR_PIN));
+  // Serial.printf("X2:%d, Y2:%d, Z2: %d\n", digitalRead(X2_SENSOR_PIN), digitalRead(Y2_SENSOR_PIN), digitalRead(Z2_SENSOR_PIN));
+  // Serial.printf("X1: %d, X2: %d, Y1: %d, Y2: %d, Z1: %d, Z2: %d\n", digitalRead(X_LIMIT_PIN), digitalRead(X2_SENSOR_PIN), digitalRead(Y_LIMIT_PIN), digitalRead(Y2_SENSOR_PIN), digitalRead(Z_LIMIT_PIN), digitalRead(Z2_SENSOR_PIN));
   if (SENSOR_2_TRIGGERED == false && sys.state == State::Cycle && DWINHMI::ManualControl == true)
   {
-    Serial.printf("X2: %d, Y2: %d\n", digitalRead(X2_SENSOR_PIN), digitalRead(Y2_SENSOR_PIN));
-    if (digitalRead(X2_SENSOR_PIN) == LOW || digitalRead(Y2_SENSOR_PIN) == LOW)
+    // Serial.printf("X2: %d, Y2: %d\n", digitalRead(X2_SENSOR_PIN), digitalRead(Y2_SENSOR_PIN));
+    if (digitalRead(X2_SENSOR_PIN) == LOW || digitalRead(Y2_SENSOR_PIN) == LOW || digitalRead(Z2_SENSOR_PIN) == LOW)
     {
       mc_reset();
       sys_rt_exec_alarm = ExecAlarm::HardLimit;  // Indicate hard limit critical event
@@ -109,13 +108,13 @@ void KhoiTao(void){
     _ThongSoBoard.XoaEEPROM(0,_ChieuDaiI2CEEPROM);
 #endif
 
-  pinMode(X2_SENSOR_PIN, INPUT);
-  pinMode(Y2_SENSOR_PIN, INPUT);
-  pinMode(Z2_SENSOR_PIN, INPUT);
+  pinMode(X2_SENSOR_PIN, INPUT_PULLUP);
+  pinMode(Y2_SENSOR_PIN, INPUT_PULLUP);
+  pinMode(Z2_SENSOR_PIN, INPUT_PULLUP);
 
   attachInterrupt(X2_SENSOR_PIN, ISR_2_SENSOR, FALLING);
   attachInterrupt(Y2_SENSOR_PIN, ISR_2_SENSOR, FALLING);
-  // attachInterrupt(Z2_SENSOR_PIN, ISR_2_SENSOR, FALLING);
+  attachInterrupt(Z2_SENSOR_PIN, ISR_2_SENSOR, FALLING);
   
 }
 
@@ -127,11 +126,21 @@ void CapNhatDuLieuLenHMI(void)
   _DWIN.DuLieuBoardGuiLenHMI.DSChuongTrinh = _grbl._DSChuongTrinh;
   _DWIN.DuLieuBoardGuiLenHMI.RTC_ChuoiNgay = _RTC.ChuanHoaChuoiRTC_Ngay();
   _DWIN.DuLieuBoardGuiLenHMI.RTC_ChuoiGio  = _RTC.ChuanHoaChuoiRTC_Gio();
-  _DWIN.DuLieuBoardGuiLenHMI.OngDaPhanPhoi = _grbl.OngDaPhanPhoi;
-  _DWIN.DuLieuBoardGuiLenHMI.KhuVucDangChay = _grbl.KhuVucDangChay;
-  _DWIN.DuLieuBoardGuiLenHMI.ToaDoXDaChay = _grbl.ToaDoXDaChay;
-  _DWIN.DuLieuBoardGuiLenHMI.ToaDoYDaChay = _grbl.ToaDoYDaChay;
-  _DWIN.DuLieuBoardGuiLenHMI.DaChayXongCacKhuVuc = _grbl.DaChayXongCacKhuVuc;
+  if (_grbl.DaChayXongMotOng == true)
+  {
+    _grbl.DaChayXongMotOng = false;
+    _DWIN.DuLieuBoardGuiLenHMI.DaChayXongMotOng = true;
+    _DWIN.DuLieuBoardGuiLenHMI.OngDaPhanPhoi = _grbl.OngDaPhanPhoi;
+    _DWIN.DuLieuBoardGuiLenHMI.KhuVucDangChay = _grbl.KhuVucDangChay;
+    _DWIN.DuLieuBoardGuiLenHMI.ToaDoXDaChay = _grbl.ToaDoXDaChay;
+    _DWIN.DuLieuBoardGuiLenHMI.ToaDoYDaChay = _grbl.ToaDoYDaChay;
+  }
+
+  if (_grbl.DaChayXongCacKhuVuc == true)
+  {
+    _grbl.DaChayXongCacKhuVuc = false;
+    _DWIN.DuLieuBoardGuiLenHMI.DaChayXongCacKhuVuc = true;
+  }
 
 }
 
@@ -174,7 +183,8 @@ void XuLyDuLieuNhanTuHMI(void)
         delay(100);
         break;
       }
-      _grbl.VeToaDoGoc();
+      // _grbl.VeToaDoGoc();
+      _grbl.VeViTriHome();
       break;
     case GOHOME:
       #ifdef DEBUG_CHUONGTRINHCHINH
@@ -184,13 +194,8 @@ void XuLyDuLieuNhanTuHMI(void)
       // _DWIN.DuLieuBoardGuiLenHMI.TrangThaiXacNhanSetHome = true;
       break;
     case RUN:
+
       _grbl._DSChuongTrinh =_DWIN._ChuongTrinhEEPROM;
-      if (_grbl.DaChayXongCacKhuVuc == true)
-      {
-        _grbl.OngDaPhanPhoi = -1;
-        _DWIN.DuLieuBoardGuiLenHMI.OngDaPhanPhoi = -1;
-        delay(10);
-      }
       if (DangTamDungPhanPhoi == true) 
       {
         #ifdef DEBUG_CHUONGTRINHCHINH
@@ -201,6 +206,8 @@ void XuLyDuLieuNhanTuHMI(void)
       }
       else 
       {
+        _grbl.DaChayXongCacKhuVuc = false;
+        _grbl.DaChayXongMotOng = false;
         #ifdef DEBUG_CHUONGTRINHCHINH
         Serial.println("RUN PhanPhoi");
         #endif
@@ -224,14 +231,15 @@ void XuLyDuLieuNhanTuHMI(void)
         DangTamDungPhanPhoi = false;
         _grbl.DungPhanPhoi();
       }
-      _grbl.OngDaPhanPhoi = -1;
-      _DWIN.DuLieuBoardGuiLenHMI.OngDaPhanPhoi = -1;
-      _grbl.VeToaDoGoc();
+      _grbl.DaChayXongCacKhuVuc = false;
+      _grbl.DaChayXongMotOng = false;
+      // _grbl.VeToaDoGoc();
+      _grbl.VeViTriHome();
       break;
     case EXITVETRANGCAIDATCHEDOCHUONGTRINH:
       Serial.println("EXITVETRANGCAIDATCHEDOCHUONGTRINH");
-      _grbl.OngDaPhanPhoi = -1;
-      _DWIN.DuLieuBoardGuiLenHMI.OngDaPhanPhoi = -1;
+     _grbl.DaChayXongCacKhuVuc = false;
+     _grbl.DaChayXongMotOng = false;
       if (_grbl.CoBaoPhanPhoiLaiOng == true)
       {
         Serial.println("EXITVETRANGCAIDATCHEDOCHUONGTRINH CoBaoPhanPhoiLaiOng");
@@ -245,8 +253,8 @@ void XuLyDuLieuNhanTuHMI(void)
         DangTamDungPhanPhoi = false;
         _grbl.DungPhanPhoi();
       }
-      // _grbl.VeViTriHome();
-      _grbl.VeToaDoGoc();
+      _grbl.VeViTriHome();
+      // _grbl.VeToaDoGoc();
       break;
     case CAPNHATTHONGSO:            // khi nhấn enter lúc nhập các thông số trong SETUP PROGRAM
       Serial.println("CapNhatThongSo");
@@ -468,22 +476,6 @@ void XuLyDuLieuNhanTuHMI(void)
       SoBuocTamThoi = SoBuocFAST;
       break;
     }
-    case UNLOCK:
-     WebUI::inputBuffer.push("$X\n");
-     delay(100);
-     break;
-
-    case RESET:
-      if (sys.state == State::Alarm)
-      {
-        _grbl.VeViTriHome();
-        break;
-      }
-      WebUI::inputBuffer.write(0x18);
-      delay(100);
-      WebUI::inputBuffer.push("$X\n");
-      delay(100);
-      break;
 
     case SHUTDOWN:
       Shutdown();
@@ -640,7 +632,7 @@ void Shutdown(void)
       delay(1);
     }
   }
-  _grbl.DiChuyenToiViTri(DEFAULT_HOMING_PULLOFF, -DEFAULT_HOMING_PULLOFF, -800.0, TocDoCao);
+  _grbl.DiChuyenToiViTri(DEFAULT_HOMING_PULLOFF, -DEFAULT_HOMING_PULLOFF, -105.0, TocDoCao);
   delay(100);
   while (sys.state != State::Idle)
   {
