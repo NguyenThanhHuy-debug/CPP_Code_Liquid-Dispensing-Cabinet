@@ -946,21 +946,15 @@ void DWINHMI::XuLyChonViTriPhanPhoi(void)
     VeToanBoHinhTron(_VpAddressVung3KhayChon, _ChuongTrinhEEPROM[DSIndexChuongTrinhDuocChon[IdxKhuVucDangXuLy]]);
     VeToanBoHinhTron(_VpAddressVung4KhayChon, _ChuongTrinhEEPROM[DSIndexChuongTrinhDuocChon[IdxKhuVucDangXuLy]]);
     ResetFullMauChonToaDo(MauDo);
+    SoLuongOngThayDoi = 0;
+    GuiTextLenHMI(_VpTextThayDoiSoLuongOng, "0");
   }
 
   if(codeHMI == _HMIBamNutFULLTrangPhanPhoiViTri)
   {
     DWIN::setPage(_TrangPhanPhoiViTriFULL);
-    // _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].DanhSachToaDo.clear();
     _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].DsToaDo[IdxKhuVucDangXuLy].clear();
-    // for (int i = 0; i < _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].rackX * _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].rackY; i++)
-    // {
-    //   toadoINT_t toadoht;
-    //   toadoht.X = i % _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].rackX;
-    //   toadoht.Y = i / _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].rackX;
-    //   // _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].DanhSachToaDo.push_back(toadoht);
-    //   _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].DsToaDo[IdxKhuVucDangXuLy].push_back(toadoht);
-    // }
+
     for (uint8_t i = 0; i < _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].rackX; i++)
     {
       for (uint8_t j = 0; j < _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].rackY; j++)
@@ -1099,14 +1093,50 @@ void DWINHMI::XuLyChonViTriPhanPhoi(void)
       /* Hiển thị */
       HienThiThongTinPhanPhoi();
   }
-  else if (codeHMI == _HMIBamNutIncreaseTrangPhanPhoiViTri && holdAdd == 1)
+  else if (codeHMI == _HMIBamNutThayDoiSoLuongOng && (holdAdd == 1 || holdAdd == 2))
   {
-
-  } 
-  else if (codeHMI == _HMIBamNutDecreaseTrangPhanPhoiViTri && holdAdd == 2)
-  {
-
+    setPage(_TrangBanPhimThayDoiSoLuongOng);
   }
+  else if (codeHMI == _HMIBamNutOkThayDoiSoLuongOng && (holdAdd == 1 || holdAdd == 2))
+  {
+    codeHMI = -1;
+    if (SoLuongOngThayDoi == 0)
+    {
+      return;
+    }
+    for (uint8_t SoLuong = 1; SoLuong < SoLuongOngThayDoi; SoLuong++)
+    {
+      uint8_t X = (SoLuong - 1) / _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].rackY;
+      uint8_t Y = (SoLuong - 1) % _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].rackY;
+      auto & DsToaDoCanKiemTra = _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].DsToaDo[IdxKhuVucDangXuLy];
+      int8_t ViTriTonTai = -1;
+      for (uint8_t ViTri = 0; ViTri < DsToaDoCanKiemTra.size(); ViTri++)
+      {
+        if (DsToaDoCanKiemTra[ViTri].X == X && DsToaDoCanKiemTra[ViTri].Y == Y)
+        {
+          ViTriTonTai = ViTri;
+        }
+      }
+      if (holdAdd == 1) //ADD
+      {
+        if (ViTriTonTai == -1) //chưa có vị trí này trong vector
+        {
+          DsToaDoCanKiemTra.push_back({X, Y});
+        }
+      }
+      else if (holdAdd == 2) //SUB
+      {
+        if (ViTriTonTai != -1) //nếu có vị trí này trong vector thì erase nó đi
+        {
+          DsToaDoCanKiemTra.erase(DsToaDoCanKiemTra.begin() + ViTriTonTai);
+        }
+      }
+    }
+
+    ResetFullMauChonToaDo(MauDo);
+  }
+
+
 }
 //=============================================================================================================================
 
@@ -1260,6 +1290,13 @@ void DWINHMI::XuLyBanPhim(void)
       CheDoCaiDatTimeLoop = _CaiDatGiayLoop;
       GuiTextLenHMI(_VPTextSecondTrangCaiDatThoiGianLoop, ChuoiDangNhap);
       break;
+    case _HMIBamNutThayDoiSoLuongOng:
+      codeHMI = -1;
+      ChuoiDangNhap = "";
+      CheDoVaoTrangBanPhim = _VaoTrangBanPhimThayDoiSoLuongOng;
+      GuiTextLenHMI(_VpTextThayDoiSoLuongOng, ChuoiDangNhap);
+      GuiTextLenHMI(_VpTextCanhBaoChuoiDangNhap, "");
+      break;
   }
 
   /* Reset lại biến ChuoiDangNhap*/
@@ -1376,6 +1413,9 @@ void DWINHMI::XuLyBanPhim(void)
         break;
       case _VaoTrangBanPhimMatKhau:
         GuiTextLenHMI(_VpTextMatKhau, ChuoiDangNhap);
+        break;
+      case _VaoTrangBanPhimThayDoiSoLuongOng:
+        GuiTextLenHMI(_VpTextThayDoiSoLuongOng, ChuoiDangNhap);
         break;
     } 
   }
@@ -1523,6 +1563,16 @@ void DWINHMI::XuLyBanPhim(void)
           break;
         }
         break;
+        case _VaoTrangBanPhimThayDoiSoLuongOng:
+          codeHMI = -1;
+          uint8_t SoLuongOngThayDoiToiDa = _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].rackX * _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].rackY;
+          if (ChuoiDangNhap.toInt() > SoLuongOngThayDoiToiDa)
+          {
+            GuiTextLenHMI(_VpTextCanhBaoChuoiDangNhap, "ERROR: Tubes must be less than or equal to " + String(SoLuongOngThayDoiToiDa));
+            return;
+          }
+          SoLuongOngThayDoi = ChuoiDangNhap.toInt();
+          break;
     }
     switch (CheDoVaoTrangBanPhim)
     {
@@ -1584,6 +1634,22 @@ void DWINHMI::XuLyBanPhim(void)
           GuiTextLenHMI(_VpTextCanhBaoChuoiDangNhap, "Wrong password");
         }
         break;
+      case _VaoTrangBanPhimThayDoiSoLuongOng:
+      {
+        switch (holdAdd)
+        {
+        case 0:
+          setPage(_TrangPhanPhoiViTri);
+          break;
+        
+        case 1:
+          setPage(_TrangPhanPhoiViTriADD);
+          break;
+        case 2:
+          setPage(_TrangPhanPhoiViTriSub);
+          break;
+        }
+      }
     }  
   }
 
@@ -1625,6 +1691,9 @@ void DWINHMI::XuLyBanPhim(void)
         GuiTextLenHMI(_VPTextSecondTrangMULTIPROGRAMSETUP,(String)(timeLoopDelay));
         break;
       }
+      case _VaoTrangBanPhimThayDoiSoLuongOng:
+        GuiTextLenHMI(_VpTextThayDoiSoLuongOng, String(SoLuongOngThayDoi));
+        break;
     }
 
     switch (CheDoVaoTrangBanPhim)
@@ -1672,6 +1741,22 @@ void DWINHMI::XuLyBanPhim(void)
         GuiTextLenHMI(_VPTextHienThiChuongTrinhTrangChonChuongTrinh, "");
         setPage(_TrangChonChuongTrinh);
         break;
+      case _VaoTrangBanPhimThayDoiSoLuongOng:
+      {
+        switch (holdAdd)
+        {
+        case 0:
+          setPage(_TrangPhanPhoiViTri);
+          break;
+        
+        case 1:
+          setPage(_TrangPhanPhoiViTriADD);
+          break;
+        case 2:
+          setPage(_TrangPhanPhoiViTriSub);
+          break;
+        }
+      }
     }  
   }
   if(codeHMI == _HMIBamNutEnterTrangBanPhim || codeHMI == _HMIBamNutReturnTrangBanPhim)
@@ -2328,7 +2413,7 @@ void DWINHMI::XuLyXemConfig()
   }
   if(codeHMI == _HMIBamNutResetTrangXemconfig)
   {
-    _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].DsToaDo[IdxKhuVucDangXuLy].clear();
+    // _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].DsToaDo[IdxKhuVucDangXuLy].clear();
     fillnumber = 0;
     GuiTextLenHMI(_VPTextTotalFillTubeTrangXemConfig,(String)fillnumber);
     codeHMI = -1;

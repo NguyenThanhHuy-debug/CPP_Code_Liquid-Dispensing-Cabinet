@@ -177,8 +177,8 @@
 #define _HMIBamNutOKTrangPhanPhoiViTri 0x9B
 #define _HMIBamNutEXITTrangPhanPhoiViTri 0x9C
 
-#define _HMIBamNutIncreaseTrangPhanPhoiViTri 0xDEADBEEF
-#define _HMIBamNutDecreaseTrangPhanPhoiViTri 0xDEADBEFF
+#define _HMIBamNutThayDoiSoLuongOng 0xDEADBEEF //TODO thay đổi keycode
+#define _HMIBamNutOkThayDoiSoLuongOng 0xDEADBEEF //TODO
 
 /* Define các nút bấm trang 134*/
 #define _HMIBamNutRUNTrangHienThiPhanPhoiThoiGianThuc 0x9D
@@ -361,6 +361,8 @@
 #define _TrangBanPhimCaiDatThoiGian 167
 #define _TrangBanPhimMoRongSo 168
 #define _TrangBanPhimMauKhau 176
+#define _TrangBanPhimThayDoiSoLuongOng 177 //TODO
+
 
 
 #define _VPChonProgram1TrangCaiDatCheDoChuongTrinh 0x3300
@@ -486,6 +488,9 @@
 
 #define _HMIBamNutGoHomeTrangDieuKhien 0x801
 
+// Trang 176
+#define _VpTextThayDoiSoLuongOng 0xDEADBEEF
+
 typedef enum {
   _CaiDatGioLoop,
   _CaiDatPhutLoop,
@@ -530,6 +535,7 @@ typedef enum {
   _VaoTrangBanPhimSecondLoop,
   _VaoTrangBanPhimCaiDatThoiGian,
   _VaoTrangBanPhimMatKhau,
+  _VaoTrangBanPhimThayDoiSoLuongOng,
 }CheDoVaoTrangBanPhim_t;
 typedef enum {
   _VaoTrangBanPhimMoRongTuNutEDITTrangThongSoChuongTrinh,
@@ -603,6 +609,7 @@ public:
       
 
 private:
+  uint8_t SoLuongOngThayDoi = 0;
   bool DaChayXongCacKhuVuc_oneTimeMulti = false;
   vector<ViTrivaToaDo_t> vitrivatoado;
   uint16_t khaychon[12][8];
