@@ -44,7 +44,6 @@ void IRAM_ATTR ISR_2_SENSOR(void)
       mc_reset();
       sys_rt_exec_alarm = ExecAlarm::HardLimit;  // Indicate hard limit critical event
       SENSOR_2_TRIGGERED = true;
-      Serial.println("Reset");
     }
   }
 }
@@ -165,13 +164,45 @@ void XuLyDuLieuNhanTuHMI(void)
   switch (_MaLenhGRBL)
   {
     case GOHOMEKHONGCHUYENTRANG:
-      if (SENSOR_2_TRIGGERED == true)
+      if (DWINHMI::ManualControl == true && sys.state == State::Alarm)
       {
-        SENSOR_2_TRIGGERED = false;
         WebUI::inputBuffer.write(0x18);
         delay(100);
-        WebUI::inputBuffer.push("$H\n");
+        WebUI::inputBuffer.push("$X\n");
+        delay(100);
+        if (digitalRead(X2_SENSOR_PIN) == LOW)
+        {
+          _grbl.DiChuyenX(Am, 10, TocDoTamThoi);
+        }
+        else if (digitalRead(Y2_SENSOR_PIN) == LOW)
+        {
+          _grbl.DiChuyenY(Duong, 10, TocDoTamThoi);
+        }
+        else if (digitalRead(Z2_SENSOR_PIN) == LOW)
+        {
+          _grbl.DiChuyenZ(Duong, 10, TocDoTamThoi);
+        }
+        else if (digitalRead(X_LIMIT_PIN) == LOW)
+        {
+          _grbl.DiChuyenX(Duong, 10, TocDoTamThoi);
+        }
+        else if (digitalRead(Y_LIMIT_PIN) == LOW)
+        {
+          _grbl.DiChuyenY(Am, 10, TocDoTamThoi);
+        }
+        else if (digitalRead(Z_LIMIT_PIN) == LOW)
+        {
+          _grbl.DiChuyenZ(Am, 10, TocDoTamThoi);
+        }
+        delay(100);
+        while (sys.state != State::Idle)
+        {
+          delay(10);
+        }
+        SENSOR_2_TRIGGERED = false;
+        break;
       }
+
       if (DangTamDungPhanPhoi == true)
       {
         Serial.println("Set Home khi dang phan phoi");

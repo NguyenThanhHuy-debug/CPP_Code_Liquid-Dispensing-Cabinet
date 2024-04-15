@@ -74,13 +74,13 @@
 //* Khai báo tốc độ di chuyển tối đa của các trục
 #define DEFAULT_X_MAX_RATE      10000.0 //* mm/min $110
 #define DEFAULT_Y_MAX_RATE      10000.0 //* mm/min $111
-#define DEFAULT_Z_MAX_RATE      1000.0 //* mm/min $112
+#define DEFAULT_Z_MAX_RATE      1500.0 //* mm/min $112
 #define DEFAULT_A_MAX_RATE      500.0 //* vòng/phút $113 
 
 //* Khai báo gia tốc của các trục
 #define DEFAULT_X_ACCELERATION  300 //* mm/sec^2. 50 mm/sec^2 = 180000 mm/min^2 $120
 #define DEFAULT_Y_ACCELERATION  300 //* mm/sec^2. 50 mm/sec^2 = 180000 mm/min^2 $121
-#define DEFAULT_Z_ACCELERATION  50 //* mm/sec^2. 50 mm/sec^2 = 180000 mm/min^2 $122
+#define DEFAULT_Z_ACCELERATION  70 //* mm/sec^2. 50 mm/sec^2 = 180000 mm/min^2 $122
 #define DEFAULT_A_ACCELERATION  50 //* mm/sec^2. 50 mm/sec^2 = 180000 mm/min^2 $123
 
 //* Khoảng cách di chuyển tối đa của các trục
