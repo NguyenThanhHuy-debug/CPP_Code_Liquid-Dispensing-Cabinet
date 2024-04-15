@@ -1941,6 +1941,11 @@ void DWINHMI::HienThiThongSoHienThiThoiGianThuc(void)
   // /* Cập nhật lại các giá trị để sử dụng */
   if(codeHMI == _HMIBamNutRUNTrangHienThiPhanPhoiThoiGianThuc)
   {
+    if (sys.state == State::Homing)
+    {
+      codeHMI = -1;
+      return;
+    }
     if (BamNutRunON == true)
     {
       DWIN::setPage(_TrangHienThiPhanPhoiThoiGianThuc_OFF_notHOME);
@@ -3121,7 +3126,7 @@ void DWINHMI::TaskFunction_RunTime(void)
     if (DuLieuBoardGuiLenHMI.DaChayXongMotOng == true && delay_flag == false)
     {
       DuLieuBoardGuiLenHMI.DaChayXongMotOng = false;
-      Serial.printf("KhuVuc: %d, X: %d, Y: %d\n",DuLieuBoardGuiLenHMI.KhuVucDangChay,DuLieuBoardGuiLenHMI.ToaDoXDaChay,DuLieuBoardGuiLenHMI.ToaDoYDaChay);
+      // Serial.printf("KhuVuc: %d, X: %d, Y: %d\n",DuLieuBoardGuiLenHMI.KhuVucDangChay,DuLieuBoardGuiLenHMI.ToaDoXDaChay,DuLieuBoardGuiLenHMI.ToaDoYDaChay);
       IdxKhuVucDangXuLy = DuLieuBoardGuiLenHMI.KhuVucDangChay;
       GuiTextLenHMI(_VPTextFillNumberTrangHienThiPhanPhoiThoiGianThuc, String(DuLieuBoardGuiLenHMI.OngDaPhanPhoi + 1));
       HienThiMau(DuLieuBoardGuiLenHMI.KhuVucDangChay, DuLieuBoardGuiLenHMI.ToaDoXDaChay, DuLieuBoardGuiLenHMI.ToaDoYDaChay, _ChuongTrinhEEPROM[DSIndexChuongTrinhDuocChon[DuLieuBoardGuiLenHMI.KhuVucDangChay]], MauXanhLa);

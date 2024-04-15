@@ -161,7 +161,7 @@ void _GRBL::BatDauPhanPhoi()
       // delay(300);
       while(sys.state == State::Idle)
       {
-        delay(1);
+        delay(10);
       }
 
       while ((sys.state == State::Cycle) || (sys.state == State::Hold) ) 
@@ -173,6 +173,11 @@ void _GRBL::BatDauPhanPhoi()
         }
         if (CoBaoPhanPhoiLaiOng == true)
           {
+            WebUI::inputBuffer.push("~\n");
+            while(sys.state == State::Hold)
+            {
+              delay(10);
+            }
             break;
           }
         delay(10);
@@ -181,6 +186,7 @@ void _GRBL::BatDauPhanPhoi()
       if (CoBaoPhanPhoiLaiOng == true)
       {
         CoBaoPhanPhoiLaiOng = false;
+        ToaDoHienTai--;
         continue;
       }
 
@@ -196,10 +202,9 @@ void _GRBL::BatDauPhanPhoi()
         }
       }
       DaChayXongMotOng = true;
-
       OngDaPhanPhoi = ToaDoHienTai;
-      ToaDoXDaChay = _DSChuongTrinh[IdxChuongTrinh].DsToaDo[i][ToaDoHienTai].X;
-      ToaDoYDaChay = _DSChuongTrinh[IdxChuongTrinh].DsToaDo[i][ToaDoHienTai].Y;
+      ToaDoXDaChay = DSToaDoCanChay[ToaDoHienTai].X;  
+      ToaDoYDaChay = DSToaDoCanChay[ToaDoHienTai].Y;
       Serial.printf("ToaDoXDaChay: %d, ToaDoYDaChay: %d\n", ToaDoXDaChay, ToaDoYDaChay);
       KhuVucDangChay = i;
       Serial.printf("OngDaPhanPhoi: %d\n", OngDaPhanPhoi);
@@ -224,7 +229,6 @@ void _GRBL::TamDungPhanPhoi(void) {
   if (CoBaoPhanPhoiLaiOng == true)
   {
     vTaskSuspend(_PhanPhoiTaskHandle);
-    return;
   }
   WebUI::inputBuffer.push("!\r");
 }
@@ -236,7 +240,6 @@ void _GRBL::TiepTucPhanPhoi(void) {
     return;
   }
   WebUI::inputBuffer.push("~\n");
-  // vTaskResume(_PhanPhoiTaskHandle);
 }
 
 void _GRBL::DungPhanPhoi(void) {
@@ -244,13 +247,13 @@ void _GRBL::DungPhanPhoi(void) {
   if (CoBaoPhanPhoiLaiOng == true)
   {
     vTaskResume(_PhanPhoiTaskHandle);
-    CoBaoDungPhanPhoi = true;
     CoBaoPhanPhoiLaiOng = false;
-    delay(100);
-    return;
   }
   CoBaoDungPhanPhoi = true;
-  delay(100); /* NOTE delay(100)*/
+  delay(100);
+  WebUI::inputBuffer.write(0x18);
+  delay(100);
+  WebUI::inputBuffer.push("$X\n");
 }
 
 

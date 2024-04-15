@@ -230,8 +230,6 @@ void XuLyDuLieuNhanTuHMI(void)
       // _DWIN.DuLieuBoardGuiLenHMI.TrangThaiXacNhanSetHome = true;
       break;
     case RUN:
-
-      _grbl._DSChuongTrinh =_DWIN._ChuongTrinhEEPROM;
       if (DangTamDungPhanPhoi == true) 
       {
         #ifdef DEBUG_CHUONGTRINHCHINH
@@ -242,6 +240,7 @@ void XuLyDuLieuNhanTuHMI(void)
       }
       else 
       {
+        _grbl._DSChuongTrinh =_DWIN._ChuongTrinhEEPROM;
         _grbl.DaChayXongCacKhuVuc = false;
         _grbl.DaChayXongMotOng = false;
         #ifdef DEBUG_CHUONGTRINHCHINH
