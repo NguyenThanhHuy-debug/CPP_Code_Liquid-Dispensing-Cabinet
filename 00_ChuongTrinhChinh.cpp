@@ -287,8 +287,8 @@ void XuLyDuLieuNhanTuHMI(void)
         DangTamDungPhanPhoi = false;
         _grbl.DungPhanPhoi();
       }
-      _grbl.VeViTriHome();
-      // _grbl.VeToaDoGoc();
+      _grbl.VeToaDoGoc();
+      // _grbl.VeViTriHome();
       break;
     case CAPNHATTHONGSO:            // khi nhấn enter lúc nhập các thông số trong SETUP PROGRAM
       Serial.println("CapNhatThongSo");
@@ -605,25 +605,6 @@ void KiemTraNguon(void)
 
 void ChayChuongTrinhChinh()
 {
-  // if (SENSOR_2_TRIGGERED == false)
-  // {
-  //   if (sys.state == State::Cycle)
-  //   {
-  //     if (digitalRead(Z2_SENSOR_PIN) == LOW)
-  //     {
-  //       delay(100);
-  //       if (digitalRead(Z2_SENSOR_PIN) == LOW)
-  //       {
-  //         Serial.println("Z2");
-  //         mc_reset();
-  //         sys_rt_exec_alarm = ExecAlarm::HardLimit;  // Indicate hard limit critical event
-  //         SENSOR_2_TRIGGERED = true;
-  //       }
-  //     }
-  //   }
-
-  // }
-  KiemTraNguon();
 
   _Flags.TurnONFlags();
 
@@ -631,24 +612,15 @@ void ChayChuongTrinhChinh()
 
   _Flags.TurnOFFFlags();
 
-  // if (SENSOR_2_TRIGGERED == true)
-  //   {
-  //     SENSOR_2_TRIGGERED = false;
-  //     if (sys.state == State::Homing)
-  //     {
-  //       return;
-  //     }
-  //     Serial.println("LIMIT2");
-  //     sys.state = State::Alarm;
-  //   }
 }
 void ThucThiCacTacVuTheoFlag()
 {
   // Serial.printf("Z1: %d, Z2:%d\n", digitalRead(Z_LIMIT_PIN), digitalRead(Z2_SENSOR_PIN));
   if(_Flags.Flag.t1s)
   {
-    _RTC.LayRTCTuDS3231();
+    KiemTraNguon();
 
+    _RTC.LayRTCTuDS3231();
   }
 }
 

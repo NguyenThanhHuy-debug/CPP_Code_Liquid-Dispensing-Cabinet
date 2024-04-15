@@ -52,13 +52,6 @@ void DWINHMI::onHMIEvent(String address, int lastByte, String message, String re
 {
 #pragma region onHMIEvent
   //Nếu cần kiểm tra địa chỉ, chuỗi được gửi từ màn hình về esp32 thì define debug
-  if (ManualControl == true)
-  {
-    if (address.substring(0, 4) == "4f4b")
-    {
-      return;
-    }
-  }
 
 #ifdef DEBUG_DWIN
   Serial.println("OnEvent : [ A : " + address + " | D : " + String(lastByte, HEX) + " | M : " + message + " | R : " + response + " ]");
@@ -79,6 +72,10 @@ void DWINHMI::onHMIEvent(String address, int lastByte, String message, String re
     //delay(1);
     ESP_LOGI("CODE", "CODEHMI :%d", codeHMI);
     ESP_LOGW("CODE", "Lastcode :%d", lastcodeHMI);
+  }
+  else
+  {
+    return;
   }
 
     if (!ManualControl) return;
@@ -261,6 +258,7 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
         }
         IdxKhuVucDangXuLy = i;
         ResetFullMau(DSIndexChuongTrinhDuocChon[i], MauDo, i);
+        delay(20);
       }
 
       if (DangOViTriHome() == true)
@@ -945,6 +943,7 @@ void DWINHMI::XuLyChonViTriPhanPhoi(void)
     VeToanBoHinhTron(_VpAddressVung2KhayChon, _ChuongTrinhEEPROM[DSIndexChuongTrinhDuocChon[IdxKhuVucDangXuLy]]);
     VeToanBoHinhTron(_VpAddressVung3KhayChon, _ChuongTrinhEEPROM[DSIndexChuongTrinhDuocChon[IdxKhuVucDangXuLy]]);
     VeToanBoHinhTron(_VpAddressVung4KhayChon, _ChuongTrinhEEPROM[DSIndexChuongTrinhDuocChon[IdxKhuVucDangXuLy]]);
+    delay(20);
     ResetFullMauChonToaDo(MauDo);
     SoLuongOngThayDoi = 0;
     GuiTextLenHMI(_VpTextThayDoiSoLuongOng, "0");
@@ -1981,6 +1980,7 @@ void DWINHMI::ResetProgram(void)
         }
         IdxKhuVucDangXuLy = i;
         ResetFullMau(DSIndexChuongTrinhDuocChon[i], MauDo, i);
+        delay(20);
       }
       GuiTextLenHMI(_VPTextTimeRunTrangHienThiPhanPhoiThoiGianThuc, "00:00:00");
       GuiTextLenHMI(_VPTextDelayTimeRunTrangHienThiPhanPhoiThoiGianThuc, "00:00:00");
@@ -1990,6 +1990,7 @@ void DWINHMI::ResetProgram(void)
 
     else if (codeHMI == _HMIBamNutRUNTrangHienThiPhanPhoiThoiGianThuc && BamNutRunON == false && DaChayXongCacKhuVuc_oneTimeMulti == true)
     {
+      Serial.println("resetfull mau run");
       DaChayXongCacKhuVuc_oneTimeMulti = false;
       for (uint8_t i = 0; i < sizeof(DSIndexChuongTrinhDuocChon); i++)
       {
@@ -1999,6 +2000,8 @@ void DWINHMI::ResetProgram(void)
         }
         IdxKhuVucDangXuLy = i;
         ResetFullMau(DSIndexChuongTrinhDuocChon[i], MauDo, i);
+        delay(20);
+        // Serial.println("Reset Full Mau KhuVuc " + String(i));
       }
       GuiTextLenHMI(_VPTextTimeRunTrangHienThiPhanPhoiThoiGianThuc, "00:00:00");
       GuiTextLenHMI(_VPTextDelayTimeRunTrangHienThiPhanPhoiThoiGianThuc, "00:00:00");
@@ -2810,7 +2813,6 @@ void DWINHMI ::HienThiMau(uint32_t VpAddress, uint16_t X, uint16_t Y, uint16_t M
   uint8_t endBuffer[] = {0xFF, 0x00};
   memcpy(buffer + 250, endBuffer, 2);
   DGUS_SERIAL.write(buffer, 252);
-
   #ifdef DEBUG_DWIN
   for (uint8_t i = 0; i < 156; i++){
     Serial.printf("%02X ", buffer[i]);
@@ -2833,7 +2835,6 @@ void DWINHMI::ResetFullMauChonToaDo(uint16_t Mau)
 }
 void DWINHMI::ResetFullMau(uint8_t IdxChuongTrinhDuocChon, uint16_t Mau, uint8_t SoKhay){
   ChuongTrinh_t ChuongTrinhDuocChon = _ChuongTrinhEEPROM[IdxChuongTrinhDuocChon];
-
   switch(SoKhay){
     case 0:
       for (uint8_t i = 0; i < 12; i++){
@@ -3171,6 +3172,7 @@ void DWINHMI::TaskFunction_RunTime(void)
             continue;
           }
           ResetFullMau(DSIndexChuongTrinhDuocChon[i], MauDo, i);
+          delay(20);
         }
 
         codeHMI = _HMIBamNutRUNTrangHienThiPhanPhoiThoiGianThuc;
@@ -3259,14 +3261,18 @@ void DWINHMI::XoaMau(uint32_t VpAddress){
 
 void DWINHMI::CapNhatLaiDanhSachToaDo(ChuongTrinh_t & ChuongTrinh)
 {
-  ChuongTrinh.DsToaDo[IdxKhuVucDangXuLy].clear();
-  for (uint8_t x = 0; x < ChuongTrinh.rackX; x++)
+  for (uint8_t KhuVuc = 0; KhuVuc < SoLuongKhuVucToiDa; KhuVuc++)
   {
-    for (uint8_t y = 0; y < ChuongTrinh.rackY; y++)
+    ChuongTrinh.DsToaDo[KhuVuc].clear();
+    for (uint8_t x = 0; x < ChuongTrinh.rackX; x++)
     {
-      ChuongTrinh.DsToaDo[IdxKhuVucDangXuLy].push_back({x, y});
+      for (uint8_t y = 0; y < ChuongTrinh.rackY; y++)
+      {
+        ChuongTrinh.DsToaDo[KhuVuc].push_back({x, y});
+      }
     }
   }
+
 }
 
 void DWINHMI::HienThiNoiDungChuongTrinh(uint8_t IdxChuongTrinh, uint32_t VpAddress)

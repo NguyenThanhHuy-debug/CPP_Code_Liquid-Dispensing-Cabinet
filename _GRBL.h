@@ -67,6 +67,8 @@ private:
     
     void TinhKhoangCachGiuaHaiOng(ChuongTrinh_t ChuongTrinh, uint8_t KhuVuc);
 
+    void Reset_Home(void);
+
 };
 
 extern _GRBL _grbl;

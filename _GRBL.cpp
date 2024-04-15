@@ -97,7 +97,13 @@ void _GRBL::BatDauPhanPhoi()
 
   // Chờ đến khi về Home xong
   // while (sys.state == State::Homing) delay(1);
-
+  if (sys.state == State::Alarm)
+  {
+    WebUI::inputBuffer.write(0x18);
+    delay(100);
+    WebUI::inputBuffer.push("$X\n");
+    delay(100);
+  }
 
   //* Xử lý vụ multi với simple
   char* ViTri;
@@ -188,18 +194,6 @@ void _GRBL::BatDauPhanPhoi()
         CoBaoPhanPhoiLaiOng = false;
         ToaDoHienTai--;
         continue;
-      }
-
-      if (sys.state == State::Alarm)
-      {
-        WebUI::inputBuffer.write(0x18);
-        delay(100);
-        WebUI::inputBuffer.push("$H\n");
-        delay(100);
-        while (sys.state != State::Idle)
-        {
-          delay(10);
-        }
       }
       DaChayXongMotOng = true;
       OngDaPhanPhoi = ToaDoHienTai;
@@ -438,15 +432,19 @@ void _GRBL::VeToaDoGoc(void)
     delay(100);
     return;
   }
-
-  // if (_grbl.ViTriHienTaiCuaSTEP(TrucX) == DEFAULT_HOMING_PULLOFF &&
-  //     _grbl.ViTriHienTaiCuaSTEP(TrucY) == DEFAULT_HOMING_PULLOFF &&
-  //     _grbl.ViTriHienTaiCuaSTEP(TrucZ) == DEFAULT_HOMING_PULLOFF)
-  // {
-  //   VeViTriHome();
-  //   return;
-  // }
   DiChuyenToiViTri(ToaDoGoc, TocDoCao);
+}
+
+void _GRBL::Reset_Home(void)
+{
+  WebUI::inputBuffer.write(0x18);
+  delay(100);
+  WebUI::inputBuffer.push("$H\n");
+  delay(100);
+  while (sys.state != State::Idle)
+  {
+    delay(10);
+  }
 }
 
 _GRBL _grbl;
