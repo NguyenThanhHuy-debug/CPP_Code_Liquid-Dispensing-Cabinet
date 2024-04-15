@@ -447,4 +447,12 @@ void _GRBL::Reset_Home(void)
   }
 }
 
+void _GRBL::Reset_Unlock(void)
+{
+  WebUI::inputBuffer.write(0x18);
+  delay(100);
+  WebUI::inputBuffer.push("$X\n");
+  delay(100);
+}
+
 _GRBL _grbl;

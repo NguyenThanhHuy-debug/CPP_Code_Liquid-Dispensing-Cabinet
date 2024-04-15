@@ -7,7 +7,7 @@ using namespace std;
 // #define DEBUG_THONGSOBOARD
 // #define DEBUG_DWIN
 #define DEBUG_GRBL
-// #define DEBUG_CHUONGTRINHCHINH
+#define DEBUG_CHUONGTRINHCHINH
 
 // #define RESET_EEPROM
 
