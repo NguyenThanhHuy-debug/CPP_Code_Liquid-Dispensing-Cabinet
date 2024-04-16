@@ -47,6 +47,9 @@ void IRAM_ATTR isr_limit_switches() {
     // limit setting if their limits are constantly triggering after a reset and move their axes.
     if (sys.state != State::Alarm && sys.state != State::Homing) {
         if (sys_rt_exec_alarm == ExecAlarm::None) {
+            X1_Triggered = !digitalRead(X_LIMIT_PIN);
+            Y1_Triggered = !digitalRead(Y_LIMIT_PIN);
+            Z1_Triggered = !digitalRead(Z_LIMIT_PIN);
 #ifdef ENABLE_SOFTWARE_DEBOUNCE
             // we will start a task that will recheck the switches after a small delay
             int evt;

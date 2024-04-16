@@ -19,9 +19,7 @@ bool DangFastPump = false;
 float TocDoTamThoi = TocDoLOW;
 float SoBuocTamThoi = SoBuocLOW;
 
-volatile bool X2_Triggered = false;
-volatile bool Y2_Triggered = false;
-volatile bool Z2_Triggered = false;
+bool X2_Triggered, Y2_Triggered, Z2_Triggered = false;
 
 Flags _Flags;
 Firmware _Firmware;          // Phiên bản firmware hiện tại của board.
@@ -49,7 +47,6 @@ void IRAM_ATTR ISR_2_SENSOR(void)
     {
       mc_reset();
       sys_rt_exec_alarm = ExecAlarm::HardLimit;  // Indicate hard limit critical event
-      SENSOR_2_TRIGGERED = true;
     }
   }
 }
@@ -170,45 +167,6 @@ void XuLyDuLieuNhanTuHMI(void)
   switch (_MaLenhGRBL)
   {
     case GOHOMEKHONGCHUYENTRANG:
-      // if (DWINHMI::ManualControl == true && sys.state == State::Alarm)
-      // {
-      //   WebUI::inputBuffer.write(0x18);
-      //   delay(100);
-      //   WebUI::inputBuffer.push("$X\n");
-      //   delay(100);
-      //   if (digitalRead(X2_SENSOR_PIN) == LOW)
-      //   {
-      //     _grbl.DiChuyenX(Am, 10, TocDoTamThoi);
-      //   }
-      //   else if (digitalRead(Y2_SENSOR_PIN) == LOW)
-      //   {
-      //     _grbl.DiChuyenY(Duong, 10, TocDoTamThoi);
-      //   }
-      //   else if (digitalRead(Z2_SENSOR_PIN) == LOW)
-      //   {
-      //     _grbl.DiChuyenZ(Duong, 10, TocDoTamThoi);
-      //   }
-      //   else if (digitalRead(X_LIMIT_PIN) == LOW)
-      //   {
-      //     _grbl.DiChuyenX(Duong, 10, TocDoTamThoi);
-      //   }
-      //   else if (digitalRead(Y_LIMIT_PIN) == LOW)
-      //   {
-      //     _grbl.DiChuyenY(Am, 10, TocDoTamThoi);
-      //   }
-      //   else if (digitalRead(Z_LIMIT_PIN) == LOW)
-      //   {
-      //     _grbl.DiChuyenZ(Am, 10, TocDoTamThoi);
-      //   }
-      //   delay(100);
-      //   while (sys.state != State::Idle)
-      //   {
-      //     delay(10);
-      //   }
-      //   SENSOR_2_TRIGGERED = false;
-      //   break;
-      // }
-
       if (DangTamDungPhanPhoi == true)
       {
         Serial.println("Set Home khi dang phan phoi");
@@ -303,16 +261,20 @@ void XuLyDuLieuNhanTuHMI(void)
       _ThongSoBoard.CaiDatThongSoBoardVaoROM(_ThongSoBoard.ChuyenDoiChuongTrinhSangJsonVar(_grbl._DSChuongTrinh));
       break;
     case BAMNUTDICHUYENXTRU:
-      // if (_DWIN.DuLieuBoardGuiLenHMI.V iTriHienTaiX - SoBuocTamThoi < DEFAULT_HOMING_PULLOFF)
-      //   break;
+      if (X1_Triggered == true)
+      {
+        return;
+      }
       _grbl.DiChuyenX(Am,SoBuocTamThoi,TocDoTamThoi);
       #ifdef DEBUG_CHUONGTRINHCHINH
       Serial.printf("X-, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoFAST);
       #endif
       break;
     case BAMNUTDICHUYENYCONG:
-      // if (_DWIN.DuLieuBoardGuiLenHMI.ViTriHienTaiY + SoBuocTamThoi > -DEFAULT_HOMING_PULLOFF)
-      //   break;
+      if (Y1_Triggered == true)
+      {
+        return;
+      }
       _grbl.DiChuyenY(Duong,SoBuocTamThoi,TocDoTamThoi);
       #ifdef DEBUG_CHUONGTRINHCHINH
       Serial.printf("Y+, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoFAST);
@@ -341,8 +303,10 @@ void XuLyDuLieuNhanTuHMI(void)
       #endif
       break;
     case BAMNUTDICHUYENZCONG:
-      // if (_DWIN.DuLieuBoardGuiLenHMI.ViTriHienTaiZ + SoBuocTamThoi > DEFAULT_HOMING_PULLOFF)
-      //   break;
+      if (Z1_Triggered == true)
+      {
+        return;
+      }
       _grbl.DiChuyenZ(Duong, SoBuocTamThoi, TocDoTamThoi);
       #ifdef DEBUG_CHUONGTRINHCHINH
       Serial.printf("Y-, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoFAST);
@@ -371,6 +335,10 @@ void XuLyDuLieuNhanTuHMI(void)
       break;
 
     case HOLDXTRU:
+      if (X1_Triggered == true)
+      {
+        return;
+      }
       _grbl.DiChuyenX(Am, 1000.0f, TocDoTamThoi);
       #ifdef DEBUG_CHUONGTRINHCHINH
       Serial.printf("Hold X-, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoTamThoi);
@@ -378,6 +346,10 @@ void XuLyDuLieuNhanTuHMI(void)
       break;
 
     case HOLDYCONG:
+      if (Y1_Triggered == true)
+      {
+        return;
+      }
       _grbl.DiChuyenY(Duong, 1000.0f, TocDoTamThoi);
       #ifdef DEBUG_CHUONGTRINHCHINH
       Serial.printf("Hold Y+, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoTamThoi);
@@ -396,6 +368,10 @@ void XuLyDuLieuNhanTuHMI(void)
       break;
 
     case HOLDZCONG:
+      if (Z1_Triggered == true)
+      {
+        return;
+      }
       _grbl.DiChuyenZ(Duong, 1000.0f, TocDoTamThoi);
       #ifdef DEBUG_CHUONGTRINHCHINH
       Serial.printf("Hold Z+, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoTamThoi);
@@ -631,7 +607,7 @@ void KiemTraNguon(void)
 void ChayChuongTrinhChinh()
 {
 
-  if ((X2_Triggered || Y2_Triggered || Z2_Triggered) && SENSOR_2_TRIGGERED == true)
+  if (sys_rt_exec_alarm == ExecAlarm::HardLimit && DWINHMI::ManualControl == true)  // Indicate hard limit critical event
   {
     _grbl.Reset_Unlock();
   }
