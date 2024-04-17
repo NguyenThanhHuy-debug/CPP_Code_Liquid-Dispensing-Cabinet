@@ -44,6 +44,9 @@ public:
 
     void VeToaDoGoc(void);
 
+    void Reset_Home(void);
+    void Reset_Unlock(void);
+
     int8_t KhuVucDangChay = -1;
     int8_t OngDaPhanPhoi = -1;
     uint8_t ToaDoXDaChay;
@@ -66,8 +69,6 @@ private:
     TaskHandle_t _PhanPhoiTaskHandle;
     
     void TinhKhoangCachGiuaHaiOng(ChuongTrinh_t ChuongTrinh, uint8_t KhuVuc);
-
-    void Reset_Home(void);
 
 };
 

@@ -7,7 +7,7 @@ using namespace std;
 // #define DEBUG_THONGSOBOARD
 // #define DEBUG_DWIN
 #define DEBUG_GRBL
-// #define DEBUG_CHUONGTRINHCHINH
+#define DEBUG_CHUONGTRINHCHINH
 
 // #define RESET_EEPROM
 
@@ -41,6 +41,10 @@ using namespace std;
 #define MatKhau                             "123456"
 
 #define HeSoCalibMacDinh 403.041 // ul/duongkinhong
+
+#define X2_SENSOR_PIN            39 //limit 2        //cảm biến hành trình cuối trục X
+#define Y2_SENSOR_PIN            35 //limit 4     //cảm biến Y2 hiên tại đang bị hư nên không dùng
+#define Z2_SENSOR_PIN            33
 
 typedef struct {
     uint8_t X;

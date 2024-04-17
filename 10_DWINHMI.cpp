@@ -717,9 +717,31 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
     case _HMIBamNutGetB2:
     case _HMIBamNutGetC1:
     case _HMIBamNutGetC2:
+      if (digitalRead(X_LIMIT_PIN) == LOW 
+      ||  digitalRead(X2_SENSOR_PIN) == LOW
+      ||  digitalRead(Y_LIMIT_PIN) == LOW
+      || digitalRead(Y2_SENSOR_PIN) == LOW)
+      {
+        GuiTextLenHMI(_VPTextXacNhanGETTrangLayViTri, "Check Limit XY");
+        codeHMI = -1;
+      }
+      else
+      {
+        setPage(_TrangLayViTriChonDiem);
+      }
+      break;
     case _HMIBamNutGetH1:
     case _HMIBamNutGetH2:
-      setPage(_TrangLayViTriChonDiem);
+      if (digitalRead(Z_LIMIT_PIN) == LOW
+      || digitalRead(Z2_SENSOR_PIN) == LOW)
+      {
+        GuiTextLenHMI(_VPTextXacNhanGETTrangLayViTri, "Check Limit Z");
+        codeHMI = -1;
+      }
+      else
+      {
+        setPage(_TrangLayViTriChonDiem);
+      }
       break;
   }
 #pragma endregion ChuyenTrangTheoBamChonCuaUserTrenHMI
@@ -1614,6 +1636,7 @@ void DWINHMI::XuLyBanPhim(void)
         break;
       }
       case _VaoTrangBanPhimMatKhau:
+        codeHMI = -1;
         if (ChuoiDangNhap == MatKhau)
         {
           CheDoVaoTrangBanPhim = _RESETBanPhim;
@@ -2193,7 +2216,7 @@ DanhSachMaLenh_t DWINHMI::ReturnMaLenhGRBL()
         if (!Holding)
         {
           // Serial.println("Start Holding");
-          ESP_LOGI("Holding", "Start Holding");
+          // ESP_LOGI("Holding", "Start Holding");
           MaLenhNhanDuoc = MaLenhManualControl;
           Holding = true;
           HoldingTime = millis();
@@ -2206,13 +2229,13 @@ DanhSachMaLenh_t DWINHMI::ReturnMaLenhGRBL()
       HoldingTime = millis();
       if ((MaLenhManualControl >= HOLDXTRU) && (MaLenhManualControl <= HOLDZCONG))
       {
-        ESP_LOGI("Holding", "On Holding");
+        // ESP_LOGI("Holding", "On Holding");
         // Serial.println("On Holding");
         MaLenhManualControl = RESETMALENH;
       }
       else if ((MaLenhManualControl == RESETMALENH) || (MaLenhManualControl == DUNGDICHUYEN))
       {
-        ESP_LOGI("Holding", "Stop Holding");
+        // ESP_LOGI("Holding", "Stop Holding");
         // Serial.println("Stop Holding");
         Holding = false;
         MaLenhNhanDuoc = DUNGDICHUYEN;
@@ -2348,6 +2371,7 @@ void DWINHMI::XuLyXemConfig()
     codeHMI == _HMIBamNutGETCTrangLayViTriChonDiem ||
     codeHMI == _HMIBamNutConfigTrangCaiDatCheDoChuongTrinh)
   {
+    GuiTextLenHMI(_VPTextXacNhanGETTrangLayViTri, "");
     controlABC = true;
   } 
   if(controlABC == true)
