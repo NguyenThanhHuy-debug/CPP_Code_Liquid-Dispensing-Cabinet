@@ -19,8 +19,6 @@ bool DangFastPump = false;
 float TocDoTamThoi = TocDoLOW;
 float SoBuocTamThoi = SoBuocLOW;
 
-bool X2_Triggered, Y2_Triggered, Z2_Triggered = false;
-
 Flags _Flags;
 Firmware _Firmware;          // Phiên bản firmware hiện tại của board.
 ThongSoBoard _ThongSoBoard;  // Thông số cài đặt cho board lưu trong EEPROM.
@@ -32,17 +30,15 @@ String _ID;                  // Số ID của ESP32, đây là số IMEI của b
 
 //--------------------------------------------------------------------------------------------------------//
 
-volatile bool SENSOR_2_TRIGGERED = false;
-
 void IRAM_ATTR ISR_2_SENSOR(void)
 {
   // Serial.printf("X2:%d, Y2:%d, Z2: %d\n", digitalRead(X2_SENSOR_PIN), digitalRead(Y2_SENSOR_PIN), digitalRead(Z2_SENSOR_PIN));
   // Serial.printf("X1: %d, X2: %d, Y1: %d, Y2: %d, Z1: %d, Z2: %d\n", digitalRead(X_LIMIT_PIN), digitalRead(X2_SENSOR_PIN), digitalRead(Y_LIMIT_PIN), digitalRead(Y2_SENSOR_PIN), digitalRead(Z_LIMIT_PIN), digitalRead(Z2_SENSOR_PIN));
-  if (SENSOR_2_TRIGGERED == false && sys.state == State::Cycle && DWINHMI::ManualControl == true)
+  if (sys.state != State::Alarm && sys.state != State::Homing && DWINHMI::ManualControl == true)
   {
-    X2_Triggered = !digitalRead(X2_SENSOR_PIN);
-    Y2_Triggered = !digitalRead(Y2_SENSOR_PIN);
-    Z2_Triggered = !digitalRead(Z2_SENSOR_PIN);
+    int X2_Triggered = !digitalRead(X2_SENSOR_PIN);
+    int Y2_Triggered = !digitalRead(Y2_SENSOR_PIN);
+    int Z2_Triggered = !digitalRead(Z2_SENSOR_PIN);
     if (X2_Triggered || Y2_Triggered || Z2_Triggered)
     {
       mc_reset();
@@ -114,9 +110,9 @@ void KhoiTao(void){
   pinMode(Y2_SENSOR_PIN, INPUT_PULLUP);
   pinMode(Z2_SENSOR_PIN, INPUT_PULLUP);
 
-  attachInterrupt(X2_SENSOR_PIN, ISR_2_SENSOR, CHANGE);
-  attachInterrupt(Y2_SENSOR_PIN, ISR_2_SENSOR, CHANGE);
-  attachInterrupt(Z2_SENSOR_PIN, ISR_2_SENSOR, CHANGE);
+  attachInterrupt(X2_SENSOR_PIN, ISR_2_SENSOR, FALLING);
+  attachInterrupt(Y2_SENSOR_PIN, ISR_2_SENSOR, FALLING);
+  attachInterrupt(Z2_SENSOR_PIN, ISR_2_SENSOR, FALLING);
   
 }
 
@@ -260,8 +256,12 @@ void XuLyDuLieuNhanTuHMI(void)
       /* Lưu vào Eeprom */
       _ThongSoBoard.CaiDatThongSoBoardVaoROM(_ThongSoBoard.ChuyenDoiChuongTrinhSangJsonVar(_grbl._DSChuongTrinh));
       break;
+    
     case BAMNUTDICHUYENXTRU:
-      if (X1_Triggered == true)
+    {
+      int X1 = !digitalRead(X_LIMIT_PIN);
+      Serial.printf("X1: %d\n", X1);
+      if (X1 == true)
       {
         return;
       }
@@ -270,8 +270,13 @@ void XuLyDuLieuNhanTuHMI(void)
       Serial.printf("X-, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoFAST);
       #endif
       break;
+    }
+
     case BAMNUTDICHUYENYCONG:
-      if (Y1_Triggered == true)
+    {
+      int Y1 = !digitalRead(Y_LIMIT_PIN);
+      Serial.printf("Y1: %d\n", Y1);
+      if (Y1 == true)
       {
         return;
       }
@@ -280,8 +285,12 @@ void XuLyDuLieuNhanTuHMI(void)
       Serial.printf("Y+, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoFAST);
       #endif
       break;
+    }
     case BAMNUTDICHUYENXCONG:
-      if (X2_Triggered == true)
+    {
+      int X2 = !digitalRead(X2_SENSOR_PIN);
+       Serial.printf("X2: %d\n", X2);   
+      if (X2 == true)
       {
         return;
       }
@@ -289,10 +298,14 @@ void XuLyDuLieuNhanTuHMI(void)
       #ifdef DEBUG_CHUONGTRINHCHINH
       Serial.printf("X+, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoFAST);
       #endif
-
       break;
+    }
+
     case BAMNUTDICHUYENYTRU:
-      if (Y2_Triggered == true)
+    {
+      int Y2 = !digitalRead(Y2_SENSOR_PIN);
+      Serial.printf("Y2: %d\n", Y2);
+      if (Y2 == true)
       {
         return;
       }
@@ -302,8 +315,14 @@ void XuLyDuLieuNhanTuHMI(void)
       Serial.printf("Y-, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoFAST);
       #endif
       break;
+    }
+
     case BAMNUTDICHUYENZCONG:
-      if (Z1_Triggered == true)
+
+    {  
+      int Z1 = !digitalRead(Z_LIMIT_PIN);
+      Serial.printf("Z1: %d\n", Z1);
+      if (Z1 == true)
       {
         return;
       }
@@ -312,8 +331,13 @@ void XuLyDuLieuNhanTuHMI(void)
       Serial.printf("Y-, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoFAST);
       #endif
       break;
+    }
+
     case BAMNUTDICHUYENZTRU:
-      if (Z2_Triggered == true)
+    {
+        int Z2 = !digitalRead(Z2_SENSOR_PIN);
+      Serial.printf("Z2: %d\n", Z2);
+      if (Z2 == true)
       {
         return;
       }
@@ -322,9 +346,13 @@ void XuLyDuLieuNhanTuHMI(void)
       Serial.printf("Z-, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoFAST);
       #endif
       break;
+    }
 
     case HOLDXCONG:
-      if (X2_Triggered == true)
+    {
+      int X2 = !digitalRead(X2_SENSOR_PIN);
+      Serial.printf("X2: %d\n", X2);
+      if (X2 == true)
       {
         return;
       }
@@ -333,9 +361,13 @@ void XuLyDuLieuNhanTuHMI(void)
       Serial.printf("Hold X+, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoTamThoi);
       #endif
       break;
+    }
 
     case HOLDXTRU:
-      if (X1_Triggered == true)
+    {
+      int X1 = !digitalRead(X_LIMIT_PIN);
+      Serial.printf("X1: %d\n", X1);
+      if (X1 == true)
       {
         return;
       }
@@ -344,9 +376,13 @@ void XuLyDuLieuNhanTuHMI(void)
       Serial.printf("Hold X-, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoTamThoi);
       #endif
       break;
+    }
 
     case HOLDYCONG:
-      if (Y1_Triggered == true)
+    {
+      int Y1 = !digitalRead(Y_LIMIT_PIN);
+      Serial.printf("Y1: %d\n", Y1);
+      if (Y1 == true)
       {
         return;
       }
@@ -355,9 +391,13 @@ void XuLyDuLieuNhanTuHMI(void)
       Serial.printf("Hold Y+, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoTamThoi);
       #endif
       break;
+    }
 
     case HOLDYTRU:
-      if (Y2_Triggered == true)
+    {
+      int Y2 = !digitalRead(Y2_SENSOR_PIN);
+      Serial.printf("Y2: %d\n", Y2);
+      if (Y2 == true)
       {
         return;
       }
@@ -366,9 +406,13 @@ void XuLyDuLieuNhanTuHMI(void)
       Serial.printf("Hold Y-, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoTamThoi);
       #endif
       break;
+    }
 
     case HOLDZCONG:
-      if (Z1_Triggered == true)
+    {
+      int Z1 = !digitalRead(Z_LIMIT_PIN);
+      Serial.printf("Z1: %d\n", Z1);
+      if (Z1 == true)
       {
         return;
       }
@@ -377,9 +421,13 @@ void XuLyDuLieuNhanTuHMI(void)
       Serial.printf("Hold Z+, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoTamThoi);
       #endif
       break;
-    
+    }
+
     case HOLDZTRU:
-      if (Z2_Triggered == true)
+    {
+      int Z2 = !digitalRead(Z2_SENSOR_PIN);
+      Serial.printf("Z2: %d\n", Z2);
+      if (Z2 == true)
       {
         return;
       }
@@ -388,6 +436,7 @@ void XuLyDuLieuNhanTuHMI(void)
       Serial.printf("Hold Z-, %g buoc, %g tocdo\n",SoBuocTamThoi,TocDoTamThoi);
       #endif
       break;
+    }
 
     case DUNGDICHUYEN:
       _grbl.TamDungChay();
@@ -607,10 +656,10 @@ void KiemTraNguon(void)
 void ChayChuongTrinhChinh()
 {
 
-  if (sys_rt_exec_alarm == ExecAlarm::HardLimit && DWINHMI::ManualControl == true)  // Indicate hard limit critical event
-  {
-    _grbl.Reset_Unlock();
-  }
+  // if (sys_rt_exec_alarm == ExecAlarm::HardLimit && DWINHMI::ManualControl == true)  // Indicate hard limit critical event
+  // {
+  //   _grbl.Reset_Unlock();
+  // }
   
 
   _Flags.TurnONFlags();

@@ -336,7 +336,7 @@
 #define _TrangLayViTriXacNhanA 143
 #define _TrangLayViTriXacNhanB 144
 #define _TrangLayViTriXacNhanC 173
-#define _TrangManualControl 174
+#define _TrangManualControl 174 //178
 #define _TrangCaiDat 146
 #define _TrangCalib 147
 #define _TrangWiFi 148
@@ -555,7 +555,7 @@ typedef struct {
   float ViTriHienTaiY;
   float ViTriHienTaiZ;
   bool TrangThaiXacNhanSaveCalib;
-  bool TrangThaiXacNhanSetHome;
+  bool TrangThaiXacNhanSetHome = false; //TTODO
   String RTC_Ngay = "";
   String RTC_Thang = "";
   String RTC_Nam = "";

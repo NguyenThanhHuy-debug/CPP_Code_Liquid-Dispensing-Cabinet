@@ -9,10 +9,6 @@
 #include "_GRBL.h"
 #include "KingTubeAuto.h"
 
-#define X2_SENSOR_PIN            39 //limit 2        //cảm biến hành trình cuối trục X
-#define Y2_SENSOR_PIN            35 //limit 4     //cảm biến Y2 hiên tại đang bị hư nên không dùng
-#define Z2_SENSOR_PIN            33
-
 #define _ChanDocNguon 15
 #define _ChanKichNguon 12
 

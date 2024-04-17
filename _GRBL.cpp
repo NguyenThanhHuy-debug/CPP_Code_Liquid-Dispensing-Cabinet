@@ -224,7 +224,7 @@ void _GRBL::TamDungPhanPhoi(void) {
   {
     vTaskSuspend(_PhanPhoiTaskHandle);
   }
-  WebUI::inputBuffer.push("!\r");
+  WebUI::inputBuffer.push("!\n");
 }
 
 void _GRBL::TiepTucPhanPhoi(void) {
@@ -255,6 +255,10 @@ void _GRBL::DungPhanPhoi(void) {
 //* Chieu là hướng di chuyển, Duong hoặc Am
 //* Buoc là số mm di chuyển mỗi lần nhấn
 void _GRBL::DiChuyenX(bool Chieu, float Buoc, float TocDo) {
+  if (sys_rt_exec_alarm == ExecAlarm::HardLimit)
+  {
+    Reset_Unlock();
+  }
   char* ViTri;
 
   //* nếu chiều âm - thì thêm dấu "-" để xoay ngược chiều
@@ -271,6 +275,10 @@ void _GRBL::DiChuyenX(bool Chieu, float Buoc, float TocDo) {
 }
 
 void _GRBL::DiChuyenY(bool Chieu, float Buoc, float TocDo) {
+  if (sys_rt_exec_alarm == ExecAlarm::HardLimit)
+  {
+    Reset_Unlock();
+  }
   char* ViTri;
 
   if (Chieu == Duong) {
@@ -285,6 +293,10 @@ void _GRBL::DiChuyenY(bool Chieu, float Buoc, float TocDo) {
 }
 
 void _GRBL::DiChuyenZ(bool Chieu, float Buoc, float TocDo) {
+  if (sys_rt_exec_alarm == ExecAlarm::HardLimit)
+  {
+    Reset_Unlock();
+  }
   char* ViTri;
 
   if (Chieu == Duong) {
@@ -375,10 +387,19 @@ void _GRBL::PhanPhoi(void) {
 }
 
 void _GRBL::TamDungChay(void){
-  WebUI::inputBuffer.push("!"); //* Feed Hold
+  if (sys.state == State::Alarm || sys.state == State::Idle)                
+  {
+    return;
+  }
+  WebUI::inputBuffer.push("!\n"); //* Feed Hold
   delay(600); //* nếu gọi ngay lập tức thì sẽ bị Alarm, nên cần phải delay một khoảng thời gian
   WebUI::inputBuffer.write(0x18); //* Xóa các lệnh GCode đang chạy, reset mềm esp32
   delay(100);
+  if (sys.state == State::Alarm)
+  {
+    WebUI::inputBuffer.push("$X\n");
+    delay(100);
+  }
 }
 
 void _GRBL::DiChuyenToiViTri(float X, float Y, float Z, uint16_t TocDo) {

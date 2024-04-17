@@ -59,5 +59,3 @@ bool limitsCheckTravel(float* target);
 bool limitsSwitchDefined(uint8_t axis, uint8_t gang_index);
 
 void limitsCheckSoft(float* target);
-
-bool X1_Triggered, Y1_Triggered, Z1_Triggered = false;
