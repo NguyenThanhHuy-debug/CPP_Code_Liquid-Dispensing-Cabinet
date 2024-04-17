@@ -170,7 +170,7 @@ void _GRBL::BatDauPhanPhoi()
         delay(10);
       }
 
-      while ((sys.state == State::Cycle) || (sys.state == State::Hold) ) 
+      while ((sys.state == State::Cycle) || (sys.state == State::Hold) || sys.state == State::Alarm) 
       {
         if (CoBaoDungPhanPhoi == true) 
         {
@@ -192,9 +192,11 @@ void _GRBL::BatDauPhanPhoi()
       if (CoBaoPhanPhoiLaiOng == true)
       {
         CoBaoPhanPhoiLaiOng = false;
-        ToaDoHienTai--;
+        // ToaDoHienTai--;
         continue;
       }
+
+
       DaChayXongMotOng = true;
       OngDaPhanPhoi = ToaDoHienTai;
       ToaDoXDaChay = DSToaDoCanChay[ToaDoHienTai].X;  
@@ -474,6 +476,23 @@ void _GRBL::Reset_Unlock(void)
   delay(100);
   WebUI::inputBuffer.push("$X\n");
   delay(100);
+}
+
+void _GRBL::Hold_Reset(void)
+{
+  if (sys.state == State::Cycle) {
+      sys_rt_exec_state.bit.feedHold = true;
+      do {
+          vTaskDelay(1);  // Yield to other tasks
+          protocol_execute_realtime();
+          if (sys.abort) {
+              return;
+          }
+      } while (sys.state != State::Idle);
+  }
+  mc_reset();                                // Issue system reset and ensure spindle and coolant are shutdown.
+  sys_rt_exec_alarm = ExecAlarm::HardLimit;  // Indicate soft limit critical event
+  protocol_execute_realtime();   
 }
 
 _GRBL _grbl;

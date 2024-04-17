@@ -945,6 +945,7 @@ void DWINHMI::XuLyChonViTriPhanPhoi(void)
 {
   static ChuongTrinh_t ChuongTrinhTamThoi;
   static uint16_t KhayChonTamThoi[12][8];
+  static uint8_t SoLuongOngThayDoi_Add_prev = 0;
   /* Khi bấm Run hoặc modify để vào trang phân phối thì cập nhật chương trình đang xử lý */
   if(codeHMI == _HMIBamNutOKTrangChonChuongTrinh && CheDoVaoTrangChonChuongTrinh == _VaoTrangTuCacNutProgramTrangCaiDatCheDoChuongTrinh)
   {
@@ -1114,7 +1115,7 @@ void DWINHMI::XuLyChonViTriPhanPhoi(void)
       /* Hiển thị */
       HienThiThongTinPhanPhoi();
   }
-  else if (codeHMI == _HMIBamNutThayDoiSoLuongOng && (holdAdd == 1 || holdAdd == 2))
+  else if (codeHMI == _HMIBamNutThayDoiSoLuongOng)
   {
     setPage(_TrangBanPhimThayDoiSoLuongOng);
   }
@@ -1125,7 +1126,26 @@ void DWINHMI::XuLyChonViTriPhanPhoi(void)
     {
       return;
     }
-    for (uint8_t SoLuong = 1; SoLuong < SoLuongOngThayDoi; SoLuong++)
+
+    //nếu đã full thì không cần không cần add thêm
+    if (holdAdd == 1) //ADD
+    {
+      if (_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].DsToaDo[IdxKhuVucDangXuLy].size() == _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].rackX * _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].rackY)
+      {
+        return;
+      }
+      SoLuongOngThayDoi_Add_prev = SoLuongOngThayDoi;
+    }
+    //nếu danh sách toa độ rỗng thì không cần xóa
+    else if (holdAdd == 2) //SUB
+    {
+      if (_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].DsToaDo[IdxKhuVucDangXuLy].size() == 0)
+      {
+        return;
+      }
+    }
+
+    for (uint8_t SoLuong = 1; SoLuong <= SoLuongOngThayDoi; SoLuong++)
     {
       uint8_t X = (SoLuong - 1) / _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].rackY;
       uint8_t Y = (SoLuong - 1) % _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].rackY;
@@ -1589,7 +1609,7 @@ void DWINHMI::XuLyBanPhim(void)
           uint8_t SoLuongOngThayDoiToiDa = _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].rackX * _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].rackY;
           if (ChuoiDangNhap.toInt() > SoLuongOngThayDoiToiDa)
           {
-            GuiTextLenHMI(_VpTextCanhBaoChuoiDangNhap, "ERROR: Tubes must be less than or equal to " + String(SoLuongOngThayDoiToiDa));
+            GuiTextLenHMI(_VpTextCanhBaoChuoiDangNhap, "ERROR: Tubes must be <= " + String(SoLuongOngThayDoiToiDa));
             return;
           }
           SoLuongOngThayDoi = ChuoiDangNhap.toInt();

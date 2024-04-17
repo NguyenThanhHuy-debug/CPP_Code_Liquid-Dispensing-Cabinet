@@ -47,6 +47,8 @@ public:
     void Reset_Home(void);
     void Reset_Unlock(void);
 
+    void Hold_Reset(void);
+
     int8_t KhuVucDangChay = -1;
     int8_t OngDaPhanPhoi = -1;
     uint8_t ToaDoXDaChay;

@@ -32,17 +32,15 @@ String _ID;                  // Số ID của ESP32, đây là số IMEI của b
 
 void IRAM_ATTR ISR_2_SENSOR(void)
 {
-  // Serial.printf("X2:%d, Y2:%d, Z2: %d\n", digitalRead(X2_SENSOR_PIN), digitalRead(Y2_SENSOR_PIN), digitalRead(Z2_SENSOR_PIN));
-  // Serial.printf("X1: %d, X2: %d, Y1: %d, Y2: %d, Z1: %d, Z2: %d\n", digitalRead(X_LIMIT_PIN), digitalRead(X2_SENSOR_PIN), digitalRead(Y_LIMIT_PIN), digitalRead(Y2_SENSOR_PIN), digitalRead(Z_LIMIT_PIN), digitalRead(Z2_SENSOR_PIN));
   if (sys.state != State::Alarm && sys.state != State::Homing && DWINHMI::ManualControl == true)
   {
+    //TODO
     int X2_Triggered = !digitalRead(X2_SENSOR_PIN);
-    int Y2_Triggered = !digitalRead(Y2_SENSOR_PIN);
+    int Y2_Triggered = 0; //!digitalRead(Y2_SENSOR_PIN);
     int Z2_Triggered = !digitalRead(Z2_SENSOR_PIN);
     if (X2_Triggered || Y2_Triggered || Z2_Triggered)
     {
-      mc_reset();
-      sys_rt_exec_alarm = ExecAlarm::HardLimit;  // Indicate hard limit critical event
+      _grbl.Hold_Reset();
     }
   }
 }
@@ -111,7 +109,7 @@ void KhoiTao(void){
   pinMode(Z2_SENSOR_PIN, INPUT_PULLUP);
 
   attachInterrupt(X2_SENSOR_PIN, ISR_2_SENSOR, FALLING);
-  attachInterrupt(Y2_SENSOR_PIN, ISR_2_SENSOR, FALLING);
+  // attachInterrupt(Y2_SENSOR_PIN, ISR_2_SENSOR, FALLING);
   attachInterrupt(Z2_SENSOR_PIN, ISR_2_SENSOR, FALLING);
   
 }
@@ -303,7 +301,8 @@ void XuLyDuLieuNhanTuHMI(void)
 
     case BAMNUTDICHUYENYTRU:
     {
-      int Y2 = !digitalRead(Y2_SENSOR_PIN);
+      //TODO
+      int Y2 = 0;//!digitalRead(Y2_SENSOR_PIN);
       Serial.printf("Y2: %d\n", Y2);
       if (Y2 == true)
       {
@@ -395,7 +394,8 @@ void XuLyDuLieuNhanTuHMI(void)
 
     case HOLDYTRU:
     {
-      int Y2 = !digitalRead(Y2_SENSOR_PIN);
+      //TODO
+      int Y2 = 0;//!digitalRead(Y2_SENSOR_PIN);
       Serial.printf("Y2: %d\n", Y2);
       if (Y2 == true)
       {
@@ -439,6 +439,10 @@ void XuLyDuLieuNhanTuHMI(void)
     }
 
     case DUNGDICHUYEN:
+    if (sys.state == State::Alarm && DWINHMI::ManualControl == true)
+    {
+      _grbl.Reset_Unlock();
+    }
       _grbl.TamDungChay();
       #ifdef DEBUG_CHUONGTRINHCHINH
       Serial.println("Dừng di chuyển");
@@ -620,6 +624,7 @@ void CaiDatNguon(void)
   digitalWrite(2, HIGH);
   delay(100);
   digitalWrite(2, LOW);
+  //TODO
   // while (digitalRead(_ChanDocNguon))
   // {
   //   delay(1);

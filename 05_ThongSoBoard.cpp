@@ -179,7 +179,6 @@ void ThongSoBoard::CaiDatThongSoBoardVaoROM(JSONVar ThongSo) {
   for (int i = 0; i < strThongSo.length(); ++i) {
     // EEPROM.write(i, strThongSo[i]);
     _i2c_eeprom.update(i, strThongSo[i]);
-    delay(1);
   }
   // delay(5000);
 
