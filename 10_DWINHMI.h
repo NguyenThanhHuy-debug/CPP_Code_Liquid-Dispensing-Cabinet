@@ -14,9 +14,14 @@
 #define DENSITY_LOWER_LIMIT 0
 
 #define TUBE_ID_LOWER_LIMIT 0
+
 #define SPEED_XY_UPPER_LIMIT DEFAULT_X_MAX_RATE
+#define SPEED_XY_LOWER_LIMIT 0
 
 #define SPEED_PUMP_UPPER_LIMIT DEFAULT_A_MAX_RATE
+#define SPEED_PUMP_LOWER_LIMIT 0
+
+#define VOLUME_LOWER_LIMIT 0
 
 #define AddrPressXcong    "1010"
 #define AddrHoldXcong     "1020"
@@ -155,8 +160,8 @@
 #define _HMIBamNutOKTrangPhanPhoiViTri 0x9B
 #define _HMIBamNutEXITTrangPhanPhoiViTri 0x9C
 
-#define _HMIBamNutThayDoiSoLuongOng 0x802 //TODO thay đổi keycode
-#define _HMIBamNutOkThayDoiSoLuongOng 0x803 //TODO
+#define _HMIBamNutThayDoiSoLuongOng 0x802 
+// #define _HMIBamNutOkThayDoiSoLuongOng 0x803 
 
 
 /* Define các nút bấm trang 134*/
@@ -340,7 +345,7 @@
 #define _TrangBanPhimCaiDatThoiGian 167
 #define _TrangBanPhimMoRongSo 168
 #define _TrangBanPhimMauKhau 176
-#define _TrangBanPhimThayDoiSoLuongOng 177 //TODO
+#define _TrangBanPhimThayDoiSoLuongOng 177 
 
 
 
@@ -468,7 +473,7 @@
 #define _HMIBamNutGoHomeTrangDieuKhien 0x801
 
 // Trang 176
-#define _VpTextThayDoiSoLuongOng 0x3C00UL//TODO
+#define _VpTextThayDoiSoLuongOng 0x3C00UL
 
 typedef enum {
   _CaiDatGioLoop,

@@ -21,9 +21,9 @@ public:
     float ViTriHienTaiCuaSTEP(uint8_t STEP);
     // void Calib();
 
-    void DiChuyenX(bool Chieu, float Buoc, float TocDo);
-    void DiChuyenY(bool Chieu, float Buoc, float TocDo);
-    void DiChuyenZ(bool Chieu, float Buoc, float TocDo);
+    void DiChuyenX(bool Chieu, float Buoc, uint16_t TocDo);
+    void DiChuyenY(bool Chieu, float Buoc, uint16_t TocDo);
+    void DiChuyenZ(bool Chieu, float Buoc, uint16_t TocDo);
 
     void KhoiTaoGRBL(void);
 
@@ -46,8 +46,6 @@ public:
 
     void Reset_Home(void);
     void Reset_Unlock(void);
-
-    void Hold_Reset(void);
 
     int8_t KhuVucDangChay = -1;
     int8_t OngDaPhanPhoi = -1;

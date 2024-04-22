@@ -2,9 +2,9 @@
 
 DanhSachMaLenh_t _MaLenhGRBL;
 // #define debug
-#define TocDoLOW 500.0f
-#define TocDoMEDIUM 2000.0f
-#define TocDoFAST 5000.0f
+#define TocDoLOW 500U
+#define TocDoMEDIUM 2000U
+#define TocDoFAST 5000U
 
 #define SoBuocLOW 1.0f
 #define SoBuocMEDIUM 10.0f
@@ -16,7 +16,7 @@ DanhSachMaLenh_t _MaLenhGRBL;
 
 bool DangTamDungPhanPhoi = false;
 bool DangFastPump = false;
-float TocDoTamThoi = TocDoLOW;
+uint16_t TocDoTamThoi = TocDoLOW;
 float SoBuocTamThoi = SoBuocLOW;
 
 Flags _Flags;
@@ -36,11 +36,12 @@ void IRAM_ATTR ISR_2_SENSOR(void)
   {
     //TODO
     int X2_Triggered = !digitalRead(X2_SENSOR_PIN);
-    int Y2_Triggered = 0; //!digitalRead(Y2_SENSOR_PIN);
+    int Y2_Triggered = !digitalRead(Y2_SENSOR_PIN);
     int Z2_Triggered = !digitalRead(Z2_SENSOR_PIN);
     if (X2_Triggered || Y2_Triggered || Z2_Triggered)
     {
-      _grbl.Hold_Reset();
+      mc_reset();
+      sys_rt_exec_alarm = ExecAlarm::HardLimit;  // Indicate hard limit critical event
     }
   }
 }
@@ -109,8 +110,11 @@ void KhoiTao(void){
   pinMode(Z2_SENSOR_PIN, INPUT_PULLUP);
 
   attachInterrupt(X2_SENSOR_PIN, ISR_2_SENSOR, FALLING);
-  // attachInterrupt(Y2_SENSOR_PIN, ISR_2_SENSOR, FALLING);
+  attachInterrupt(Y2_SENSOR_PIN, ISR_2_SENSOR, FALLING);
   attachInterrupt(Z2_SENSOR_PIN, ISR_2_SENSOR, FALLING);
+
+  // delay(500);
+  _DWIN.DuLieuBoardGuiLenHMI.TrangThaiXacNhanSetHome = _grbl.VeViTriHome();
   
 }
 
@@ -302,7 +306,7 @@ void XuLyDuLieuNhanTuHMI(void)
     case BAMNUTDICHUYENYTRU:
     {
       //TODO
-      int Y2 = 0;//!digitalRead(Y2_SENSOR_PIN);
+      int Y2 = !digitalRead(Y2_SENSOR_PIN);
       Serial.printf("Y2: %d\n", Y2);
       if (Y2 == true)
       {
@@ -395,7 +399,7 @@ void XuLyDuLieuNhanTuHMI(void)
     case HOLDYTRU:
     {
       //TODO
-      int Y2 = 0;//!digitalRead(Y2_SENSOR_PIN);
+      int Y2 = !digitalRead(Y2_SENSOR_PIN);
       Serial.printf("Y2: %d\n", Y2);
       if (Y2 == true)
       {
@@ -471,6 +475,7 @@ void XuLyDuLieuNhanTuHMI(void)
     case TESTCALIB:
     case TESTFILL:
     {
+
       if (_DWIN.countTest == 2){
         sys_position[A_AXIS] = 0;
 #ifdef DEBUG_CHUONGTRINHCHINH
@@ -499,9 +504,9 @@ void XuLyDuLieuNhanTuHMI(void)
       if (DangFastPump == false){
         ChuongTrinh_t ChuongTrinhDangXuLy = _DWIN._ChuongTrinhEEPROM[_DWIN.IndexChuongTrinhDangXuLy];
         if (ChuongTrinhDangXuLy.TheTichBomDuocKhiQuay1Vong > 0)
-          WebUI::inputBuffer.push("G91A1000\r");
+          WebUI::inputBuffer.push("G0G91A1000\n");
         else
-          WebUI::inputBuffer.push("G91A-1000\r");
+          WebUI::inputBuffer.push("G0G91A-1000\n");
         DangFastPump = true;
       }
       else{
@@ -688,7 +693,7 @@ void ThucThiCacTacVuTheoFlag()
 void Shutdown(void)
 {
   // _grbl.VeToaDoGoc();
-  if (sys.state == State::Alarm)
+  if (sys.state != State::Idle)
   {
     WebUI::inputBuffer.write(0x18);
     delay(100);

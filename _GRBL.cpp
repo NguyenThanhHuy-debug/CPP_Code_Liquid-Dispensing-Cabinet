@@ -10,9 +10,7 @@ bool _GRBL::VeViTriHome()
   }
   WebUI::inputBuffer.push("$H\r"); //* set home
   sys_position[MayBom] = 0; //* reset vị trí máy bơm
-  digitalWrite(2, HIGH);
   delay(100);
-  digitalWrite(2, LOW);
   while (sys.state == State::Homing){
       delay(100);
   }
@@ -97,12 +95,14 @@ void _GRBL::BatDauPhanPhoi()
 
   // Chờ đến khi về Home xong
   // while (sys.state == State::Homing) delay(1);
+  if (sys.state == State::Hold)
+  {
+    Reset_Unlock();
+  }
+
   if (sys.state == State::Alarm)
   {
-    WebUI::inputBuffer.write(0x18);
-    delay(100);
-    WebUI::inputBuffer.push("$X\n");
-    delay(100);
+    Reset_Unlock();
   }
 
   //* Xử lý vụ multi với simple
@@ -146,31 +146,41 @@ void _GRBL::BatDauPhanPhoi()
 
     for (uint8_t ToaDoHienTai = 0; ToaDoHienTai < DSToaDoCanChay.size(); ToaDoHienTai++)
     {
-
+      float X = ViTriACanChay.X + DSToaDoCanChay[ToaDoHienTai].X * _KhoangCachGiuaHaiOng.X;
+      float Y = ViTriACanChay.Y + DSToaDoCanChay[ToaDoHienTai].Y * _KhoangCachGiuaHaiOng.Y;
+      float Z = ViTriHCanChay;
+      uint16_t TocDoXY = _DSChuongTrinh[IdxChuongTrinh].tocdoXY;
       //* Di chuyển đến vị trí X Y Z
-      asprintf(&ViTri, "G1G90X%gY%gZ%gF%d\r", ViTriACanChay.X + DSToaDoCanChay[ToaDoHienTai].X * _KhoangCachGiuaHaiOng.X,
-                                              ViTriACanChay.Y + DSToaDoCanChay[ToaDoHienTai].Y * _KhoangCachGiuaHaiOng.Y, ViTriHCanChay, 
-                                              _DSChuongTrinh[IdxChuongTrinh].tocdoXY); //thêm F để đặt tôc độ trục XY
+      asprintf(&ViTri, "G1G90X%4.3fY%4.3fZ%4.3fF%d\n", X, Y, Z, TocDoXY); //thêm F để đặt tôc độ trục XY
       WebUI::inputBuffer.push(ViTri);
+#ifdef DEBUG_GRBL
+      Serial.println(ViTri);
+#endif
       free(ViTri);
 
       //* Xoay ống bơm 
-      asprintf(&SoVongDeBomDungTheTich, "G1G91A%gF%d\r", SoVongCanBom,
+      asprintf(&SoVongDeBomDungTheTich, "G1G91A%4.3fF%d\n", SoVongCanBom,
         _DSChuongTrinh[IdxChuongTrinh].tocdobom); //thêm F để đặt tôc độ trục A
       WebUI::inputBuffer.push(SoVongDeBomDungTheTich);
+#ifdef DEBUG_GRBL
+      Serial.println(SoVongDeBomDungTheTich);
+#endif
       free(SoVongDeBomDungTheTich);
 
-      asprintf(&ChongNhoGiot, "G1G91A%gF%d\r", SoVongDeChongNhoGiot, _DSChuongTrinh[IdxChuongTrinh].tocdobom);
+      asprintf(&ChongNhoGiot, "G1G91A%4.3fF%d\n", SoVongDeChongNhoGiot, _DSChuongTrinh[IdxChuongTrinh].tocdobom);
       WebUI::inputBuffer.push(ChongNhoGiot);
+#ifdef DEBUG_GRBL
+      Serial.println(ChongNhoGiot);
+#endif
       free(ChongNhoGiot);
       //* phải delay để grbl xử lý xong lệnh
-      // delay(300);
-      while(sys.state == State::Idle)
+      // delay(100);
+      while (sys.state == State::Idle)
       {
         delay(10);
       }
 
-      while ((sys.state == State::Cycle) || (sys.state == State::Hold) || sys.state == State::Alarm) 
+      while (sys.state != State::Idle) 
       {
         if (CoBaoDungPhanPhoi == true) 
         {
@@ -180,6 +190,7 @@ void _GRBL::BatDauPhanPhoi()
         if (CoBaoPhanPhoiLaiOng == true)
           {
             WebUI::inputBuffer.push("~\n");
+            delay(100);
             while(sys.state == State::Hold)
             {
               delay(10);
@@ -256,7 +267,7 @@ void _GRBL::DungPhanPhoi(void) {
 //* Các hàm điều khiển X+, X-, Y+, Y-, Z+, Z-
 //* Chieu là hướng di chuyển, Duong hoặc Am
 //* Buoc là số mm di chuyển mỗi lần nhấn
-void _GRBL::DiChuyenX(bool Chieu, float Buoc, float TocDo) {
+void _GRBL::DiChuyenX(bool Chieu, float Buoc, uint16_t TocDo) {
   if (sys_rt_exec_alarm == ExecAlarm::HardLimit)
   {
     Reset_Unlock();
@@ -266,17 +277,20 @@ void _GRBL::DiChuyenX(bool Chieu, float Buoc, float TocDo) {
   //* nếu chiều âm - thì thêm dấu "-" để xoay ngược chiều
   //* Thêm G91 để dùng vị trí tương đối
   if (Chieu == Duong) {
-    asprintf(&ViTri, "G1G91X%3.3fF%3.3f\r", Buoc, TocDo); //* thêm F để đặt tôc độ trục XY
+    asprintf(&ViTri, "G1G91X%4.3fF%d\r", Buoc, TocDo); //* thêm F để đặt tôc độ trục XY
   }
   else {
-    asprintf(&ViTri, "G1G91X-%3.3fF%3.3f\r", Buoc, TocDo); //* thêm F để đặt tôc độ trục XY
+    asprintf(&ViTri, "G1G91X-%4.3fF%d\r", Buoc, TocDo); //* thêm F để đặt tôc độ trục XY
   }
 
   WebUI::inputBuffer.push(ViTri);
+#ifdef DEBUG_GRBL
+  Serial.println(ViTri);
+#endif
   free(ViTri);
 }
 
-void _GRBL::DiChuyenY(bool Chieu, float Buoc, float TocDo) {
+void _GRBL::DiChuyenY(bool Chieu, float Buoc, uint16_t TocDo) {
   if (sys_rt_exec_alarm == ExecAlarm::HardLimit)
   {
     Reset_Unlock();
@@ -284,17 +298,20 @@ void _GRBL::DiChuyenY(bool Chieu, float Buoc, float TocDo) {
   char* ViTri;
 
   if (Chieu == Duong) {
-    asprintf(&ViTri, "G1G91Y%3.3fF%3.3f\r", Buoc, TocDo); //* thêm F để đặt tôc độ trục XY
+    asprintf(&ViTri, "G1G91Y%4.3fF%d\r", Buoc, TocDo); //* thêm F để đặt tôc độ trục XY
   }
   else {
-    asprintf(&ViTri, "G1G91Y-%3.3fF%3.3f\r", Buoc, TocDo); //* thêm F để đặt tôc độ trục XY
+    asprintf(&ViTri, "G1G91Y-%4.3fF%d\r", Buoc, TocDo); //* thêm F để đặt tôc độ trục XY
   }
 
   WebUI::inputBuffer.push(ViTri);
+#ifdef DEBUG_GRBL
+  Serial.println(ViTri);
+#endif
   free(ViTri);
 }
 
-void _GRBL::DiChuyenZ(bool Chieu, float Buoc, float TocDo) {
+void _GRBL::DiChuyenZ(bool Chieu, float Buoc, uint16_t TocDo) {
   if (sys_rt_exec_alarm == ExecAlarm::HardLimit)
   {
     Reset_Unlock();
@@ -302,13 +319,16 @@ void _GRBL::DiChuyenZ(bool Chieu, float Buoc, float TocDo) {
   char* ViTri;
 
   if (Chieu == Duong) {
-    asprintf(&ViTri, "G1G91Z%3.3fF%3.3f\r", Buoc, TocDo);
+    asprintf(&ViTri, "G1G91Z%4.3fF%d\r", Buoc, TocDo);
   }
   else {
-    asprintf(&ViTri, "G1G91Z-%3.3fF%3.3f\r", Buoc, TocDo);
+    asprintf(&ViTri, "G1G91Z-%4.3fF%d\r", Buoc, TocDo);
   }
 
   WebUI::inputBuffer.push(ViTri);
+#ifdef DEBUG_GRBL
+  Serial.println(ViTri);
+#endif
   free(ViTri);
 }
 
@@ -423,7 +443,7 @@ void _GRBL::TestFill(ChuongTrinh_t ChuongTrinh)
     char* str;
     // float SoVongQuay = ChuongTrinhDangXuLy.SoVongDeBom1ml * ChuongTrinhDangXuLy.thetich * ChuongTrinhDangXuLy.duongkinhong; //bơm đủ thể tích
     float SoVongQuay = ChuongTrinh.thetich * 1000  / (ChuongTrinh.TheTichBomDuocKhiQuay1Vong * ChuongTrinh.duongkinhong);
-    asprintf(&str, "G1G91A%3.3fF%d\r", SoVongQuay, ChuongTrinh.tocdobom); 
+    asprintf(&str, "G1G91A%4.3fF%d\r", SoVongQuay, ChuongTrinh.tocdobom); 
     WebUI::inputBuffer.push(str);
 
     #ifdef DEBUG_GRBL
@@ -433,7 +453,7 @@ void _GRBL::TestFill(ChuongTrinh_t ChuongTrinh)
 
     // SoVongQuay = (signbit(ChuongTrinhDangXuLy.SoVongDeBom1ml) ? 1 : -1) * ChuongTrinhDangXuLy.chongnhogiot / 360.0f; //* chông nhỏ giọt, chiều chuyển động ngược chiều bơm
     SoVongQuay = (signbit(ChuongTrinh.TheTichBomDuocKhiQuay1Vong) ? 1 : -1) * ChuongTrinh.chongnhogiot / 360.0f; //* chông nhỏ giọt, chiều chuyển động ngược chiều bơm
-    asprintf(&str, "G1G91A%3.3fF%d\r", SoVongQuay, ChuongTrinh.tocdobom);
+    asprintf(&str, "G1G91A%4.3fF%d\r", SoVongQuay, ChuongTrinh.tocdobom);
     WebUI::inputBuffer.push(str);
     free(str);
   }
@@ -476,23 +496,6 @@ void _GRBL::Reset_Unlock(void)
   delay(100);
   WebUI::inputBuffer.push("$X\n");
   delay(100);
-}
-
-void _GRBL::Hold_Reset(void)
-{
-  if (sys.state == State::Cycle) {
-      sys_rt_exec_state.bit.feedHold = true;
-      do {
-          vTaskDelay(1);  // Yield to other tasks
-          protocol_execute_realtime();
-          if (sys.abort) {
-              return;
-          }
-      } while (sys.state != State::Idle);
-  }
-  mc_reset();                                // Issue system reset and ensure spindle and coolant are shutdown.
-  sys_rt_exec_alarm = ExecAlarm::HardLimit;  // Indicate soft limit critical event
-  protocol_execute_realtime();   
 }
 
 _GRBL _grbl;
