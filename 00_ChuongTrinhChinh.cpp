@@ -66,7 +66,6 @@ void vTaskDWINCode(void* pvParameters)
     _DWIN.XuLyXemConfig();
     _DWIN.ResetProgram();
     XuLyDuLieuNhanTuHMI();
-    CapNhatDuLieuLenHMI();
     _DWIN.ResetCode();
     delay(1);
   }
@@ -96,9 +95,9 @@ void KhoiTao(void){
   // Khởi tạo HMI và chạy giao diện khởi động.
   _DWIN.KhoiTaoDWIN();
   DWINCapNhatDSChuongTrinhBanDau();
+  CapNhatDuLieuLenHMI();
   xTaskCreate(vTaskDWINCode, "Task DWIN", 4096, NULL, 2, NULL);
 
-  CapNhatDuLieuLenHMI();
 
 /////////////////////////////////////////////////////////////////////////
 #ifdef RESET_EEPROM
@@ -113,7 +112,7 @@ void KhoiTao(void){
   attachInterrupt(Y2_SENSOR_PIN, ISR_2_SENSOR, FALLING);
   attachInterrupt(Z2_SENSOR_PIN, ISR_2_SENSOR, FALLING);
 
-  // delay(500);
+  delay(2000);
   _DWIN.DuLieuBoardGuiLenHMI.TrangThaiXacNhanSetHome = _grbl.VeViTriHome();
   
 }
@@ -123,7 +122,6 @@ void CapNhatDuLieuLenHMI(void)
   _DWIN.DuLieuBoardGuiLenHMI.ViTriHienTaiX = _grbl.ViTriHienTaiCuaSTEP(TrucX);
   _DWIN.DuLieuBoardGuiLenHMI.ViTriHienTaiY = _grbl.ViTriHienTaiCuaSTEP(TrucY);
   _DWIN.DuLieuBoardGuiLenHMI.ViTriHienTaiZ = _grbl.ViTriHienTaiCuaSTEP(TrucZ);
-  _DWIN.DuLieuBoardGuiLenHMI.DSChuongTrinh = _grbl._DSChuongTrinh;
   _DWIN.DuLieuBoardGuiLenHMI.RTC_ChuoiNgay = _RTC.ChuanHoaChuoiRTC_Ngay();
   _DWIN.DuLieuBoardGuiLenHMI.RTC_ChuoiGio  = _RTC.ChuanHoaChuoiRTC_Gio();
   if (_grbl.DaChayXongMotOng == true)
@@ -578,7 +576,7 @@ void XuLyDuLieuNhanTuHMI(void)
 
 void DWINCapNhatDSChuongTrinhBanDau()
 {
-  _DWIN.DuLieuBoardGuiLenHMI.DSChuongTrinh = _grbl._DSChuongTrinh;
+  _DWIN._ChuongTrinhEEPROM = _grbl._DSChuongTrinh;
 }
 
 void CapNhatDanhSachChuongTrinhLuuTrongEEPROM()
@@ -665,13 +663,7 @@ void KiemTraNguon(void)
 
 void ChayChuongTrinhChinh()
 {
-
-  // if (sys_rt_exec_alarm == ExecAlarm::HardLimit && DWINHMI::ManualControl == true)  // Indicate hard limit critical event
-  // {
-  //   _grbl.Reset_Unlock();
-  // }
   
-
   _Flags.TurnONFlags();
 
   ThucThiCacTacVuTheoFlag();
@@ -681,7 +673,11 @@ void ChayChuongTrinhChinh()
 }
 void ThucThiCacTacVuTheoFlag()
 {
-  // Serial.printf("Z1: %d, Z2:%d\n", digitalRead(Z_LIMIT_PIN), digitalRead(Z2_SENSOR_PIN));
+  if (_Flags.Flag.t100ms)
+  {
+    CapNhatDuLieuLenHMI();
+  }
+
   if(_Flags.Flag.t1s)
   {
     KiemTraNguon();
@@ -692,7 +688,9 @@ void ThucThiCacTacVuTheoFlag()
 
 void Shutdown(void)
 {
-  // _grbl.VeToaDoGoc();
+  _grbl.TamDungChay();
+  _grbl.DungPhanPhoi();
+  _DWIN.setPage(_TrangBatDauChaySetHome);
   if (sys.state != State::Idle)
   {
     WebUI::inputBuffer.write(0x18);

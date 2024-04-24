@@ -14,8 +14,6 @@ using namespace std;
 // #define ABCH_LAB
 #define ABCH_NHAMAY
 
-// #define TEST_SENSORS
-
 
 #define Serial                              Uart0
 
@@ -32,7 +30,7 @@ using namespace std;
 #define Duong                               true
 #define Am                                  false
 
-#define TocDoCao                            DEFAULT_X_MAX_RATE           
+#define TocDoCao                            DEFAULT_X_MAX_RATE       
 #define TocDoTrungBinh                      DEFAULT_X_MAX_RATE / 2
 #define TocDoThap                           DEFAULT_X_MAX_RATE / 4
 
@@ -40,10 +38,10 @@ using namespace std;
 
 #define MatKhau                             "123456"
 
-#define HeSoCalibMacDinh 403.041 // ul/duongkinhong
+#define HeSoCalibMacDinh 375.673 // ul/duongkinhong
 
-#define X2_SENSOR_PIN            39 //limit 2        //cảm biến hành trình cuối trục X
-#define Y2_SENSOR_PIN            35 //limit 4     //cảm biến Y2 hiên tại đang bị hư nên không dùng
+#define X2_SENSOR_PIN            39 
+#define Y2_SENSOR_PIN            35 
 #define Z2_SENSOR_PIN            33
 
 typedef struct {
@@ -61,7 +59,7 @@ typedef struct {
 
     float thetich = 10.0; //ml
     float duongkinhong = 1.6; //mm
-    uint16_t tocdobom = 500; //vòng/phút
+    uint16_t tocdobom = DEFAULT_A_MAX_RATE; //vòng/phút
     uint16_t tocdoXY = TocDoCao; //vòng/phút
 
     float chongnhogiot = 45; //độ

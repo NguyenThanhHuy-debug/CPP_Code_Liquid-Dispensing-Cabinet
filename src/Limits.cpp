@@ -47,12 +47,6 @@ void IRAM_ATTR isr_limit_switches() {
     // moves in the planner and serial buffers are all cleared and newly sent blocks will be
     // locked out until a homing cycle or a kill lock command. Allows the user to disable the hard
     // limit setting if their limits are constantly triggering after a reset and move their axes.
-    // if (sys.state != State::Alarm)
-    // {
-    //     X1_Triggered = !digitalRead(X_LIMIT_PIN);
-    //     Y1_Triggered = !digitalRead(Y_LIMIT_PIN);
-    //     Z1_Triggered = !digitalRead(Z_LIMIT_PIN);
-    // }
     if (sys.state != State::Alarm && sys.state != State::Homing) {
         if (sys_rt_exec_alarm == ExecAlarm::None) {
 

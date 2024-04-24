@@ -213,7 +213,14 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
     }
     case _HMIBamNutBackTrangCaiDat:
     {
-      DWIN::setPage(_TrangCaiDatCheDoChuongTrinh_HOME);
+      if (DangOViTriHome() == true)
+        {
+          DWIN::setPage(_TrangCaiDatCheDoChuongTrinh_HOME);
+        }
+        else
+        {
+          DWIN::setPage(_TrangCaiDatCheDoChuongTrinh_notHOME);
+        }
       break;
     }
     case _HMIBamNutCalibTrangCaiDat:
@@ -258,9 +265,9 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
         }
         IdxKhuVucDangXuLy = i;
         ResetFullMau(DSIndexChuongTrinhDuocChon[i], MauDo, i);
-        delay(20);
+        // delay(20);
       }
-
+      flushDWIN();
       if (DangOViTriHome() == true)
       {
         DWINHMI::setPage(_TrangHienThiPhanPhoiThoiGianThuc_OFF_HOME);
@@ -298,14 +305,7 @@ void DWINHMI::ChuyenTrangTheoBamChonCuaUserTrenHMI(void)
             DWIN::setPage(_TrangThietLapCheDoChayMulti);
             break;
           case _VaoTrangTuNutCopyTrangThongSoChuongTrinh:
-            if (DangOViTriHome() == true)
-            {
-              DWIN::setPage(_TrangCaiDatCheDoChuongTrinh_HOME);
-            }
-            else
-            {
-              DWIN::setPage(_TrangCaiDatCheDoChuongTrinh_notHOME);
-            }
+            setPage(_TrangCaiDat);
             break;
           case _VaoTrangTuNutSetupProgramTrangCaiDatCheDoChuongTrinh:
             if (lastcodeHMI >= _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh && lastcodeHMI < _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh + SoLuongChuongTrinhCoDinh)
@@ -756,8 +756,6 @@ void DWINHMI::XuLySetHome()
     while(DWIN::getPage() == _TrangBatDauChaySetHome && flagOneTime == false)
     {
       flagOneTime = true;
-      /* Cập nhật tất cả chương trình có trong EEPROM*/
-      _ChuongTrinhEEPROM = DuLieuBoardGuiLenHMI.DSChuongTrinh;
 
       CapNhatHienThiDuLieuThoiGianTuDS3231();
       GuiTextLenHMI(_VPTextNgay,DuLieuBoardGuiLenHMI.RTC_ChuoiNgay);
@@ -1100,12 +1098,11 @@ void DWINHMI::XuLyChonViTriPhanPhoi(void)
     codeHMI  == _HMIBamNutFULLTrangPhanPhoiViTri ||
     codeHMI  == _HMIBamNutCLEARTrangPhanPhoiViTri)
   {
-    holdAdd = 0;
-  }
-  else if (codeHMI == _HMIBamNutOKTrangPhanPhoiViTri)
-  {
-      /* Hiển thị */
+    if (codeHMI == _HMIBamNutOKTrangPhanPhoiViTri)
+    {
       HienThiThongTinPhanPhoi();
+    }
+    holdAdd = 0;
   }
   else if (codeHMI == _HMIBamNutThayDoiSoLuongOng)
   {
@@ -1322,7 +1319,7 @@ void DWINHMI::XuLyBanPhim(void)
     GuiTextLenHMI(_VpTextCanhBaoChuoiDangNhap, "");
     ChuoiDangNhap = "";
   }
-  else if (codeHMI == _HMIBamNutOKTrangChonChuongTrinh && CheDoVaoTrangChonChuongTrinh == _VaoTrangTuNutSetupProgramTrangCaiDatCheDoChuongTrinh)
+  else if (codeHMI == _HMIBamNutOKTrangChonChuongTrinh && (CheDoVaoTrangChonChuongTrinh == _VaoTrangTuNutSetupProgramTrangCaiDatCheDoChuongTrinh || CheDoVaoTrangChonChuongTrinh == _VaoTrangTuNutSelectTrangCalib))
   {
     ChuoiDangNhap = "";
   }
@@ -1958,6 +1955,11 @@ void DWINHMI::ResetProgram(void)
 {
     if (codeHMI == _HMIBamNutRESETPROGRAMTrangHienThiPhanPhoiThoiGianThuc && BamNutRunON == false)
     {
+      if (sys.state == State::Homing)
+      {
+        codeHMI = -1;
+        return;
+      }
       DaChayXongCacKhuVuc_oneTimeMulti = false;
       for (uint8_t i = 0; i < sizeof(DSIndexChuongTrinhDuocChon); i++)
       {
@@ -1967,8 +1969,9 @@ void DWINHMI::ResetProgram(void)
         }
         IdxKhuVucDangXuLy = i;
         ResetFullMau(DSIndexChuongTrinhDuocChon[i], MauDo, i);
-        delay(20);
+        // delay(20);
       }
+      flushDWIN();
       GuiTextLenHMI(_VPTextTimeRunTrangHienThiPhanPhoiThoiGianThuc, "00:00:00");
       GuiTextLenHMI(_VPTextDelayTimeRunTrangHienThiPhanPhoiThoiGianThuc, "00:00:00");
       GuiTextLenHMI(_VPTextFillNumberTrangHienThiPhanPhoiThoiGianThuc,"0");
@@ -1977,7 +1980,6 @@ void DWINHMI::ResetProgram(void)
 
     else if (codeHMI == _HMIBamNutRUNTrangHienThiPhanPhoiThoiGianThuc && BamNutRunON == false && DaChayXongCacKhuVuc_oneTimeMulti == true)
     {
-      Serial.println("resetfull mau run");
       DaChayXongCacKhuVuc_oneTimeMulti = false;
       for (uint8_t i = 0; i < sizeof(DSIndexChuongTrinhDuocChon); i++)
       {
@@ -1987,9 +1989,9 @@ void DWINHMI::ResetProgram(void)
         }
         IdxKhuVucDangXuLy = i;
         ResetFullMau(DSIndexChuongTrinhDuocChon[i], MauDo, i);
-        delay(20);
-        // Serial.println("Reset Full Mau KhuVuc " + String(i));
+        // delay(20);
       }
+      flushDWIN();
       GuiTextLenHMI(_VPTextTimeRunTrangHienThiPhanPhoiThoiGianThuc, "00:00:00");
       GuiTextLenHMI(_VPTextDelayTimeRunTrangHienThiPhanPhoiThoiGianThuc, "00:00:00");
       GuiTextLenHMI(_VPTextFillNumberTrangHienThiPhanPhoiThoiGianThuc,"0");
@@ -2066,6 +2068,14 @@ DanhSachMaLenh_t DWINHMI::ReturnMaLenhGRBL()
         codeHMI = -1;
         if (CanCapNhatThongSo == true)
         {
+          for (uint8_t KhuVuc = 0; KhuVuc < SoLuongKhuVucToiDa; KhuVuc++)
+          {
+            if (DSIndexChuongTrinhDuocChon[KhuVuc] == IndexChuongTrinhDangXuLy)
+            {
+              IdxKhuVucDangXuLy = KhuVuc;
+              HienThiThongTinPhanPhoi();
+            }
+          }
           CanCapNhatThongSo = false;
           return CAPNHATTHONGSO;
         }
@@ -2256,6 +2266,8 @@ void DWINHMI::ResetCode()
     codeHMI = -1;
   else if(codeHMI == _HMIBamNutBACKTrangLayViTriChonDiem)
     codeHMI = -1;
+  else if (codeHMI == _HMIBamNutNextTrangThietLapTheTichPhanPhoi)
+    codeHMI = -1;
   else if (codeHMI == _HMIBamTextActualWeight)
     codeHMI = -1;
   else if(codeHMI == _HMIBamTextDensity)
@@ -2307,8 +2319,7 @@ void DWINHMI::ResetCode()
   {
     _time500ms = millis();
   }
-  /* Với trường hợp codeHMI >= _HMIBamNutChonChuongTrinh1TrangChonChuongTrinh && codeHMI <= _HMIBamNutChonChuongTrinh10TrangChonChuongTrinh
-  để lastcode được tồn tại nên không reset lascode*/
+
 }
 //=============================================================================================================================
 void DWINHMI::XuLyXemConfig()
@@ -2376,11 +2387,11 @@ void DWINHMI::XuLyXemConfig()
     static bool RevertDirection = false;
     RevertDirection = !RevertDirection;
     if (RevertDirection == true)
-      setVP(_VPIconDIRECTION, 0);
+      setVP(_VPIconDIRECTION, 1);
       // GuiIconLenHMI(_VPIconDIRECTION, 0);
     else
     {
-      setVP(_VPIconDIRECTION, 1);
+      setVP(_VPIconDIRECTION, 0);
       // GuiIconLenHMI(_VPIconDIRECTION, 1);
     }
     // codeHMI = -1;
@@ -2613,6 +2624,13 @@ void DWINHMI::ThayDoiTenChuongTrinh()
       _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].tenchuongtrinh = stringdangxuly;
       GuiTextLenHMI(_VPTextTenChuongTrinhTrangThietLapChuongTrinh,stringdangxuly);
       CapNhatHienThiThongTinTenChuongTrinhKhiVaoTrangChonChuongTrinh();
+      for (uint8_t KhuVuc = 0; KhuVuc < SoLuongKhuVucToiDa; KhuVuc++)
+      {
+        if (DSIndexChuongTrinhDuocChon[KhuVuc] == IndexChuongTrinhDangXuLy)
+        {
+          GuiTextLenHMI(_VPTextTenProgramArea1 + 0x100 * KhuVuc, stringdangxuly);
+        }
+      }
 
     }
     else if(codeHMI == _HMIBamNutReturnTrangBanPhimMoRong)
@@ -2812,10 +2830,10 @@ void DWINHMI ::HienThiMau(uint32_t VpAddress, uint16_t X, uint16_t Y, uint16_t M
   memcpy(buffer + 250, endBuffer, 2);
   DGUS_SERIAL.write(buffer, 252);
   #ifdef DEBUG_DWIN
-  for (uint8_t i = 0; i < 156; i++){
-    Serial.printf("%02X ", buffer[i]);
-  }
-  Serial.println();
+  // for (uint8_t i = 0; i < 156; i++){
+  //   Serial.printf("%02X ", buffer[i]);
+  // }
+  // Serial.println();
   #endif
 }
 void DWINHMI::ResetFullMauChonToaDo(uint16_t Mau) 
@@ -3086,10 +3104,7 @@ void DWINHMI::TaskFunction_RunTime(void)
   uint32_t seconds,minutes,hours;
   while (1)
   {
-    // if (sys.state == State::Alarm)
-    // {
-    //   vTaskSuspend(xTaskHandle_RunTime);
-    // }
+
     if (millis() - time1s >= 1000)
     {
       if(delay_flag == true)
@@ -3114,12 +3129,13 @@ void DWINHMI::TaskFunction_RunTime(void)
         // Tạo chuỗi thời gian
         TimeRunStart_c = twoDigits(hours % 24) + ":" + twoDigits(minutes % 60) + ":" + twoDigits(seconds % 60);
         GuiTextLenHMI(_VPTextTimeRunTrangHienThiPhanPhoiThoiGianThuc, String(TimeRunStart_c));
+        
       }
       GuiTextLenHMI(_VPTextGetLocationX,(String)DuLieuBoardGuiLenHMI.ViTriHienTaiX);
       GuiTextLenHMI(_VPTextGetLocationY,(String)(-DuLieuBoardGuiLenHMI.ViTriHienTaiY));
-
       GuiTextLenHMI(_VPTextGetLocationZ,(String)(-DuLieuBoardGuiLenHMI.ViTriHienTaiZ));
       time1s = millis();
+      flushDWIN();
     }
 
     if (DuLieuBoardGuiLenHMI.DaChayXongMotOng == true && delay_flag == false)
@@ -3129,6 +3145,7 @@ void DWINHMI::TaskFunction_RunTime(void)
       IdxKhuVucDangXuLy = DuLieuBoardGuiLenHMI.KhuVucDangChay;
       GuiTextLenHMI(_VPTextFillNumberTrangHienThiPhanPhoiThoiGianThuc, String(DuLieuBoardGuiLenHMI.OngDaPhanPhoi + 1));
       HienThiMau(DuLieuBoardGuiLenHMI.KhuVucDangChay, DuLieuBoardGuiLenHMI.ToaDoXDaChay, DuLieuBoardGuiLenHMI.ToaDoYDaChay, _ChuongTrinhEEPROM[DSIndexChuongTrinhDuocChon[DuLieuBoardGuiLenHMI.KhuVucDangChay]], MauXanhLa);
+      flushDWIN();
     }
 
       if (DuLieuBoardGuiLenHMI.DaChayXongCacKhuVuc == true && delay_flag == false)
@@ -3169,10 +3186,10 @@ void DWINHMI::TaskFunction_RunTime(void)
           {
             continue;
           }
+          IdxKhuVucDangXuLy = i;
           ResetFullMau(DSIndexChuongTrinhDuocChon[i], MauDo, i);
-          delay(20);
         }
-
+        flushDWIN();
         codeHMI = _HMIBamNutRUNTrangHienThiPhanPhoiThoiGianThuc;
         BamNutRunON = false;
       }
@@ -3195,16 +3212,40 @@ void DWINHMI::HienThiMau(int8_t SoKhay, uint16_t X, uint16_t Y, ChuongTrinh_t Ch
       break;    
 
     case 0:
-      HienThiMau(_VpAddressVung1Khay1HienThiMau, X, Y, Mau, ChuongTrinh);
-      HienThiMau(_VpAddressVung2Khay1HienThiMau, X, Y, Mau, ChuongTrinh);
-      HienThiMau(_VpAddressVung3Khay1HienThiMau, X, Y, Mau, ChuongTrinh);
-      HienThiMau(_VpAddressVung4Khay1HienThiMau, X, Y, Mau, ChuongTrinh);
+      if (Y < 2)
+      {
+        HienThiMau(_VpAddressVung1Khay1HienThiMau, X, Y, Mau, ChuongTrinh);
+      }
+      else if (Y < 4)
+      {
+        HienThiMau(_VpAddressVung2Khay1HienThiMau, X, Y, Mau, ChuongTrinh);
+      }
+      else if (Y < 6)
+      {
+        HienThiMau(_VpAddressVung3Khay1HienThiMau, X, Y, Mau, ChuongTrinh);
+      }
+      else if (Y < 8)
+      {
+        HienThiMau(_VpAddressVung4Khay1HienThiMau, X, Y, Mau, ChuongTrinh);
+      }
       break;
     case 1:
-      HienThiMau(_VpAddressVung1Khay2HienThiMau, X, Y, Mau, ChuongTrinh);
-      HienThiMau(_VpAddressVung2Khay2HienThiMau, X, Y, Mau, ChuongTrinh);
-      HienThiMau(_VpAddressVung3Khay2HienThiMau, X, Y, Mau, ChuongTrinh);
-      HienThiMau(_VpAddressVung4Khay2HienThiMau, X, Y, Mau, ChuongTrinh);
+      if (Y < 2)
+      {
+        HienThiMau(_VpAddressVung1Khay2HienThiMau, X, Y, Mau, ChuongTrinh);
+      }
+      else if (Y < 4)
+      {
+        HienThiMau(_VpAddressVung2Khay2HienThiMau, X, Y, Mau, ChuongTrinh);
+      }
+      else if (Y < 6)
+      {
+        HienThiMau(_VpAddressVung3Khay2HienThiMau, X, Y, Mau, ChuongTrinh);
+      }
+      else if (Y < 8)
+      {
+        HienThiMau(_VpAddressVung4Khay2HienThiMau, X, Y, Mau, ChuongTrinh);
+      }
       break;
     case 2:
       HienThiMau(_VpAddressVung1Khay3HienThiMau, X, Y, Mau, ChuongTrinh);
@@ -3306,6 +3347,7 @@ bool DWINHMI::DangOViTriHome(void)
 
 void DWINHMI::HienThiThongTinPhanPhoi(void)
 {
+  Serial.println("KhuVucDangXuLy: " + String(IdxKhuVucDangXuLy));
   ChuongTrinh_t chuongtrinhhienthi = _ChuongTrinhEEPROM[DSIndexChuongTrinhDuocChon[IdxKhuVucDangXuLy]];
   String rackstr, volstr, fillstr, AntiDropStr;
   rackstr = "Rack: " + String(chuongtrinhhienthi.rackX) + "x" + String(chuongtrinhhienthi.rackY) + "\r\n";
@@ -3383,4 +3425,27 @@ void DWINHMI::HienThiThongTinABCH(void)
             HZ1, HZ2, AX1, AY1, AX2, AY2, BX1, BY1, BX2, BY2, CX1, CY1, CX2, CY2);
   GuiTextLenHMI(_VPTextInformationLocation,String(temp));
   free(temp);
+}
+
+void DWINHMI::flushDWIN(void)
+{
+  uint32_t startTime = millis();
+  while (millis() - startTime < 100)
+  {
+    delay(1);
+    int c = -1;
+    while (DGUS_SERIAL.available() > 0)
+    {
+      c = DGUS_SERIAL.read();
+      // if (c == 0x5A)
+      // {
+      //   return;
+      // }
+    }
+    if (c != -1)
+    {
+      return;
+    }
+
+  }
 }

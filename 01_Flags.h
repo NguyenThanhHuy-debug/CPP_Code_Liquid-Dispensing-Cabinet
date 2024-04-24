@@ -5,7 +5,7 @@
 //-------- Begin: Các define cho cờ thời gian --------//
 //----------------------------------------------------//
 // Lưu ý: muốn sử dụng cờ nào thì mở define cho cờ đó.
-// #define _Flag_100ms
+#define _Flag_100ms
 // #define _Flag_250ms
 // #define _Flag_500ms
 //#define _Flag_750ms

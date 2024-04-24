@@ -268,7 +268,7 @@ void _GRBL::DungPhanPhoi(void) {
 //* Chieu là hướng di chuyển, Duong hoặc Am
 //* Buoc là số mm di chuyển mỗi lần nhấn
 void _GRBL::DiChuyenX(bool Chieu, float Buoc, uint16_t TocDo) {
-  if (sys_rt_exec_alarm == ExecAlarm::HardLimit)
+  if (sys.state == State::Alarm)
   {
     Reset_Unlock();
   }
@@ -291,7 +291,7 @@ void _GRBL::DiChuyenX(bool Chieu, float Buoc, uint16_t TocDo) {
 }
 
 void _GRBL::DiChuyenY(bool Chieu, float Buoc, uint16_t TocDo) {
-  if (sys_rt_exec_alarm == ExecAlarm::HardLimit)
+  if (sys.state == State::Alarm)
   {
     Reset_Unlock();
   }
@@ -312,7 +312,7 @@ void _GRBL::DiChuyenY(bool Chieu, float Buoc, uint16_t TocDo) {
 }
 
 void _GRBL::DiChuyenZ(bool Chieu, float Buoc, uint16_t TocDo) {
-  if (sys_rt_exec_alarm == ExecAlarm::HardLimit)
+  if (sys.state == State::Alarm)
   {
     Reset_Unlock();
   }
@@ -433,7 +433,9 @@ void _GRBL::DiChuyenToiViTri(float X, float Y, float Z, uint16_t TocDo) {
 
 void _GRBL::Calib(ChuongTrinh_t * ChuongTrinh)
 {
-  ChuongTrinh->TheTichBomDuocKhiQuay1Vong = (float)(ChuongTrinh->actualweight * 1000.0f / (ChuongTrinh->density * ChuongTrinh->duongkinhong * ViTriHienTaiCuaSTEP(MayBom)));
+  float ViTriHienTai = ViTriHienTaiCuaSTEP(MayBom) + (signbit(ChuongTrinh->TheTichBomDuocKhiQuay1Vong) ? 1 : -1) * ChuongTrinh->chongnhogiot / 360.0f;
+
+  ChuongTrinh->TheTichBomDuocKhiQuay1Vong = (float)(ChuongTrinh->actualweight * 1000.0f / (ChuongTrinh->density * ChuongTrinh->duongkinhong * ViTriHienTai));
 }
 
 void _GRBL::TestFill(ChuongTrinh_t ChuongTrinh)

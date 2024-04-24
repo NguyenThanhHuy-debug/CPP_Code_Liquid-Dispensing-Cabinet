@@ -534,7 +534,6 @@ typedef enum {
 }CheDoCaiDatThoiGian_t;
 
 typedef struct {
-  vector<ChuongTrinh_t> DSChuongTrinh;
   float ViTriHienTaiX;
   float ViTriHienTaiY;
   float ViTriHienTaiZ;
@@ -650,6 +649,7 @@ private:
 
   void HienThiThongTinABCH(void);
 
+  void flushDWIN(void);
 };
 
 #endif
