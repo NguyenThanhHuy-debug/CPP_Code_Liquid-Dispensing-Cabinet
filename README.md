@@ -2,14 +2,15 @@
 
 
 <img src="Tổng quan hệ thống tủ chiết rót ESP32S3.png" width="800" alt="center View">
-![GitHub
-stars](https://img.shields.io/github/stars/NguyenThanhHuy-debug/CPP_Code_Liquid-Dispensing-Cabinet?style=for-the-badge&logo=github)
-![GitHub
-forks](https://img.shields.io/github/forks/NguyenThanhHuy-debug/CPP_Code_Liquid-Dispensing-Cabinet?style=for-the-badge&logo=github)
-![GitHub
-issues](https://img.shields.io/github/issues/NguyenThanhHuy-debug/CPP_Code_Liquid-Dispensing-Cabinet?style=for-the-badge&logo=github)
-![Last
-commit](https://img.shields.io/github/last-commit/NguyenThanhHuy-debug/CPP_Code_Liquid-Dispensing-Cabinet?style=for-the-badge&logo=github)
+
+![GitHub stars](https://img.shields.io/github/stars/NguyenThanhHuy-debug/CPP_Code_Liquid-Dispensing-Cabinet?style=for-the-badge&logo=github)
+
+![GitHub forks](https://img.shields.io/github/forks/NguyenThanhHuy-debug/CPP_Code_Liquid-Dispensing-Cabinet?style=for-the-badge&logo=github)
+
+![GitHub issues](https://img.shields.io/github/issues/NguyenThanhHuy-debug/CPP_Code_Liquid-Dispensing-Cabinet?style=for-the-badge&logo=github)
+
+![Last commit](https://img.shields.io/github/last-commit/NguyenThanhHuy-debug/CPP_Code_Liquid-Dispensing-Cabinet?style=for-the-badge&logo=github)
+
 ![Language](https://img.shields.io/badge/Language-C%2B%2B-blue?style=for-the-badge&logo=cplusplus)
 ![Platform](https://img.shields.io/badge/Platform-ESP32-orange?style=for-the-badge&logo=espressif)
 
