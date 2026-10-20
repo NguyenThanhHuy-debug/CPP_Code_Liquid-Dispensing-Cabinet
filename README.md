@@ -1,7 +1,7 @@
 # CPP_Code_Liquid-Dispensing-Cabinet
 
 
-<img src="Tổng quan hệ thống tủ chiết rót ESP32S3.png" width="800" align="center">
+<img src="Tổng quan hệ thống tủ chiết rót ESP32S3.png" width="800" alt="center View">
 ![GitHub
 stars](https://img.shields.io/github/stars/NguyenThanhHuy-debug/CPP_Code_Liquid-Dispensing-Cabinet?style=for-the-badge&logo=github)
 ![GitHub
