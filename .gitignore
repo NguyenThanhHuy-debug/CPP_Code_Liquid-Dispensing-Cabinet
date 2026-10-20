@@ -3,3 +3,7 @@
 build/
 .vscode/
 .github/
+
+*.WEBConfig.h
+*.10_DWINHMI.cpp
+*.10_DWINHMI.h

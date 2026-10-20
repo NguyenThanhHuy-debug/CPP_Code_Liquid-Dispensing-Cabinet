@@ -1035,8 +1035,10 @@ void DWINHMI::XuLyChonViTriPhanPhoi(void)
     //Serial.printf("Count %d, du lieu nhan duoc %s | X: %d | Y: %d \r\n",count,resp.c_str(),vitriX,vitriY);
     uint8_t e_data[] = {0x5A,0x5A,0x05,0x82,0x00,0x16,0x00,0x00};
     DGUS_SERIAL.write(e_data,sizeof(e_data));
-  
-    if(holdAdd != 0)
+
+#pragma region CodePhong
+// #ifndef CODE_PHONG
+    if (holdAdd != 0)
     {
       Serial.printf("ViTriVaToaDo size: %d\n", vitrivatoado.size());
       for(int i = 0; i < vitrivatoado.size(); i++)
@@ -1048,13 +1050,15 @@ void DWINHMI::XuLyChonViTriPhanPhoi(void)
         if((long) (vitriX - vitrivatoado[i].vitriX) < (BuachieuDaiXChonToaDo / _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].rackX - 10) && 
           (long) (vitriY- vitrivatoado[i].vitriY) < (BuachieuDaiYChonToaDo / _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].rackY - 10))
         {
-          for (uint8_t m = 0; m < _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].DsToaDo[IdxKhuVucDangXuLy].size(); m++) 
+          //TODO duyệt hết danh sách tọa độ tìm có ô ở vị trí bấm ko 
+          for (uint8_t m = 0; m < _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].DsToaDo[IdxKhuVucDangXuLy].size(); m++)
           {
-            if (_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].DsToaDo[IdxKhuVucDangXuLy][m].X == vitrivatoado[i].toadoX && _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].DsToaDo[IdxKhuVucDangXuLy][m].Y == vitrivatoado[i].toadoY)
+            if (_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].DsToaDo[IdxKhuVucDangXuLy][m].X == vitrivatoado[i].toadoX &&
+              _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].DsToaDo[IdxKhuVucDangXuLy][m].Y == vitrivatoado[i].toadoY) //TODO kiểm tra vị trí bấm có trùng vị trí khay ko 
             {
-              if(holdAdd == 1)
+              if(holdAdd == 1) //TODO kiểm tra nếu user đổi ý muốn add điểm 
                 return;
-              if(holdAdd == 2)
+              if (holdAdd == 2) //TODO kiểm tra đúng chế độ xóa điểm
               {
                 HienThiMau(-1, vitrivatoado[i].toadoX, vitrivatoado[i].toadoY, _ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy],MauTrang);
                 if(_ChuongTrinhEEPROM[IndexChuongTrinhDangXuLy].DsToaDo[IdxKhuVucDangXuLy].size() != 0)
@@ -1078,6 +1082,8 @@ void DWINHMI::XuLyChonViTriPhanPhoi(void)
     }
 
   }
+// #endif // CODE_PHONG
+#pragma endregion CodePhong
 
   else if (codeHMI == _HMIBamNutEXITTrangPhanPhoiViTri)
   {
