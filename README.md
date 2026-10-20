@@ -1,90 +1,364 @@
-Luồng xử lý của chương trình
+# CPP_Code_Liquid-Dispensing-Cabinet
 
-1. Trong hàm setup() (chỉ chạy 1 lần), hàm KhoiTao() trong ChuongTrinhChinh được gọi, thực hiện các công việc như sau:
-    - Khởi tạo GRBL (đọc các thông số đã cài từ trước cho máy chạy trong flash của ESP32, tạo các task serial, grbl).
-    - Khởi tạo ThongSoBoard(đọc các chương trình từ eeprom ngoại, nếu dữ liệu đọc được không phải ở dạng JSON gồm các keys thì tạo các chương trình mặc định và lưu lại vào eeprom).
-    - Khởi tạo DWIN (tạo hàm callback khi có dữ liệu gửi xuống từ HMI).
+![GitHub
+stars](https://img.shields.io/github/stars/NguyenThanhHuy-debug/CPP_Code_Liquid-Dispensing-Cabinet?style=for-the-badge&logo=github)
+![GitHub
+forks](https://img.shields.io/github/forks/NguyenThanhHuy-debug/CPP_Code_Liquid-Dispensing-Cabinet?style=for-the-badge&logo=github)
+![GitHub
+issues](https://img.shields.io/github/issues/NguyenThanhHuy-debug/CPP_Code_Liquid-Dispensing-Cabinet?style=for-the-badge&logo=github)
+![Last
+commit](https://img.shields.io/github/last-commit/NguyenThanhHuy-debug/CPP_Code_Liquid-Dispensing-Cabinet?style=for-the-badge&logo=github)
+![Language](https://img.shields.io/badge/Language-C%2B%2B-blue?style=for-the-badge&logo=cplusplus)
+![Platform](https://img.shields.io/badge/Platform-ESP32-orange?style=for-the-badge&logo=espressif)
 
-2. Các tasks (FreeRTOS) bao gồm:
-    - Loop: đọc thời gian từ RTC DS3231 mỗi 1s.
-    - GRBL: xử lý các lệnh điều khiển STEP.
-    - Serial: Xử lý lệnh GRBL nhận được qua serial (sử dụng WebUI::inputBuffer.* để thay cho serial uart).
-    - PhanPhoiTask: điều khiển STEP phân phối tại các ống có tọa độ trong chương trình được gửi xuống từ DWIN (chạy khi được notify khi nhấn nút RUN trên màn hình).
-    - vTaskDWINCode: xử lý tương tác từ người dùng trên HMI.
-    - xTaskFunction_RunTime: xử lý hiển thị các ống đã được phân phối, các thông số khác trên _TrangHienThiPhanPhoiThoiGianThuc_OFF_HOME (được resume khi chạy, khi chạy xong hoặc tạm dừng thì suspend task đi).
+A C++ firmware project for a liquid-dispensing cabinet. The firmware
+combines GRBL-based motion control, a DWIN HMI workflow, persistent
+program configuration, RTC timekeeping, and FreeRTOS tasks to coordinate
+dispensing operations across configured tube positions.
 
-3. Luồng xử lý (không bao gồm Loop, GRBL, Serial):
-    - PhanPhoiTask: Khi nhận được notify, hàm BatDauPhanPhoi được gọi. Lý do dùng hàm là vì phải kết thúc task khi cần người dùng không muốn chạy phân phối nữa (Nhấn RUN để dừng, sau đó nhấn EXIT để thoát), khi đó chỉ cần return hàm BatDauPhanPhoi để task tiếp tục chờ notify (nếu không dùng hàm mà chạy lệnh trực tiếp trong task thì khi return sẽ làm RTOS bị lỗi, reset lại ESP32). Quá trình chạy hàm BatDauPhanPhoi:
-        + Sắp xếp thứ tự chạy của các chương trình được chọn dựa vào TrangThaiChuongTrinh và ThuTuChuongTrinhCanChay của từng chương trình.
-        + Chạy các chương trình theo thứ tự đã sắp xếp.
-        + Phân phối tại các tọa độ trong DanhSachToaDo của chương trình.
-        + Tính khoảng cách giữa các ống theo theo chiều X và Y.
-        + Sắp xếp lại thứ tự phân phối để có được quãng đường chạy ngắn nhất.
-        + Tính SoVongDeChongNhoGiot antidrop = chongnhogiot (góc quay ngược trong chương trình) / 360. Do 1 đơn vị của trục A là quay 1 vòng, nên muốn quay bao nhiêu độ thì chia cho 360 độ (1 vòng). Sau đó đảo dấu ngược dấu của TheTichBomDuocKhiQuay1Vong để quay ngược lại.
-        + Tính SoVongCanBom (số vòng để bơm được đúng thể tích) = thể tích cần bơm * 1000 / (TheTichBomDuocKhiQuay1Vong * đường kính ống). Trong đó, TheTichBomDuocKhiQuay1Vong là thể tích dung dịch bơm được từ ống khi máy bơm quay 1 vòng rồi chia cho hệ số đường kính ống.
-        + Tạo các chuỗi lệnh GRBL để điều khiển máy sau đó push vào inputBuffer để thực hiện. Ở cuối các chuỗi phải có '\r' hoặc '\n' để GRBL xử lý.
-        + Tạo chuỗi lệnh GRBL để di chuyển tới vị trí của ống với format "G1G90X(ToaDoX)Y(ToaDoY)Z(ToaDoZ)F(TocDo)\r". Công thức tính các tọa độ:
-            * ToaDoX = Vị trí X của điểm A + Tọa độ ma trận X của điểm cần đến * Khoảng cách giữa 2 ống theo X.
-            * ToaDoY = Vị trí Y của điểm A + Tọa độ ma trận Y của điểm cần đến * Khoảng cách giữa 2 ống theo Y.            
-            * ToaDoZ = Độ cao H trong chương trình.
-            * TocDo = Tốc độ chạy của trục XY trong chương trình.
-        + Tạo chuỗi lệnh GRBL để quay máy bơm với format "G1G91A(SoVong)F(TocDo)\r":
-            * SoVong: là SoVongCanBom đã tính được ở trên.
-            * TocDo: tốc độ bơm trong chương trình.
-        + Delay(100) để chờ GRBL nhận và xử lý lệnh.
-        + Chờ GRBL phân phối xong.
-        + Tạo chuỗi lệnh GRBL để quay ngược chống nhỏ giọt với format "G1G91A(SoVong)F(TocDo)\r":
-            * SoVong: là SoVongDeChongNhoGiot đã tính được ở trên.
-            * TocDo: tốc độ bơm trong chương trình.
-        + Chờ GRBL chống nhỏ giọt xong.
-        + Cập nhật ToaDoHienTai là tọa độ đã bơm được.
-        + Bước chờ GRBL chạy xong là do không thể gửi hết tất cả lệnh xuống một lúc được mà phải gửi rồi chờ đến khi thực hiện xong.
-        + Trong khi chờ, chương trình liên tục kiểm tra xem người dùng có nhấn EXIT không thông qua biến CoBaoDungPhanPhoi, nếu có thì return ngay lập tức, không bị delay.
+> **Project note:** This README documents the architecture and behavior
+> described in the project notes. Hardware revisions, exact peripheral
+> models, build instructions, and calibration limits should be confirmed
+> against the actual hardware and source code before deployment.
 
+## Table of Contents
 
-    - vTaskDwinCode: 
-        + Các biến quan trọng, được dùng thường xuyên:
-            * IndexChuongTrinhDangXuLy: index của _ChuongTrinhEEPROM đang xử lý (từ 0 -> 9).
-            * Mode: _CheDoHoatDongSimple hoặc _CheDoHoatDongMulti.
-            * IdxKhuVucDangXuLy: index của _ChuongTrinhEEPROM được chọn khi nhấn các nút MODIFY1 -> 5.
-            * DSIndexChuongTrinhHienThi: array chứa index của các _ChuongTrinhEEPROM hiện ở trang _TrangCaiDatCheDoChuongTrinh_HOME.
-            * CheDoVaoTrangChonChuongTrinh: là trang hiện 10 chương trình để chọn, tương ứng với mỗi nút nhấn mà có 1 chế độ riêng như thay đổi chương trình chạy, chọn chương trình để SETUP, COPY, sau khi nhấn nút OK hoặc EXIT lúc cài đặt thông số chương trình, nút CHANGE đổi chương trình khác lúc chọn vị trí phân phối, nút SELECT chọn chương trình CALIB, nút SELECT chọn chương trình trang CONFIG.
-            * codeHMI: nằm trong dữ liệu nhân được từ DWIN, thường là keycode của nút vừa nhấn.
-            * lastcodeHMI: keycode của nút nhấn trước đó. Do DWIN hay gửi dữ liệu rác hoặc trùng lặp xuống nên cần dùng để lọc ra và thực hiện một số chức năng khác.
+-   [Overview](#overview)
+-   [Key Capabilities](#key-capabilities)
+-   [System Architecture](#system-architecture)
+-   [Dispensing Workflow](#dispensing-workflow)
+-   [Motion and Volume Calculations](#motion-and-volume-calculations)
+-   [Program and HMI Workflow](#program-and-hmi-workflow)
+-   [Project Structure](#project-structure)
+-   [Development Setup](#development-setup)
+-   [Operating Notes](#operating-notes)
+-   [Contributing](#contributing)
+-   [Contributors](#contributors)
 
-        + LangNgheDWIN: đọc dữ liệu trả về từ DWIN.
-        + ChuyenTrangTheoBamChonCuaUserTrenHMI: khi nhấn 1 nút, nếu đủ điều kiện thì sẽ dẫn đến trang tiếp theo.
-        + XuLySetHome: (Xử lý ở trang _TrangBatDauChaySetHome)
-            * Khi đang ở trang _TrangBatDauChaySetHome thì hiện ngày, giờ, Step, Feed, Feed mặc định ở trang MANUAL CONFIG và trang Get ABCH, vẽ khung hình chữ nhật ở phần chọn tọa độ phân phối, đảm bảo DanhSachToaDo của các trang đều full (chỉ chạy một lần).
-            * Khi nhấn nút GO HOME thì gửi lệnh xuống cho GRBL thực hiện lệnh HOMING, sau khi thực hiện xong thì gửi lên TrangThaiXacNhanSetHome, sau đó mới chuyển sang trang _TrangCaiDatCheDoChuongTrinh_HOME.
-            * Khi nhấn GO HOME hoặc _HMIBamNutBackTrangCaiDat thì hiển thị lại tên các chương trình ở các ô 1 -> 5 trang _TrangCaiDatCheDoChuongTrinh_HOME.
-        + XuLyChonMode: (xử lý ở trang _TrangCaiDatCheDoChuongTrinh_HOME)
-            * Khi nhấn nút _HMIBamNutModeTrangCaiDatCheDoChuongTrinh (nút đổi chế độ giữa SIMPLE và MULTI) thì tên và nội dung chương trình ở phần bên trái bị xóa đi, đồng thời reset TrangThaiChuongTrinh và ThuTuChay của tất cả các chương trình hiển thị 1 -> 5, đồng thời đảo Mode thành _CheDoHoatDongMulti hoặc _CheDoHoatDongSimple.
-        + XuLyChonChuongTrinhSeChay: (xử lý ở trang _TrangCaiDatCheDoChuongTrinh_HOME)
-            * Khi thoát ra từ _TrangHienThiPhanPhoiThoiGianThuc_OFF_HOME (EXIT) hoặc trang _TrangCaiDat (BACK) thì xóa tên và nội dung chương trình được chọn ở phần bên trái trang _TrangCaiDatCheDoChuongTrinh_HOME.
-            * Khi nhấn vào nút chọn chương trình (dấu tick V hoặc X): cập nhật IndexChuongTrinhDangXuLy, đảo TrangThaiChuongTrinh của chương trình đó, đổi icon V hoặc X tương ứng. Nếu đang ở chế độ SIMPLE thì có chương trình được chọn là DuocChon, còn lại là KhongDuocChon. Nếu TrangThaiChuongTrinh của chương trình vừa chọn là KhongDuocChon (bỏ tick V) thì xóa tên và nội dung chương trình bên trái. Còn nếu là DuocChon thì hiện tên và nội dung.
-            * Nếu chế độ hiện tại là vào trang từ các nút nhấn PROGRAM 1 -> 5 thì cập nhật IndexChuongTrinhDangXuLy dựa vào nút đã nhấn, và hiện tên 10 chương trình. Nếu chọn 1 trong 10 chương trình thì hiện thông tin chương trình đó bên phải. Nếu nhấn nút OK kiểm tra chương trình được chọn có trùng với các chương trình hiển thị bên ngoài không (dựa vào DSIndexChuongTrinhHienThi), nếu không thì set TrangThai của chương trình cũ là KhongDuocChon, cập nhật DSIndexChuongTrinhHienThi, hiện lại tên 5 chương trình.
-        + XuLyThietLapChuongTrinhCheDoMulti: (xử lý ở trang _TrangThietLapCheDoChayMulti)
-            * Nếu nhấn vào các nút MODIFY 1 -> 5 thì cập nhật IndxChuongTrinhDangModify, hiện tên chương trình ở trang _TrangPhanPhoiViTri.
-            * Nếu nhấn nút X ở mục TIME LOOP, thì cho phép chạy MULTI 1 lần
-            * Nếu nhấn nút Second ở mục TIME LOOP để đặt thời gian thì chạy MULTI nhiều lần.
-        + XuLyChonViTriPhanPhoi: (xử lý ở trang _TrangPhanPhoiViTri)
-            * Sử dụng biến static tạm để chứa ChuongTrinhDangXuLy và KhayChonTamThoi(chứa ống đã chọn) để backup khi người dùng nhấn EXIT nhằm giữ lại giá trị tọa độ ban đầu.
-            * Khi bấm nút RUN ở trang _TrangCaiDatCheDoChuongTrinh_HOME, nếu đang ở chế độ SIMPLE, quét qua các chương trình kiểm tra chương trình nào được chọn thì cho ThuTuChay = 0 để gửi xuống GRBL, sau đó hiển thị thông tin ở trang chọn vị trí, sau đó vẽ các ô để chọn ống cần phân phối.
-             Nếu ở chế độ MULTI, clear DSIndexChuongTrinhDuocChon để sau đó push_back lại tất cả và set ThuTuChay tương ứng. Sau đó hiển thị thông tin chương trình lên 5 ô MODIFY.
-             Khi nhấn các nút MODIFY 1->5, cập nhật IndexChuongTrinhDangXuLy và backup chương trình đang chọn, khaychon bằng chương trình tạm thời, KhayChonTamThoi. Vẽ các ô để chọn dựa vào số hàng và cột của ChuongTrinh. Trạng thái chọn của ống vẫn giữ nguyên từ trước.
-             Khi nhấn FULL, clear rồi push_back lại toàn bộ DsToaDo, đổi màu thành Đỏ(chọn).
-             Khi nhấn CLEAR, clear DsToaDo rồi đổi thành màu Trắng(không chọn).
-             Khi nhấn nút ADD, tùy thuộc vào lần nhấn trước đó mà sẽ vào chế độ ADD, SUB, hoặc tắt chức năng này đi. Khi vào ADD hoặc SUB và nhấn vào vùng chọn vị trí ống, HMI sẽ gửi xuống phản hồi có chứa vị trí vừa nhấn, nếu vị trí này nằm trong khoảng của hình chữ nhật thì sẽ push_back hoặc remove vị trí này trong DsToaDo.
-             Khi nhấn EXIT, cập nhật lại ChuongTrinh và khaychon bằng 2 biến backup TamThoi như trên. Tức là nếu nhấn OK, thay đổi có hiệu lực trên ChuongTrinh gốc, còn nếu nhấn EXIT thì hủy bỏ thay đổi đó đi.
-             Khi nhấn OK, nếu ở MULTI, hiện thị lại thông tin ở 5 chương trình MODIFY. Còn nếu ở SIMPLE, thì cập nhật lại DSIndexChuongTrinhDuocChon, vẽ khung ở trang _TrangHienThiPhanPhoiThoiGianThuc_OFF_HOME, hiển thị lại màu được chọn.
-        + XuLyConfigChuongTrinh:
-            * Nếu nhấn nút _HMIBamNutSetupProgramTrangCaiDat, thì hiện tên các chương trình 1->10.
-            * Nếu chọn Chương trình 1->10 thì hiện thông tin chương trình tương ứng.
-            * Nếu nhấn OK thì hiện thị thông tin chi tiết chương trình ở ô bên phải trang _VPTextThongSoTrangThietLapChuongTrinh.
-        + XuLySetupProgram:
-            * Ở chế độ COPY, khi nhấn nút COPY, cập nhật lastprogram, nếu nhấn chương trình 1->10, cập nhật IndexChuongTrinhDangXuLy, hiển thị thông tin chương trình. Nếu nhấn OK, thì chương trình trước đó đã được chọn để COPY sẽ thay đổi thành chương trình vừa được chọn. Nếu nhấn EXIT thì cập nhật lại IndexChuongTrinhDangXuLy.
-            * Nếu nhấn _HMIBamNutNEXTTrangLayViTriChonDiem thì hiện thông tin chi tiết chương trình.
-            * Nếu nhấn _HMIBamNutNEXTTrangThietLapChuongTrinhDiChuyen thì hiện thông tin ABC của chương trình.
-            * Nếu nhấn LOW, MEDIUM, HIGH thì thay đổi STEP và FEED tương ứng.
-            * Nếu nhấn GET thì cập nhật vị trí A, B, C, H tương ứng.
+## Overview
+
+The firmware coordinates user-selected dispensing programs and tube
+locations through a DWIN Human-Machine Interface (HMI). GRBL processes
+motion commands for the machine axes, while a dedicated dispensing task
+prepares and submits movement and pump commands through the firmware's
+input buffer.
+
+Program data is loaded from external EEPROM. If the stored content does
+not match the expected JSON/key structure, the firmware creates default
+program data and saves it back to EEPROM. Machine settings are also
+loaded from ESP32 flash during initialization.
+
+## Key Capabilities
+
+-   **GRBL motion control** --- uses GRBL command processing to control
+    STEP-based motion.
+-   **DWIN HMI interaction** --- handles screen navigation, program
+    selection, configuration, tube selection, and run controls.
+-   **FreeRTOS task separation** --- separates motion processing,
+    command handling, dispensing, HMI input, and runtime display
+    updates.
+-   **Persistent program data** --- reads and updates dispensing
+    programs stored in external EEPROM.
+-   **Program execution modes** --- supports SIMPLE and MULTI workflows
+    as described in the firmware logic.
+-   **Tube-position selection** --- supports selecting all, clearing
+    selections, or adding/removing individual tube positions.
+-   **Dispensing sequence coordination** --- moves to a configured
+    position, runs the pump for a calculated number of revolutions, and
+    performs a reverse rotation intended to reduce dripping.
+-   **RTC display support** --- reads time from a DS3231 RTC at
+    one-second intervals.
+
+## System Architecture
+
+### Initialization
+
+During `setup()`, `KhoiTao()` in `ChuongTrinhChinh` performs the main
+initialization sequence:
+
+1.  Initializes GRBL, loads saved machine settings from ESP32 flash, and
+    creates the GRBL and serial-processing tasks.
+2.  Initializes `ThongSoBoard`, which loads program data from external
+    EEPROM. If the data is not in the expected JSON/key format, default
+    programs are created and saved.
+3.  Initializes the DWIN HMI interface and registers a callback for
+    incoming HMI data.
+
+### FreeRTOS Tasks
+
+  -----------------------------------------------------------------------
+  Task / component                    Responsibility
+  ----------------------------------- -----------------------------------
+  `Loop`                              Reads the DS3231 RTC every second.
+
+  `GRBL`                              Processes motion commands and STEP
+                                      control.
+
+  `Serial`                            Processes GRBL commands through
+                                      `WebUI::inputBuffer` in place of
+                                      the usual UART input path.
+
+  `PhanPhoiTask`                      Waits for a task notification
+                                      triggered by the HMI RUN action,
+                                      then coordinates dispensing.
+
+  `vTaskDWINCode`                     Receives and processes HMI input
+                                      and manages screen-related
+                                      application logic.
+
+  `xTaskFunction_RunTime`             Updates the real-time dispensing
+                                      screen and related displayed values
+                                      while dispensing is active.
+  -----------------------------------------------------------------------
+
+The runtime display task is resumed while dispensing is running and
+suspended when the process is finished or paused, according to the
+project notes.
+
+## Dispensing Workflow
+
+The dispensing task waits for a notification from the HMI. When
+notified, it calls `BatDauPhanPhoi()` to execute the selected programs.
+Keeping the dispensing routine in a separate function allows the routine
+to return when the user exits, while the task remains available to wait
+for a later notification.
+
+The documented workflow is:
+
+1.  **Determine program order** using each program's selection state and
+    configured execution order.
+2.  **Load the selected program sequence** and iterate through its
+    configured tube coordinates.
+3.  **Optimize the tube sequence** by calculating X/Y spacing and
+    reordering selected positions to reduce travel distance.
+4.  **Calculate pump rotation** from the requested dispensing volume and
+    the configured calibration parameters.
+5.  **Move to the target tube** by generating a GRBL movement command.
+6.  **Dispense liquid** by generating a relative A-axis rotation
+    command.
+7.  **Perform anti-drip reverse rotation** after dispensing.
+8.  **Update the current position/state** and continue to the next
+    selected position.
+9.  **Check for user exit requests** while waiting for GRBL operations
+    to complete.
+
+Commands are pushed into `WebUI::inputBuffer`. The documented command
+strings end with `\r` so that the command-processing path can recognize
+the end of each command. The routine waits for each GRBL operation to
+finish before submitting the next dependent operation, rather than
+sending the entire sequence at once.
+
+### Example command formats
+
+Move to a tube position:
+
+``` text
+G1G90X(ToaDoX)Y(ToaDoY)Z(ToaDoZ)F(TocDo)\r
+```
+
+Rotate the pump axis:
+
+``` text
+G1G91A(SoVong)F(TocDo)\r
+```
+
+These are **format templates**, not ready-to-run commands. The values in
+parentheses are replaced by calculated values at runtime.
+
+## Motion and Volume Calculations
+
+### Tube coordinates
+
+For a target position in the tube matrix:
+
+-   `ToaDoX = ViTriX_A + MaTranX × KhoangCachOngX`
+-   `ToaDoY = ViTriY_A + MaTranY × KhoangCachOngY`
+-   `ToaDoZ = H`
+
+Where `ViTriX_A` and `ViTriY_A` represent the configured reference
+position A, `MaTranX` and `MaTranY` identify the target position in the
+matrix, `KhoangCachOngX` and `KhoangCachOngY` are the configured tube
+spacings, and `H` is the program's configured height. XY feed rate is
+taken from the program's movement-speed setting.
+
+### Pump rotation
+
+The firmware calculates the number of pump revolutions from the
+requested volume and stored calibration data. The project notes describe
+the calculation as:
+
+`SoVongCanBom = TheTichCanBom × 1000 / (TheTichBomDuocKhiQuay1Vong × DuongKinhOng)`
+
+The calibration term `TheTichBomDuocKhiQuay1Vong` is described in the
+project notes as the volume delivered per pump revolution, adjusted by
+the tube-diameter factor. **Confirm the units and calibration convention
+in the implementation before using this expression for real
+dispensing**, because unit consistency and the exact meaning of the
+diameter factor directly affect volume accuracy.
+
+### Anti-drip reverse rotation
+
+The reverse rotation is calculated from the configured anti-drip angle:
+
+`SoVongDeChongNhoGiot = ChongNhoGiot / 360`
+
+The A axis uses one unit per revolution, so dividing the angle by 360
+converts degrees to revolutions. The implementation also reverses the
+sign of the calibrated pump-volume term for the reverse movement, as
+described in the project notes.
+
+## Program and HMI Workflow
+
+The DWIN HMI logic manages the user-facing program workflow, including:
+
+-   **Homing:** sends the GRBL homing command and waits for the homing
+    confirmation before proceeding.
+-   **SIMPLE / MULTI modes:** switches between selecting a single
+    program and configuring multiple programs for execution.
+-   **Program selection:** selects programs, changes their selection
+    state, and updates the displayed program information.
+-   **Tube selection:** supports `FULL`, `CLEAR`, and `ADD` / `SUB`
+    actions for choosing tube coordinates.
+-   **Edit confirmation:** temporarily backs up the active program and
+    tube selection. `OK` applies the edits; `EXIT` restores the previous
+    values.
+-   **Program setup and copy:** supports choosing programs, viewing
+    their parameters, copying program settings, and configuring movement
+    parameters.
+-   **Runtime display:** shows dispensing progress and related values on
+    the runtime screen.
+
+The HMI code tracks the current program index, operating mode, displayed
+program indices, and current/previous key codes. The previous key code
+is used to help filter duplicate or spurious HMI responses.
+
+## Project Structure
+
+The repository contains application-level modules and a GRBL-derived
+motion-control subsystem. The following is a high-level guide to the
+main files and folders:
+
+``` text
+.
+├── 00_ChuongTrinhChinh.cpp / .h   # Main application and initialization
+├── 01_Flags.cpp / .h              # Application flags and shared state
+├── 04_Firmware.cpp / .h           # Firmware-level logic
+├── 05_ThongSoBoard.cpp / .h       # Board and program configuration
+├── 06_RTC.cpp / .h                # RTC handling
+├── 10_DWINHMI.cpp / .h             # DWIN HMI integration
+├── KingTubeAuto.h
+├── KingTubeAuto.ino
+├── ThongSoDongCo.h                # Motor-related configuration
+├── WEBConfig.h                    # Web/configuration settings
+├── _GRBL.cpp / .h                 # GRBL integration
+├── Note                            # Project notes
+└── src/
+    ├── CPUMap.h
+    ├── Config.h
+    ├── Defaults.h
+    ├── Error.cpp / .h
+    ├── Exec.cpp / .h
+    ├── GCode.cpp / .h
+    ├── Grbl.cpp / .h
+    ├── Limits.cpp / .h
+    ├── MotionControl.cpp / .h
+    ├── Planner.cpp / .h
+    ├── Probe.cpp / .h
+    ├── Protocol.cpp / .h
+    ├── Report.cpp / .h
+    ├── Settings.cpp / .h
+    ├── Stepper.cpp / .h
+    ├── System.cpp / .h
+    ├── Uart.cpp / .h
+    ├── Motors/                     # Motor drivers and implementations
+    ├── Spindles/                   # Spindle/control implementations
+    └── WebUI/                      # Web, socket, Wi-Fi, and command handling
+```
+
+The `src/` directory contains additional implementation and header files
+for motor drivers, spindle control, settings, protocol handling, and the
+WebUI. See the repository tree for the complete file list.
+
+## Development Setup
+
+### 1. Clone the repository
+
+``` bash
+git clone https://github.com/NguyenThanhHuy-debug/CPP_Code_Liquid-Dispensing-Cabinet.git
+cd CPP_Code_Liquid-Dispensing-Cabinet
+```
+
+### 2. Configure the development environment
+
+The repository structure indicates an ESP32-oriented firmware project,
+but the exact build system and dependency versions are not specified in
+this README. Before building, verify the project's board package,
+framework, required libraries, and build configuration from the source
+repository.
+
+### 3. Build and test
+
+Use the build and upload workflow required by the project's actual
+environment. Test motion and pump behavior without liquid first, confirm
+homing and limit behavior, then validate dispensing volume using a
+measured calibration procedure before operational use.
+
+## Operating Notes
+
+-   Confirm the machine's coordinate system, homing direction, travel
+    limits, and feed-rate settings before running a program.
+-   Verify pump calibration and units before relying on calculated
+    dispensing volume.
+-   Test anti-drip reverse rotation with a safe, controlled setup;
+    excessive reverse rotation may affect repeatability.
+-   Ensure stop/exit behavior leaves the machine in a known and safe
+    state.
+-   Do not treat this README as a substitute for hardware validation or
+    a documented safety assessment.
+
+## Contributing
+
+Contributions are welcome. For a focused and reviewable change:
+
+1.  Fork the repository.
+2.  Create a feature branch: `git checkout -b feature/your-feature`.
+3.  Make the change and test it on the intended setup.
+4.  Commit with a descriptive message, for example:
+    `git commit -m "feat: improve tube selection handling"`.
+5.  Push the branch: `git push origin feature/your-feature`.
+6.  Open a pull request describing the motivation, implementation, and
+    test results.
+
+Please follow the existing code style and include test or validation
+notes for behavior changes.
+
+## Contributors
+
+Thanks to everyone who has contributed to this project.
+
+```{=html}
+<p align="left">
+```
+`<a href="https://github.com/phong516" title="phong516">`{=html}
+`<img src="https://avatars.githubusercontent.com/u/92519794?v=4&s=64" width="64" height="64" alt="phong516" />`{=html}
+`</a>`{=html}
+`<a href="https://github.com/ThanhHuyw" title="ThanhHuyw">`{=html}
+`<img src="https://avatars.githubusercontent.com/u/171933467?v=4&s=64" width="64" height="64" alt="ThanhHuyw" />`{=html}
+`</a>`{=html}
+```{=html}
+</p>
+```
+[View all
+contributors](https://github.com/NguyenThanhHuy-debug/CPP_Code_Liquid-Dispensing-Cabinet/graphs/contributors)
+
+------------------------------------------------------------------------
+
+```{=html}
+<p align="center">
+```
+`<sub>`{=html}Built with C++ and embedded control software.
+Documentation reflects the project notes available at the time of
+writing.`</sub>`{=html}
+```{=html}
+</p>
+```
